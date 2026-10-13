@@ -142,8 +142,33 @@ class DashboardController extends Controller
         ));
     }
 
-    public function kasir()
+    public function cs(Request $request)
     {
-        return view('kasir.kasir');
+        $user    = Auth::user();
+        $tanggal = $request->get('tanggal', date('Y-m-d'));
+
+        // CS hanya melihat data cabang tempat dia ditugaskan
+        $queryCabang = Transaksi::query()
+            ->where('cabang_id', $user->cabang_id)
+            ->whereDate('tanggal', $tanggal);
+
+        $transaksiSaya = (clone $queryCabang)->where('user_id', $user->id);
+
+        $statistik = [
+            'transaksi_saya'   => (clone $transaksiSaya)->count(),
+            'omzet_saya'       => (clone $transaksiSaya)->sum('total_transaksi'),
+            'transaksi_cabang' => (clone $queryCabang)->count(),
+            'omzet_cabang'     => (clone $queryCabang)->sum('total_transaksi'),
+        ];
+
+        $transaksiTerbaru = (clone $queryCabang)
+            ->with('user')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $namaCabang = optional($user->cabang)->nama ?? 'Belum ditentukan';
+
+        return view('cs.dashboard', compact('user', 'tanggal', 'statistik', 'transaksiTerbaru', 'namaCabang'));
     }
 }

@@ -25,8 +25,9 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            
-            return redirect()->intended('/admin'); 
+
+            // Arahkan sesuai role: Admin -> route 'admin', Customer Service -> route 'cs'
+            return redirect()->route(Auth::user()->homeRoute());
         }
 
         return back()->withErrors([
@@ -55,7 +56,7 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        return redirect('/admin')->with('success', 'Akun pengguna baru berhasil ditambahkan!');
+        return redirect()->route(Auth::user()->homeRoute())->with('success', 'Akun pengguna baru berhasil ditambahkan!');
     }
 
     // === FITUR LOGOUT ===

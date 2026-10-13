@@ -12,10 +12,14 @@ use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\BukuBesarController;
 use App\Http\Controllers\ProfileController;
 
-Route::redirect('/', '/admin');
+// Halaman awal: arahkan sesuai status login & role
+Route::get('/', function () {
+    return auth()->check()
+        ? redirect()->route(auth()->user()->homeRoute())
+        : redirect()->route('login');
+});
 
 // AREA PUBLIK //
-// Route untuk Login
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'authenticate'])->name('login.authenticate');
@@ -23,12 +27,16 @@ Route::middleware(['guest'])->group(function () {
 
 //====================================================================================================//
 // AREA INTERNAL //
-Route::middleware(['auth'])->group(function (){
+Route::middleware(['auth'])->group(function () {
 
-    // Halaman Dashboard Utama
-    Route::get('/admin', [DashboardController::class, 'admin'])->name('admin');
-    Route::get('/kasir', [DashboardController::class, 'kasir'])->name('kasir');
-    
+    // === DASHBOARD (dipisah per role) ===
+    Route::middleware(['role:Admin Pusat,Admin Cabang'])->group(function () {
+        Route::get('/admin', [DashboardController::class, 'admin'])->name('admin');
+    });
+    Route::middleware(['role:Customer Service'])->group(function () {
+        Route::get('/cs', [DashboardController::class, 'cs'])->name('cs');
+    });
+
     // Halaman Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -36,31 +44,35 @@ Route::middleware(['auth'])->group(function (){
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register', [AuthController::class, 'store'])->name('register.store');
 
-    //Route untuk Profil
+    // Route untuk Profil
     Route::get('/profil', [ProfileController::class, 'index'])->name('profile');
 
 //====================================================================================================//
-    // === ROUTE yang bisa diakses ADMIN PUSAT & ADMIN CABANG ===
-    // === ROUTE TRANSAKSI ===
+    // === ROUTE TRANSAKSI (Admin Pusat, Admin Cabang, Customer Service) ===
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::get('/transaksi/tambah', [TransaksiController::class, 'create'])->name('transaksi.create');
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
 
-    // === ROUTE MASTER DATA PRODUK ===
-    Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
-    Route::get('/produk/tambah', [ProdukController::class, 'create'])->name('produk.create');
-    Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
-    Route::get('/produk/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit');
-    Route::put('/produk/{id}', [ProdukController::class, 'update'])->name('produk.update');
-    Route::delete('/produk/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy');
+//====================================================================================================//
+    // === ROUTE yang bisa diakses ADMIN PUSAT & ADMIN CABANG ===
+    Route::middleware(['role:Admin Pusat,Admin Cabang'])->group(function () {
 
-    // === ROUTE JURNAL UMUM ===
-    Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
-    Route::get('/jurnal/tambah', [JurnalController::class, 'create'])->name('jurnal.create');
-    Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
+        // === ROUTE MASTER DATA PRODUK ===
+        Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
+        Route::get('/produk/tambah', [ProdukController::class, 'create'])->name('produk.create');
+        Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
+        Route::get('/produk/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit');
+        Route::put('/produk/{id}', [ProdukController::class, 'update'])->name('produk.update');
+        Route::delete('/produk/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy');
 
-    // === ROUTE BUKU BESAR ===
-    Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
+        // === ROUTE JURNAL UMUM ===
+        Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
+        Route::get('/jurnal/tambah', [JurnalController::class, 'create'])->name('jurnal.create');
+        Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
+
+        // === ROUTE BUKU BESAR ===
+        Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
+    });
 
 //====================================================================================================//
     // === ROUTE yang hanya bisa diakses ADMIN PUSAT ===

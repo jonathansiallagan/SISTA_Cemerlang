@@ -15,14 +15,26 @@ class TransaksiController extends Controller
     public function index()
     {
         // Mengambil data transaksi beserta relasi user dan cabangnya
-        $transaksis = Transaksi::with(['user', 'cabang'])->latest()->get();
+        $query = Transaksi::with(['user', 'cabang'])->latest();
+
+        // Customer Service hanya boleh melihat transaksi cabangnya sendiri
+        if (Auth::user()->isCustomerService()) {
+            $query->where('cabang_id', Auth::user()->cabang_id);
+        }
+
+        $transaksis = $query->get();
         return view('admin.transaksi.index', compact('transaksis'));
     }
 
     public function create()
     {
         $produks = Produk::all();
-        $cabangs = Cabang::where('status', 'aktif')->get();
+        $cabangs = Cabang::all();
+
+        // Customer Service hanya boleh memilih cabangnya sendiri
+        if (Auth::user()->isCustomerService()) {
+            $cabangs = $cabangs->where('id', Auth::user()->cabang_id)->values();
+        }
         
         // Pembuatan Nomor Invoice Otomatis
         $today = now()->format('Ymd');
@@ -43,6 +55,10 @@ class TransaksiController extends Controller
             'jumlah' => 'required|array',
         ]);
 
+        // Customer Service tidak boleh menyimpan transaksi untuk cabang lain
+        if (Auth::user()->isCustomerService() && (int) $request->cabang_id !== (int) Auth::user()->cabang_id) {
+            abort(403, 'Anda hanya dapat mencatat transaksi untuk cabang Anda sendiri.');
+        }
         DB::beginTransaction();
         try {
             // 1. Simpan tabel induk (Transaksi)
