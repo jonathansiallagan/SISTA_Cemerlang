@@ -58,5 +58,11 @@ class DatabaseSeeder extends Seeder
             'harga_jual' => 1500,
             'hpp' => 1000,
         ]);
+    
+        // Seeder Akun
+        $this->call([
+            AkunSeeder::class,
+        ]);
+    
     }
 }
