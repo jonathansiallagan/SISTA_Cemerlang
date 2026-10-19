@@ -17,43 +17,62 @@ class BukuBesarController extends Controller
         $start_date = $request->input('start_date', date('Y-m-01'));
         $end_date = $request->input('end_date', date('Y-m-t'));
 
-        $jurnals = collect();
         $akunTerpilih = null;
+        $baris = collect();      // baris mutasi (sudah lengkap dengan saldo berjalan)
         $saldoAwal = 0;
+        $saldoAkhir = 0;
+        $totalDebit = 0;
+        $totalKredit = 0;
 
         if ($akun_id) {
-            $akunTerpilih = Akun::find($akun_id);
+            $akunTerpilih = Akun::findOrFail($akun_id);
+            $isDebitNormal = $akunTerpilih->saldo_normal === 'Debit';
 
-            // 1. Menghitung Saldo Awal (semua transaksi sebelum start_date)
-            $jurnalsSebelumnya = DetailJurnal::where('akun_id', $akun_id)
-                ->whereHas('jurnal', function($q) use ($start_date) {
+            // 1. Saldo awal = semua mutasi SEBELUM start_date
+            $sebelumnya = DetailJurnal::where('akun_id', $akun_id)
+                ->whereHas('jurnal', function ($q) use ($start_date) {
                     $q->where('tanggal', '<', $start_date);
                 })->get();
 
-            $debitSebelumnya = $jurnalsSebelumnya->sum('debit');
-            $kreditSebelumnya = $jurnalsSebelumnya->sum('kredit');
+            $debitSebelumnya = (float) $sebelumnya->sum('debit');
+            $kreditSebelumnya = (float) $sebelumnya->sum('kredit');
 
-            // Logika Normal Balance Akuntansi
-            if (in_array($akunTerpilih->tipe_akun, ['Harta', 'Beban'])) {
-                $saldoAwal = $debitSebelumnya - $kreditSebelumnya;
-            } else {
-                $saldoAwal = $kreditSebelumnya - $debitSebelumnya;
-            }
+            $saldoAwal = $isDebitNormal
+                ? $debitSebelumnya - $kreditSebelumnya
+                : $kreditSebelumnya - $debitSebelumnya;
 
-            // 2. Mengambil mutasi pada rentang tanggal terpilih
-            $jurnals = DetailJurnal::where('akun_id', $akun_id)
-                ->whereHas('jurnal', function($q) use ($start_date, $end_date) {
-                    $q->whereBetween('tanggal', [$start_date, $end_date]);
-                })
-                ->join('jurnals', 'detail_jurnals.jurnal_id', '=', 'jurnals.id') // Join untuk sorting tanggal
-                ->orderBy('jurnals.tanggal', 'asc')
-                ->select('detail_jurnals.*') // Ambil kolom detailnya saja
-                ->with('jurnal.user') // Eager loading
+            // 2. Mutasi pada rentang tanggal terpilih (urut tanggal, lalu urutan input)
+            $mutasi = DetailJurnal::with('jurnal')
+                ->select('detail_jurnals.*')
+                ->join('jurnals', 'detail_jurnals.jurnal_id', '=', 'jurnals.id')
+                ->where('detail_jurnals.akun_id', $akun_id)
+                ->whereBetween('jurnals.tanggal', [$start_date, $end_date])
+                ->orderBy('jurnals.tanggal')
+                ->orderBy('jurnals.id')
+                ->orderBy('detail_jurnals.id')
                 ->get();
+
+            // 3. Hitung saldo berjalan per baris -> tersedia di view sebagai $detail->saldo
+            $saldo = $saldoAwal;
+            $baris = $mutasi->map(function ($detail) use (&$saldo, $isDebitNormal) {
+                $debit = (float) $detail->debit;
+                $kredit = (float) $detail->kredit;
+
+                $saldo += $isDebitNormal ? ($debit - $kredit) : ($kredit - $debit);
+                $detail->saldo = $saldo;
+
+                return $detail;
+            });
+
+            $saldoAkhir = $saldo;
+            $totalDebit = (float) $mutasi->sum('debit');
+            $totalKredit = (float) $mutasi->sum('kredit');
         }
 
         return view('admin.buku_besar.index', compact(
-            'akuns', 'jurnals', 'akunTerpilih', 'saldoAwal', 'start_date', 'end_date', 'akun_id'
+            'akuns', 'akunTerpilih', 'baris',
+            'saldoAwal', 'saldoAkhir', 'totalDebit', 'totalKredit',
+            'start_date', 'end_date', 'akun_id'
         ));
     }
 }
