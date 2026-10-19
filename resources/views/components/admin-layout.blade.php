@@ -12,7 +12,7 @@
     <!-- KOTAK 1: NAMA SISTEM -->
     <div class="bg-white border-b border-r border-gray-200 flex items-center px-6 z-20">
         <span class="font-bold text-xl text-blue-700 tracking-wide">
-            <i class="fa-solid fa-print mr-2"></i> SISTA
+            <i class="fa-solid fa-print mr-2"></i> ETEKSSS
         </span>
     </div>
     <!-- KOTAK 2: NAVBAR -->

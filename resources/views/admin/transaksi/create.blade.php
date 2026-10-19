@@ -14,8 +14,8 @@
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">No Invoice</label>
-                        <input type="text" name="no_invoice" value="{{ $no_invoice }}" class="w-full px-4 py-2 border rounded-lg bg-gray-50" readonly>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">No Referensi</label>
+                        <input type="text" name="no_referensi" value="{{ $no_referensi }}" class="w-full px-4 py-2 border rounded-lg bg-gray-50" readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
