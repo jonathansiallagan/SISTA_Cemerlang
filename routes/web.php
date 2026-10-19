@@ -7,6 +7,7 @@ use App\Http\Controllers\CabangController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\BukuBesarController;
@@ -46,6 +47,14 @@ Route::middleware(['auth'])->group(function (){
     Route::get('/transaksi/tambah', [TransaksiController::class, 'create'])->name('transaksi.create');
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
 
+    // === ROUTE PENGELUARAN ===
+    Route::get('/pengeluaran', [PengeluaranController::class, 'index'])
+    ->name('pengeluaran.index');
+    Route::get('/pengeluaran/tambah', [PengeluaranController::class, 'create'])
+    ->name('pengeluaran.create');
+    Route::post('/pengeluaran', [PengeluaranController::class, 'store'])
+    ->name('pengeluaran.store');
+    
     // === ROUTE MASTER DATA PRODUK ===
     Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
     Route::get('/produk/tambah', [ProdukController::class, 'create'])->name('produk.create');
