@@ -52,8 +52,26 @@ class BukuBesarController extends Controller
     }
 
     /**
+     * Mengubah saldo (dihitung menurut sisi normal akun) menjadi
+     * angka POSITIF + label sisinya ('Debit' / 'Kredit').
+     *
+     * Contoh akun Kas (normal Debit):
+     *   saldo  800.000 => nilai 800.000, sisi Debit
+     *   saldo -500.000 => nilai 500.000, sisi Kredit  (tidak tampil minus)
+     */
+    private function sisiSaldo(float $saldo, bool $isDebitNormal): array
+    {
+        $saldo = round($saldo, 2);
+        $sisiNormal = $isDebitNormal ? 'Debit' : 'Kredit';
+        $sisiLawan = $isDebitNormal ? 'Kredit' : 'Debit';
+
+        return $saldo >= 0
+            ? ['nilai' => $saldo, 'sisi' => $sisiNormal]
+            : ['nilai' => abs($saldo), 'sisi' => $sisiLawan];
+    }
+
+    /**
      * Menyusun data buku besar untuk satu atau banyak akun.
-     * Hasil: koleksi array berisi akun, saldoAwal, baris, saldoAkhir, totalDebit, totalKredit.
      * Data diambil sekaligus (bukan per akun) supaya query tidak berulang-ulang.
      */
     private function susunLaporan($daftarAkun, $start_date, $end_date)
@@ -90,28 +108,38 @@ class BukuBesarController extends Controller
             $debitAwal = (float) ($awal->total_debit ?? 0);
             $kreditAwal = (float) ($awal->total_kredit ?? 0);
 
-            $saldoAwal = $isDebitNormal
+            // Saldo dihitung menurut sisi normal akun (bisa minus sementara)
+            $saldo = $isDebitNormal
                 ? $debitAwal - $kreditAwal
                 : $kreditAwal - $debitAwal;
 
+            $awalTampil = $this->sisiSaldo($saldo, $isDebitNormal);
+
             $mutasi = $mutasiSemua->get($akun->id, collect());
 
-            $saldo = $saldoAwal;
             $baris = $mutasi->map(function ($detail) use (&$saldo, $isDebitNormal) {
                 $debit = (float) $detail->debit;
                 $kredit = (float) $detail->kredit;
 
                 $saldo += $isDebitNormal ? ($debit - $kredit) : ($kredit - $debit);
-                $detail->saldo = $saldo;   // dipakai di view sebagai $detail->saldo
+
+                // Yang dikirim ke view: angka positif + label sisi
+                $tampil = $this->sisiSaldo($saldo, $isDebitNormal);
+                $detail->saldo = $tampil['nilai'];        // $detail->saldo
+                $detail->sisi_saldo = $tampil['sisi'];    // $detail->sisi_saldo
 
                 return $detail;
             });
 
+            $akhirTampil = $this->sisiSaldo($saldo, $isDebitNormal);
+
             return [
                 'akun' => $akun,
-                'saldoAwal' => $saldoAwal,
+                'saldoAwal' => $awalTampil['nilai'],
+                'sisiAwal' => $awalTampil['sisi'],
                 'baris' => $baris,
-                'saldoAkhir' => $saldo,
+                'saldoAkhir' => $akhirTampil['nilai'],
+                'sisiAkhir' => $akhirTampil['sisi'],
                 'totalDebit' => (float) $mutasi->sum('debit'),
                 'totalKredit' => (float) $mutasi->sum('kredit'),
             ];

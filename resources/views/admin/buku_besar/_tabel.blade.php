@@ -20,7 +20,7 @@
                 <div class="font-bold text-blue-600">{{ $akun->tipe_akun }}</div>
             </div>
             <div>
-                <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">Saldo Normal</span>
+                <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">Saldo</span>
                 <div class="font-bold text-blue-600">{{ $sn }}</div>
             </div>
         </div>
@@ -33,24 +33,24 @@
                     <th class="px-4 py-4">Tanggal</th>
                     <th class="px-4 py-4">No Referensi</th>
                     <th class="px-4 py-4">Keterangan</th>
-                    <th class="px-4 py-4 text-right">Qty</th>
+                    <th class="px-4 py-4 text-right">Kuantitas</th>
                     <th class="px-4 py-4">Satuan</th>
                     <th class="px-4 py-4 text-right">Harga</th>
                     <th class="px-4 py-4 text-right">Total</th>
-                    <th class="px-4 py-4 text-right bg-gray-100">Saldo Normal</th>
                     <th class="px-4 py-4 text-right">Debit</th>
                     <th class="px-4 py-4 text-right">Kredit</th>
+                    <th class="px-4 py-4 text-right bg-gray-100">Saldo</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 <!-- Baris Saldo Awal -->
                 <tr class="bg-orange-50/30">
                     <td colspan="7" class="px-4 py-4 font-bold text-gray-700 text-right">Saldo Awal :</td>
+                    <td class="px-4 py-4"></td>
+                    <td class="px-4 py-4"></td>
                     <td class="px-4 py-4 text-right font-bold text-gray-800 bg-orange-50 whitespace-nowrap">
-                        {{ $rp($item['saldoAwal']) }} <span class="text-xs text-gray-400">({{ $sn }})</span>
+                        {{ $rp($item['saldoAwal']) }} <span class="text-xs text-gray-400">({{ $item['sisiAwal'] }})</span>
                     </td>
-                    <td class="px-4 py-4"></td>
-                    <td class="px-4 py-4"></td>
                 </tr>
 
                 <!-- Baris Mutasi -->
@@ -63,9 +63,11 @@
                         <td class="px-4 py-4">{{ $detail->satuan ?: '-' }}</td>
                         <td class="px-4 py-4 text-right whitespace-nowrap">{{ $detail->harga !== null ? $rp($detail->harga) : '-' }}</td>
                         <td class="px-4 py-4 text-right whitespace-nowrap">{{ $rp($detail->total) }}</td>
-                        <td class="px-4 py-4 text-right font-bold text-gray-800 bg-gray-50 whitespace-nowrap">{{ $rp($detail->saldo) }}</td>
                         <td class="px-4 py-4 text-right whitespace-nowrap">{{ $detail->debit > 0 ? $rp($detail->debit) : '-' }}</td>
                         <td class="px-4 py-4 text-right whitespace-nowrap">{{ $detail->kredit > 0 ? $rp($detail->kredit) : '-' }}</td>
+                        <td class="px-4 py-4 text-right font-bold text-gray-800 bg-gray-50 whitespace-nowrap">
+                            {{ $rp($detail->saldo) }} <span class="text-xs text-gray-400">({{ $detail->sisi_saldo }})</span>
+                        </td>
                     </tr>
                 @empty
                     <tr>
@@ -78,11 +80,11 @@
             <tfoot class="bg-gray-50 font-bold text-gray-800 border-t-2 border-gray-200">
                 <tr>
                     <td colspan="7" class="px-4 py-4 text-right">Total Mutasi / Saldo Akhir :</td>
-                    <td class="px-4 py-4 text-right bg-gray-100 whitespace-nowrap">
-                        {{ $rp($item['saldoAkhir']) }} <span class="text-xs text-gray-400">({{ $sn }})</span>
-                    </td>
                     <td class="px-4 py-4 text-right whitespace-nowrap">{{ $rp($item['totalDebit']) }}</td>
                     <td class="px-4 py-4 text-right whitespace-nowrap">{{ $rp($item['totalKredit']) }}</td>
+                    <td class="px-4 py-4 text-right bg-gray-100 whitespace-nowrap">
+                        {{ $rp($item['saldoAkhir']) }} <span class="text-xs text-gray-400">({{ $item['sisiAkhir'] }})</span>
+                    </td>
                 </tr>
             </tfoot>
         </table>
