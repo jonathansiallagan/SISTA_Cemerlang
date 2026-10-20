@@ -5,7 +5,7 @@
         {{-- HEADER DASHBOARD --}}
         <header class="cs-home-header">
             
-    <a href="{{ route('cs') }}" class="cs-home-logo">
+    <a href="{{ route('cs.dashboard') }}" class="cs-home-logo">
     <span class="cs-logo-icon">
         <i class="fa-solid fa-print"></i>
     </span>

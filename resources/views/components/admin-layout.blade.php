@@ -23,7 +23,7 @@
             <summary class="list-none cursor-pointer flex items-center hover:opacity-80 transition select-none">
                 <i class="fa-regular fa-circle-user text-3xl text-gray-600"></i>
             </summary>
-            <div class="absolute right-0 top-12 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] overflow-hidden">
+            <div class="absolute right-0 top-12 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-9999 overflow-hidden">
                 <a href="{{ route('profile') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition">
                     <i class="fa-regular fa-user w-5 text-gray-500"></i>
                     <span>Profil</span>

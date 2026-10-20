@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AkunController;
@@ -11,13 +11,17 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\BukuBesarController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\CsDashboardController;
 
 // Halaman awal: arahkan sesuai status login & role
 Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route(auth()->user()->homeRoute())
-        : redirect()->route('login');
-});
+    if (Auth::user()->role === 'Customer Service') {
+        return redirect()->route('cs.dashboard');
+    }
+    
+    return redirect()->route('admin.dashboard');
+})->middleware('auth');
 
 // AREA PUBLIK //
 Route::middleware(['guest'])->group(function () {
@@ -29,13 +33,19 @@ Route::middleware(['guest'])->group(function () {
 // AREA INTERNAL //
 Route::middleware(['auth'])->group(function () {
 
-    // === DASHBOARD (dipisah per role) ===
-    Route::middleware(['role:Admin Pusat,Admin Cabang'])->group(function () {
-        Route::get('/admin', [DashboardController::class, 'admin'])->name('admin');
-    });
-    Route::middleware(['role:Customer Service'])->group(function () {
-        Route::get('/cs', [DashboardController::class, 'cs'])->name('cs');
-    });
+    // Rute Dashboard Admin (Untuk Pusat & Cabang)
+    Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    
+    // Rute Dashboard CS
+    Route::get('/cs', [CsDashboardController::class, 'index'])->name('cs.dashboard');
+
+    // // === DASHBOARD (dipisah per role) ===
+    // Route::middleware(['role:Admin Pusat,Admin Cabang'])->group(function () {
+    //     Route::get('/admin', [DashboardController::class, 'admin'])->name('admin');
+    // });
+    // Route::middleware(['role:Customer Service'])->group(function () {
+    //     Route::get('/cs', [DashboardController::class, 'cs'])->name('cs');
+    // });
 
     // Halaman Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
