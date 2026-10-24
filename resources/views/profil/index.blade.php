@@ -14,7 +14,7 @@
             
             <!-- TOMBOL KEMBALI -->
             <div class="mb-3">
-                <a href="{{ route('admin') }}" class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[11px] text-gray-600 hover:bg-gray-50 transition">
+                <a href="{{ route(Auth::user()->homeRoute())}}" class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[11px] text-gray-600 hover:bg-gray-50 transition">
                     <i class="fa-solid fa-arrow-left text-[9px]"></i>
                     <span>Kembali</span>
                 </a>

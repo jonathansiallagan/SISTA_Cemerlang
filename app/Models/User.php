@@ -34,4 +34,25 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Cabang::class, 'cabang_id');
     }
+
+    /** Apakah user adalah Admin Pusat / Admin Cabang */
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['Admin Pusat', 'Admin Cabang'], true);
+    }
+
+    public function isCustomerService(): bool
+    {
+        return $this->role === 'Customer Service';
+    }
+
+    /** Nama route dashboard sesuai role user */
+    public function homeRoute(): string
+    {
+        if ($this->role === 'Customer Service') {
+            return 'cs.dashboard';
+        }
+        
+        return 'admin.dashboard';
+    }
 }

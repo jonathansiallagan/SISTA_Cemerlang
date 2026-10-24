@@ -9,12 +9,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, $role): Response
+    /**
+     * Pemakaian: role:Admin Pusat  atau  role:Admin Pusat,Admin Cabang
+     */
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (Auth::check() && Auth::user()->role === $role) {
+        if (Auth::check() && in_array(Auth::user()->role, $roles, true)) {
             return $next($request);
         }
 
-        abort(403, 'AKSES DITOLAK: Halaman ini hanya untuk ' . $role . '.');
+        // User sudah login tapi salah halaman -> arahkan ke dashboard miliknya sendiri
+        if (Auth::check() && $request->routeIs('admin', 'cs')) {
+            return redirect()->route(Auth::user()->homeRoute());
+        }
+
+        abort(403, 'AKSES DITOLAK: Halaman ini hanya untuk ' . implode(' / ', $roles) . '.');
     }
 }
