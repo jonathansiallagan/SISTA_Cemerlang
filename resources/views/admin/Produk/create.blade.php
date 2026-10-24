@@ -11,9 +11,21 @@
                 <input type="text" name="nama_produk" class="w-full px-4 py-2 border rounded-lg" required>
             </div>
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Satuan (Misal: m2, pcs, lembar)</label>
-                <input type="text" name="satuan" class="w-full px-4 py-2 border rounded-lg" required>
-            </div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+        Satuan
+    </label>
+
+    <select
+        name="satuan"
+        class="w-full px-4 py-2 border rounded-lg bg-white"
+        required
+    >
+        <option value="">-- Pilih Satuan --</option>
+        <option value="pcs">Pcs</option>
+        <option value="lembar">Lembar</option>
+        <option value="m2">Meter Persegi (m²)</option>
+    </select>
+</div>
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Harga Jual (Rp)</label>

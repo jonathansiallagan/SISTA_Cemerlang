@@ -14,8 +14,8 @@
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">No Invoice</label>
-                        <input type="text" name="no_invoice" value="{{ $no_invoice }}" class="w-full px-4 py-2 border rounded-lg bg-gray-50" readonly>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">No Referensi</label>
+                        <input type="text" name="no_referensi" value="{{ $no_referensi }}" class="w-full px-4 py-2 border rounded-lg bg-gray-50" readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
@@ -41,42 +41,147 @@
                 <h3 class="font-bold text-gray-800 mb-4">Detail Produk</h3>
                 
                 <div id="item-list">
-                    <!-- Baris Item (Akan dibuat dinamis oleh JS) -->
-                    <div class="item-row grid grid-cols-12 gap-2 mb-3 items-end">
-                        <div class="col-span-4">
-                            <label class="block text-xs text-gray-500 mb-1">Produk</label>
-                            <select name="produk_id[]" class="w-full px-2 py-2 border rounded-lg produk-select" required onchange="calculateRow(this)">
-                                <option value="">- Pilih Produk -</option>
-                                @foreach($produks as $produk)
-                                    <option value="{{ $produk->id }}" data-harga="{{ $produk->harga_jual }}" data-hpp="{{ $produk->hpp }}" data-satuan="{{ $produk->satuan }}">
-                                        {{ $produk->nama_produk }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-xs text-gray-500 mb-1">P/L (m) *</label>
-                            <div class="flex gap-1">
-                                <input type="number" step="0.01" name="lebar[]" class="w-full px-2 py-2 border rounded-lg lebar-input" placeholder="L" oninput="calculateRow(this)" disabled>
-                                <input type="number" step="0.01" name="tinggi[]" class="w-full px-2 py-2 border rounded-lg tinggi-input" placeholder="P" oninput="calculateRow(this)" disabled>
-                                <input type="hidden" name="luas[]" class="luas-input">
-                            </div>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-xs text-gray-500 mb-1">Qty</label>
-                            <input type="number" name="jumlah[]" class="w-full px-2 py-2 border rounded-lg jumlah-input" value="1" min="1" required oninput="calculateRow(this)">
-                        </div>
-                        <div class="col-span-4">
-                            <label class="block text-xs text-gray-500 mb-1">Subtotal</label>
-                            <input type="text" class="w-full px-2 py-2 border rounded-lg bg-gray-50 font-bold subtotal-display" readonly>
-                            <input type="hidden" name="harga_satuan[]" class="harga-satuan-input">
-                            <input type="hidden" name="hpp_satuan[]" class="hpp-satuan-input">
-                            <input type="hidden" name="subtotal[]" class="subtotal-input">
-                            <input type="hidden" name="total_hpp_item[]" class="total-hpp-item-input">
-                        </div>
-                    </div>
-                </div>
+                  <div class="item-row grid grid-cols-[2.5fr_2fr_0.8fr_1.2fr] gap-3 mb-3 items-end">
+
+    <!-- Produk -->
+    <div>
+        <label class="block text-xs text-gray-500 mb-1">
+            Produk
+        </label>
+
+        <select
+            name="produk_id[]"
+            class="w-full px-3 py-2 border rounded-lg produk-select"
+            required
+            onchange="calculateRow(this)"
+        >
+            <option value="">- Pilih Produk -</option>
+
+            @foreach($produks as $produk)
+                <option
+                    value="{{ $produk->id }}"
+                    data-harga="{{ $produk->harga_jual }}"
+                    data-hpp="{{ $produk->hpp }}"
+                    data-satuan="{{ strtolower($produk->satuan) }}"
+                >
+                    {{ $produk->nama_produk }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+
+    <!-- Ukuran -->
+    <div class="dimension-container hidden">
+
+        <label class="block text-xs text-gray-500 mb-1">
+            Ukuran (meter)
+        </label>
+
+        <div class="grid grid-cols-2 gap-2">
+
+            <div>
+                <label class="block text-[11px] text-gray-400 mb-1">
+                    Panjang
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    name="panjang[]"
+                    class="w-full px-3 py-2 border rounded-lg panjang-input"
+                    placeholder="0.00"
+                    oninput="calculateRow(this)"
+                >
             </div>
+
+            <div>
+                <label class="block text-[11px] text-gray-400 mb-1">
+                    Lebar
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    name="lebar[]"
+                    class="w-full px-3 py-2 border rounded-lg lebar-input"
+                    placeholder="0.00"
+                    oninput="calculateRow(this)"
+                >
+            </div>
+
+        </div>
+
+        <input
+            type="hidden"
+            name="luas[]"
+            class="luas-input"
+        >
+
+    </div>
+
+
+    <!-- Qty -->
+    <div class="qty-container">
+
+        <label class="block text-xs text-gray-500 mb-1">
+            Qty
+        </label>
+
+        <input
+            type="number"
+            name="jumlah[]"
+            class="w-full px-3 py-2 border rounded-lg jumlah-input"
+            value="1"
+            min="1"
+            oninput="calculateRow(this)"
+        >
+
+    </div>
+
+
+    <!-- Subtotal -->
+    <div>
+
+        <label class="block text-xs text-gray-500 mb-1">
+            Subtotal
+        </label>
+
+        <input
+            type="text"
+            class="w-full px-3 py-2 border rounded-lg bg-gray-50 font-bold subtotal-display"
+            readonly
+        >
+
+        <input
+            type="hidden"
+            name="harga_satuan[]"
+            class="harga-satuan-input"
+        >
+
+        <input
+            type="hidden"
+            name="hpp_satuan[]"
+            class="hpp-satuan-input"
+        >
+
+        <input
+            type="hidden"
+            name="subtotal[]"
+            class="subtotal-input"
+        >
+
+        <input
+            type="hidden"
+            name="total_hpp_item[]"
+            class="total-hpp-item-input"
+        >
+
+    </div>
+
+</div>
 
             <!-- Form Kanan (Total & Pembayaran) -->
             <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700 text-white">
@@ -95,66 +200,257 @@
     </form>
 
     <script>
-        function calculateRow(element) {
-            let row = element.closest('.item-row');
-            let select = row.querySelector('.produk-select');
-            let option = select.options[select.selectedIndex];
-            
-            if(!option.value) return;
+    function calculateRow(element) {
 
-            let harga = parseFloat(option.getAttribute('data-harga')) || 0;
-            let hpp = parseFloat(option.getAttribute('data-hpp')) || 0;
-            let satuan = option.getAttribute('data-satuan');
-            let qty = parseFloat(row.querySelector('.jumlah-input').value) || 0;
-            
-            let lebarInput = row.querySelector('.lebar-input');
-            let tinggiInput = row.querySelector('.tinggi-input');
-            let luasInput = row.querySelector('.luas-input');
+        // Ambil baris produk
+        let row = element.closest('.item-row');
 
-            let multiplier = qty;
+        // Ambil select produk
+        let select = row.querySelector('.produk-select');
 
-            // Jika produk meteran (m2)
-            if(satuan.toLowerCase().includes('m2') || satuan.toLowerCase().includes('meter')) {
-                lebarInput.disabled = false;
-                tinggiInput.disabled = false;
-                let l = parseFloat(lebarInput.value) || 0;
-                let t = parseFloat(tinggiInput.value) || 0;
-                let luas = l * t;
-                luasInput.value = luas;
-                multiplier = luas * qty;
-            } else {
-                lebarInput.disabled = true;
-                tinggiInput.disabled = true;
-                lebarInput.value = '';
-                tinggiInput.value = '';
-                luasInput.value = '';
-            }
+        // Ambil produk yang dipilih
+        let option = select.options[select.selectedIndex];
 
-            let subtotal = harga * multiplier;
-            let totalHpp = hpp * multiplier;
-
-            row.querySelector('.harga-satuan-input').value = harga;
-            row.querySelector('.hpp-satuan-input').value = hpp;
-            row.querySelector('.subtotal-input').value = subtotal;
-            row.querySelector('.total-hpp-item-input').value = totalHpp;
-            row.querySelector('.subtotal-display').value = 'Rp ' + subtotal.toLocaleString('id-ID');
-
-            calculateGrandTotal();
+        // Kalau belum memilih produk
+        if (!option || !option.value) {
+            return;
         }
 
-        function calculateGrandTotal() {
-            let subtotals = document.querySelectorAll('.subtotal-input');
-            let hpps = document.querySelectorAll('.total-hpp-item-input');
-            
-            let grandTotal = 0;
-            let grandHpp = 0;
 
-            subtotals.forEach(item => grandTotal += parseFloat(item.value) || 0);
-            hpps.forEach(item => grandHpp += parseFloat(item.value) || 0);
+        // =========================================================
+        // DATA PRODUK
+        // =========================================================
 
-            document.getElementById('total_transaksi_input').value = grandTotal;
-            document.getElementById('total_hpp_input').value = grandHpp;
-            document.getElementById('grand-total-display').innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+        let harga = parseFloat(
+            option.getAttribute('data-harga')
+        ) || 0;
+
+        let hpp = parseFloat(
+            option.getAttribute('data-hpp')
+        ) || 0;
+
+        let satuan = (
+            option.getAttribute('data-satuan') || ''
+        ).toLowerCase().trim();
+
+
+        // =========================================================
+        // ELEMENT INPUT
+        // =========================================================
+
+        let qtyInput = row.querySelector('.jumlah-input');
+
+       let panjangInput = row.querySelector('.panjang-input');
+let lebarInput = row.querySelector('.lebar-input');
+
+        let luasInput = row.querySelector('.luas-input');
+
+        let dimensionContainer =
+            row.querySelector('.dimension-container');
+
+        let qtyContainer =
+            row.querySelector('.qty-container');
+
+
+        // =========================================================
+        // MULTIPLIER
+        // =========================================================
+
+        let multiplier = 0;
+
+
+        // =========================================================
+        // JIKA SATUAN = METER PERSEGI
+        // =========================================================
+
+        if (
+            satuan === 'm2' ||
+            satuan === 'meter persegi' ||
+            satuan.includes('m²')
+        ) {
+
+            // Tampilkan panjang & lebar
+            dimensionContainer.classList.remove('hidden');
+
+            // Sembunyikan quantity
+            qtyContainer.classList.add('hidden');
+
+
+            // Ambil panjang
+            let panjang =
+                parseFloat(panjangInput.value) || 0;
+
+
+            // Ambil lebar
+            let lebar =
+                parseFloat(lebarInput.value) || 0;
+
+
+            // Hitung luas
+            let luas =
+                panjang * lebar;
+
+
+            // Simpan luas
+            luasInput.value = luas;
+
+
+            // Untuk m2, yang dikalikan adalah luas
+            multiplier = luas;
+
+
+            // Quantity tidak digunakan untuk m2
+            qtyInput.value = 1;
+
         }
-    </script>
+
+
+        // =========================================================
+        // JIKA SATUAN = PCS / LEMBAR
+        // =========================================================
+
+        else {
+
+            // Sembunyikan panjang & lebar
+            dimensionContainer.classList.add('hidden');
+
+            // Tampilkan quantity
+            qtyContainer.classList.remove('hidden');
+
+
+            // Kosongkan ukuran
+            panjangInput.value = '';
+            lebarInput.value = '';
+            luasInput.value = '';
+
+
+            // Ambil quantity
+            let qty =
+                parseFloat(qtyInput.value) || 0;
+
+
+            // Untuk pcs / lembar
+            multiplier = qty;
+        }
+
+
+        // =========================================================
+        // HITUNG HARGA
+        // =========================================================
+
+        let subtotal =
+            harga * multiplier;
+
+
+        // =========================================================
+        // HITUNG HPP
+        // =========================================================
+
+        let totalHpp =
+            hpp * multiplier;
+
+
+        // =========================================================
+        // SIMPAN KE INPUT HIDDEN
+        // =========================================================
+
+        row.querySelector(
+            '.harga-satuan-input'
+        ).value = harga;
+
+
+        row.querySelector(
+            '.hpp-satuan-input'
+        ).value = hpp;
+
+
+        row.querySelector(
+            '.subtotal-input'
+        ).value = subtotal;
+
+
+        row.querySelector(
+            '.total-hpp-item-input'
+        ).value = totalHpp;
+
+
+        // =========================================================
+        // TAMPILKAN SUBTOTAL
+        // =========================================================
+
+        row.querySelector(
+            '.subtotal-display'
+        ).value =
+            'Rp ' +
+            subtotal.toLocaleString('id-ID');
+
+
+        // =========================================================
+        // HITUNG TOTAL TRANSAKSI
+        // =========================================================
+
+        calculateGrandTotal();
+    }
+
+
+    // =============================================================
+    // TOTAL SEMUA PRODUK
+    // =============================================================
+
+    function calculateGrandTotal() {
+
+        let subtotals =
+            document.querySelectorAll(
+                '.subtotal-input'
+            );
+
+        let hpps =
+            document.querySelectorAll(
+                '.total-hpp-item-input'
+            );
+
+
+        let grandTotal = 0;
+
+        let grandHpp = 0;
+
+
+        // Hitung total penjualan
+        subtotals.forEach(function(item) {
+
+            grandTotal +=
+                parseFloat(item.value) || 0;
+
+        });
+
+
+        // Hitung total HPP
+        hpps.forEach(function(item) {
+
+            grandHpp +=
+                parseFloat(item.value) || 0;
+
+        });
+
+
+        // Simpan total transaksi
+        document.getElementById(
+            'total_transaksi_input'
+        ).value = grandTotal;
+
+
+        // Simpan total HPP
+        document.getElementById(
+            'total_hpp_input'
+        ).value = grandHpp;
+
+
+        // Tampilkan total
+        document.getElementById(
+            'grand-total-display'
+        ).innerText =
+            'Rp ' +
+            grandTotal.toLocaleString('id-ID');
+    }
+</script>
 </x-admin-layout>

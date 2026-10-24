@@ -20,7 +20,7 @@
                 <tr>
                     <th class="px-6 py-4">Kode</th>
                     <th class="px-6 py-4">Nama Akun</th>
-                    <th class="px-6 py-4">Kategori/Tipe</th>
+                    <th class="px-6 py-4">Tipe</th>
                     <th class="px-6 py-4 text-center">Status</th>
                     <th class="px-6 py-4 text-center">Aksi</th>
                 </tr>

@@ -26,9 +26,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            /** @var \App\Models\User $loggedInUser */
-            $loggedInUser = Auth::user();
-            return redirect()->route($loggedInUser->homeRoute());
+            return redirect()->route($this->user()->homeRoute());
         }
 
         return back()->withErrors([
@@ -57,9 +55,7 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        /** @var \App\Models\User $loggedInAdmin */
-        $loggedInAdmin = Auth::user();
-        return redirect()->route($loggedInAdmin->homeRoute())->with('success', 'Akun pengguna baru berhasil ditambahkan!');
+        return redirect()->route($this->user()->homeRoute())->with('success', 'Akun pengguna baru berhasil ditambahkan!');
     }
 
     // === FITUR LOGOUT ===

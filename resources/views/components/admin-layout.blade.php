@@ -46,6 +46,9 @@
                 </a>
                 <a href="{{ route('transaksi.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('transaksi.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <i class="fa-solid fa-cash-register w-5 text-center"></i> Transaksi
+                </a>     
+                <a href="{{ route('pengeluaran.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('pengeluaran.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <i class="fa-solid fa-money-bill-transfer w-5 text-center"></i>Pengeluaran
                 </a>
                  @if (Auth::user()->isAdmin())
                 <a href="{{ route('produk.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('produk.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">

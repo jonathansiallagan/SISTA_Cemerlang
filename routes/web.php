@@ -7,6 +7,7 @@ use App\Http\Controllers\CabangController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\BukuBesarController;
@@ -39,14 +40,6 @@ Route::middleware(['auth'])->group(function () {
     // Rute Dashboard CS
     Route::get('/cs', [CsDashboardController::class, 'index'])->name('cs.dashboard');
 
-    // // === DASHBOARD (dipisah per role) ===
-    // Route::middleware(['role:Admin Pusat,Admin Cabang'])->group(function () {
-    //     Route::get('/admin', [DashboardController::class, 'admin'])->name('admin');
-    // });
-    // Route::middleware(['role:Customer Service'])->group(function () {
-    //     Route::get('/cs', [DashboardController::class, 'cs'])->name('cs');
-    // });
-
     // Halaman Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -58,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'index'])->name('profile');
 
 //====================================================================================================//
+
     // === ROUTE TRANSAKSI (Admin Pusat, Admin Cabang, Customer Service) ===
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::get('/transaksi/tambah', [TransaksiController::class, 'create'])->name('transaksi.create');
@@ -67,6 +61,11 @@ Route::middleware(['auth'])->group(function () {
     // === ROUTE yang bisa diakses ADMIN PUSAT & ADMIN CABANG ===
     Route::middleware(['role:Admin Pusat,Admin Cabang'])->group(function () {
 
+        // === ROUTE PENGELUARAN ===
+        Route::get('/pengeluaran', [PengeluaranController::class, 'index'])->name('pengeluaran.index');
+        Route::get('/pengeluaran/tambah', [PengeluaranController::class, 'create'])->name('pengeluaran.create');
+        Route::post('/pengeluaran', [PengeluaranController::class, 'store'])->name('pengeluaran.store');
+    
         // === ROUTE MASTER DATA PRODUK ===
         Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
         Route::get('/produk/tambah', [ProdukController::class, 'create'])->name('produk.create');
@@ -107,5 +106,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/akun/{id}/edit', [AkunController::class, 'edit'])->name('akun.edit');
         Route::put('/akun/{id}', [AkunController::class, 'update'])->name('akun.update');
         Route::delete('/akun/{id}', [AkunController::class, 'destroy'])->name('akun.destroy');
+        Route::get('/akun/preview-kode', [AkunController::class, 'previewKode'])->name('akun.preview-kode');
     });
 });
