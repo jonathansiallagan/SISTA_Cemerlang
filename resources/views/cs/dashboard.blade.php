@@ -5,7 +5,11 @@
         {{-- HEADER DASHBOARD --}}
         <header class="cs-home-header">
             
+<<<<<<< HEAD
     <a href="{{ route('cs.dashboard') }}" class="cs-home-logo">
+=======
+    <a href="{{ route('cs') }}" class="cs-home-logo">
+>>>>>>> d539e67 (Fix pengeluaran dan jurnal transaksi)
     <span class="cs-logo-icon">
         <i class="fa-solid fa-print"></i>
     </span>
@@ -90,6 +94,25 @@
             <i class="fa-solid fa-arrow-right"></i>
         </span>
     </a>
+<<<<<<< HEAD
+=======
+    {{-- PENGATURAN --}}
+<a href="#" class="cs-menu-card">
+    <span class="cs-menu-icon">
+        <i class="fa-solid fa-gear"></i>
+    </span>
+
+    <span class="cs-menu-title">PENGATURAN</span>
+
+    <span class="cs-menu-description">
+        Kelola profil dan akun
+    </span>
+
+    <span class="cs-menu-arrow">
+        <i class="fa-solid fa-arrow-right"></i>
+    </span>
+</a>
+>>>>>>> d539e67 (Fix pengeluaran dan jurnal transaksi)
 
    
 </main>
@@ -104,6 +127,7 @@
    
 <style>
     .cs-home {
+<<<<<<< HEAD
         --home-blue: #1769D2;
         --home-blue-dark: #104DA5;
         --home-blue-light: #EAF3FF;
@@ -118,6 +142,25 @@
         position: relative;
         box-sizing: border-box;
     }
+=======
+    --home-blue: #1769D2;
+    --home-blue-dark: #104DA5;
+    --home-blue-light: #EAF3FF;
+    --home-card: #CBD5E1;
+    --home-text: #24344D;
+
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    margin: -28px -34px -40px;
+    padding: 0 34px 20px;
+    background: #fff;
+    color: var(--home-text);
+    position: relative;
+    box-sizing: border-box;
+}
+>>>>>>> d539e67 (Fix pengeluaran dan jurnal transaksi)
 
     /* NAVBAR */
     .cs-home-header {
@@ -283,6 +326,7 @@
 
     /* MENU UTAMA */
     .cs-menu-container {
+<<<<<<< HEAD
         min-height: 370px;
         display: flex;
         align-items: center;
@@ -292,6 +336,19 @@
         padding: 25px 0 45px;
         box-sizing: border-box;
     }
+=======
+     flex: 1;
+    min-height: 370px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 25px 0 45px;
+    box-sizing: border-box;
+}
+
+>>>>>>> d539e67 (Fix pengeluaran dan jurnal transaksi)
 
     .cs-menu-card {
         width: 200px;
@@ -407,6 +464,7 @@
 
     /* FOOTER */
     .cs-home-footer {
+<<<<<<< HEAD
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -416,6 +474,18 @@
         color: #8b98aa;
         font-size: 12px;
     }
+=======
+         display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 2px 0;
+    margin-top: auto;
+    border-top: 1px solid #e7edf5;
+    color: #8b98aa;
+    font-size: 12px;
+}
+>>>>>>> d539e67 (Fix pengeluaran dan jurnal transaksi)
 
     /* RESPONSIF TABLET DAN HP */
     @media (max-width: 700px) {
