@@ -87,6 +87,15 @@ Route::middleware(['auth'])->group(function () {
 
         // === ROUTE BUKU BESAR ===
         Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
+        Route::get('/buku-besar/export/pdf', [
+            BukuBesarController::class,
+            'cetakPdf',
+        ])->name('buku_besar.pdf');
+
+        Route::get('/buku-besar/export/excel', [
+            BukuBesarController::class,
+            'cetakExcel',
+        ])->name('buku_besar.excel');
 
         // === ROUTE LAPORAN LABA RUGI ===
         Route::get('/laporan-laba-rugi', [
