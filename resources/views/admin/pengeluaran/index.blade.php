@@ -68,7 +68,7 @@
 
                                 <td class="break-words px-5 py-5 align-middle
                                            text-slate-700">
-                                    {{ $pengeluaran->cabang->nama_cabang ?? '-' }}
+                                    {{ $pengeluaran->cabang?->nama ?? '-' }}
                                 </td>
 
                                 <td class="px-5 py-5 align-middle text-slate-600">

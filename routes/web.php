@@ -14,6 +14,7 @@ use App\Http\Controllers\BukuBesarController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\CsDashboardController;
+use App\Http\Controllers\LaporanLabaRugiController;
 
 // Halaman awal: arahkan sesuai status login & role
 Route::get('/', function () {
@@ -49,6 +50,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Route untuk Profil
     Route::get('/profil', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profil/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::put('/profil/preferensi', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
+    // Route khusus untuk upload avatar via AJAX
+    Route::post('/profil/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
 
 //====================================================================================================//
 
@@ -81,7 +87,13 @@ Route::middleware(['auth'])->group(function () {
 
         // === ROUTE BUKU BESAR ===
         Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
-    });
+
+        // === ROUTE LAPORAN LABA RUGI ===
+        Route::get('/laporan-laba-rugi', [
+            LaporanLabaRugiController::class,
+            'index'
+        ])->name('laporan_laba_rugi.index');
+            });
 
 //====================================================================================================//
     // === ROUTE yang hanya bisa diakses ADMIN PUSAT ===
