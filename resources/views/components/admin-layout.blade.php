@@ -60,6 +60,10 @@
                 <a href="{{ route('buku_besar.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('buku_besar.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <i class="fa-solid fa-book-open w-5 text-center"></i> Buku Besar
                 </a>
+                <a href="{{ route('laporan_laba_rugi.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('laporan_laba_rugi.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <i class="fa-solid fa-chart-line"></i>
+                        Laporan Laba Rugi
+                    </a>
                 @endif
             </nav>
             <!-- MASTER DATA -->
