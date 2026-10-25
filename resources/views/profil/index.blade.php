@@ -4,9 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Pengaturan Akun - SISTA</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+
+    <style>
+        .cropper-container {
+            max-height: 400px;
+        }
+
+        .avatar-overlay {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .group:hover .avatar-overlay {
+            opacity: 1;
+        }
+    </style>
 
     {{-- Inline JS sederhana untuk mengatur pergantian Tab --}}
     <script>
@@ -52,24 +69,31 @@
         <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
 
             <!-- HEADER PROFIL (FOTO & INFO SINGKAT) -->
-            <div class="px-6 py-6 border-b border-gray-100 bg-gray-50">
-                <div class="flex items-center gap-4">
-                    <div class="relative w-20 h-20 rounded-full border-4 border-white shadow-sm overflow-hidden bg-white">
-                        @if(Auth::user()->avatar)
-                        {{-- Jika punya avatar, panggil dari storage --}}
-                        <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
-                        @else
-                        {{-- Jika tidak punya, buat inisial otomatis pakai API ui-avatars --}}
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=E0F2FE&color=2563EB&bold=true&size=128" alt="Initials" class="w-full h-full object-cover">
-                        @endif
+            <div class="px-6 py-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white flex flex-col items-center sm:flex-row sm:items-start gap-6">
+
+                <!-- AVATAR DENGAN OVERLAY KLIK -->
+                <div class="relative w-28 h-28 rounded-full shadow-md group cursor-pointer border-4 border-white bg-white overflow-hidden" onclick="document.getElementById('avatar-input').click()">
+
+                    <img id="current-avatar"
+                        src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&background=E0F2FE&color=2563EB&bold=true&size=128' }}"
+                        alt="Avatar" class="w-full h-full object-cover">
+
+                    <!-- Overlay Hitam saat di-hover -->
+                    <div class="avatar-overlay absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-white">
+                        <i class="fa-solid fa-camera text-xl mb-1"></i>
+                        <span class="text-[10px] font-medium uppercase tracking-wider">Ubah Foto</span>
                     </div>
-                    <div>
-                        <h2 class="text-lg font-bold text-gray-900">{{ Auth::user()->name }}</h2>
-                        <p class="text-sm text-gray-500">{{ Auth::user()->email }}</p>
-                        <span class="inline-block mt-2 px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
-                            {{ Auth::user()->role }}
-                        </span>
-                    </div>
+                </div>
+
+                <!-- Input File Tersembunyi -->
+                <input type="file" id="avatar-input" class="hidden" accept="image/jpeg,image/png,image/jpg">
+
+                <div class="text-center sm:text-left mt-2 sm:mt-4">
+                    <h2 class="text-2xl font-bold text-gray-900">{{ Auth::user()->name }}</h2>
+                    <p class="text-sm text-gray-500 mb-2">{{ Auth::user()->email }}</p>
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold border border-blue-100">
+                        {{ Auth::user()->role }}
+                    </span>
                 </div>
             </div>
 
@@ -96,15 +120,6 @@
                         @method('PUT')
 
                         <div class="space-y-5 max-w-xl">
-                            <!-- Input Foto Profil -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Ganti Foto Profil</label>
-                                <input type="file" name="avatar" accept="image/jpeg,image/png,image/jpg"
-                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                                <p class="text-xs text-gray-400 mt-1">Format: JPG, JPEG, PNG. Maksimal 2MB.</p>
-                                @error('avatar') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                            </div>
-
                             <!-- Input Nama Lengkap -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
@@ -239,6 +254,118 @@
 
             </div>
         </div>
+
+        <!-- MODAL CROPPER.JS -->
+        <div id="cropper-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800">Sesuaikan Gambar Profil</h3>
+                    <button onclick="closeCropper()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+                <div class="p-4 bg-gray-100 flex justify-center">
+                    <div class="max-w-full">
+                        <img id="cropper-image" class="max-h-[60vh] max-w-full">
+                    </div>
+                </div>
+                <div class="p-4 border-t flex justify-end gap-3">
+                    <button onclick="closeCropper()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium">Batal</button>
+                    <button id="save-crop-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center gap-2">
+                        <i class="fa-solid fa-save"></i> Simpan Foto
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCRIPT CROPPER DAN AJAX -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+        <script>
+            function switchTab(tabId) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.tab-btn').forEach(el => {
+                    el.classList.remove('border-blue-600', 'text-blue-600');
+                    el.classList.add('border-transparent', 'text-gray-500');
+                });
+                document.getElementById(tabId).classList.remove('hidden');
+                const active = document.querySelector(`[data-tab="${tabId}"]`);
+                active.classList.remove('border-transparent', 'text-gray-500');
+                active.classList.add('border-blue-600', 'text-blue-600');
+            }
+
+            // LOGIKA CROPPER
+            let cropper = null;
+            const avatarInput = document.getElementById('avatar-input');
+            const cropperModal = document.getElementById('cropper-modal');
+            const cropperImage = document.getElementById('cropper-image');
+            const saveCropBtn = document.getElementById('save-crop-btn');
+            const currentAvatar = document.getElementById('current-avatar');
+
+            avatarInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        cropperImage.src = event.target.result;
+                        cropperModal.classList.remove('hidden');
+
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+
+                        cropper = new Cropper(cropperImage, {
+                            aspectRatio: 1, // Kunci rasio 1:1 (Persegi/Lingkaran)
+                            viewMode: 1,
+                            autoCropArea: 1,
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            function closeCropper() {
+                cropperModal.classList.add('hidden');
+                avatarInput.value = ''; // Reset input file
+                if (cropper) cropper.destroy();
+            }
+
+            // KETIKA TOMBOL "SIMPAN FOTO" DITEKAN (UPLOAD VIA AJAX)
+            saveCropBtn.addEventListener('click', function() {
+                if (!cropper) return;
+
+                saveCropBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan...';
+                saveCropBtn.disabled = true;
+
+                // Dapatkan gambar hasil crop sebagai File/Blob (dikompres otomatis)
+                cropper.getCroppedCanvas({
+                    width: 500,
+                    height: 500
+                }).toBlob(function(blob) {
+
+                    const formData = new FormData();
+                    formData.append('avatar', blob, 'avatar.jpg');
+
+                    // Kirim ke server secara diam-diam (AJAX)
+                    fetch("{{ route('profile.avatar') }}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                currentAvatar.src = data.avatar_url; // Ganti gambar di layar
+                                closeCropper();
+                            }
+                        })
+                        .catch(error => alert('Terjadi kesalahan saat mengunggah gambar.'))
+                        .finally(() => {
+                            saveCropBtn.innerHTML = '<i class="fa-solid fa-save"></i> Simpan Foto';
+                            saveCropBtn.disabled = false;
+                        });
+                }, 'image/jpeg', 0.9);
+            });
+        </script>
 
         <!-- TOMBOL KELUAR DI BAWAH -->
         <div class="mt-6 flex justify-end">

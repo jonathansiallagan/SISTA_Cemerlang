@@ -14,39 +14,45 @@ class ProfileController extends Controller
         return view('profil.index');
     }
 
-    // 1. FUNGSI UBAH PROFIL & UPLOAD AVATAR
+    // FUNGSI UBAH PROFIL
     public function updateProfile(Request $request)
     {
         $user = $this->user();
-
         $request->validate([
             'name' => 'required|string|max:255',
-            // Pengecualian email unik untuk user yang sedang login
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id, 
         ]);
-
         $user->name = $request->name;
         $user->email = $request->email;
-
-        // Logika Upload Gambar
-        if ($request->hasFile('avatar')) {
-            // Hapus foto lama dari penyimpanan jika sebelumnya sudah ada
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                Storage::disk('public')->delete($user->avatar);
-            }
-
-            // Simpan foto baru ke folder 'storage/app/public/avatars'
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $path;
-        }
-
         $user->save();
-
-        return back()->with('success', 'Profil dan avatar berhasil diperbarui!');
+        return back()->with('success', 'Profil dasar berhasil diperbarui!');
     }
 
-    // 2. FUNGSI UBAH PASSWORD
+    // FUNGSI UBAH AVATAR (UPLOAD VIA AJAX)
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user = $this->user();
+
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->avatar = $path;
+        $user->save();
+
+        // Mengembalikan respons JSON agar ditangkap oleh AJAX
+        return response()->json([
+            'success' => true,
+            'avatar_url' => asset('storage/' . $path)
+        ]);
+    }
+
+    // FUNGSI UBAH PASSWORD
     public function updatePassword(Request $request)
     {
         $request->validate([
@@ -62,7 +68,7 @@ class ProfileController extends Controller
         return back()->with('success', 'Password berhasil diubah demi keamanan!');
     }
 
-    // 3. FUNGSI SIMPAN PREFERENSI TEMA (JSON)
+    // FUNGSI SIMPAN PREFERENSI TEMA (JSON)
     public function updatePreferences(Request $request)
     {
         $request->validate([

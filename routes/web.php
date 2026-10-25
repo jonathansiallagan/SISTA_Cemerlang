@@ -52,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::put('/profil/preferensi', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
+    // Route khusus untuk upload avatar via AJAX
+    Route::post('/profil/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
 
 //====================================================================================================//
 
