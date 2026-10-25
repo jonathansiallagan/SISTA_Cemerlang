@@ -59,10 +59,21 @@
                         <td class="px-4 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($detail->jurnal->tanggal)->format('d M Y') }}</td>
                         <td class="px-4 py-4 text-blue-600 font-medium whitespace-nowrap">{{ $detail->jurnal->no_referensi }}</td>
                         <td class="px-4 py-4">{{ $detail->jurnal->keterangan }}</td>
-                        <td class="px-4 py-4 text-right">{{ $detail->kuantitas !== null ? $qty($detail->kuantitas) : '-' }}</td>
-                        <td class="px-4 py-4">{{ $detail->satuan ?: '-' }}</td>
-                        <td class="px-4 py-4 text-right whitespace-nowrap">{{ $detail->harga !== null ? $rp($detail->harga) : '-' }}</td>
-                        <td class="px-4 py-4 text-right whitespace-nowrap">{{ $rp($detail->total) }}</td>
+                        <td class="px-4 py-4 text-right">
+                            {{ $detail->quantity !== null ? $qty($detail->quantity) : '-' }}
+                        </td>
+
+                        <td class="px-4 py-4">
+                            {{ $detail->satuan ?: '-' }}
+                        </td>
+
+                        <td class="px-4 py-4 text-right whitespace-nowrap">
+                            {{ $detail->harga !== null ? $rp($detail->harga) : '-' }}
+                        </td>
+
+                        <td class="px-4 py-4 text-right whitespace-nowrap">
+                            {{ $rp($detail->total_harga ?? 0) }}
+                        </td>
                         <td class="px-4 py-4 text-right whitespace-nowrap">{{ $detail->debit > 0 ? $rp($detail->debit) : '-' }}</td>
                         <td class="px-4 py-4 text-right whitespace-nowrap">{{ $detail->kredit > 0 ? $rp($detail->kredit) : '-' }}</td>
                         <td class="px-4 py-4 text-right font-bold text-gray-800 bg-gray-50 whitespace-nowrap">

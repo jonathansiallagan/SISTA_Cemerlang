@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'nama_akun',
     'tipe_akun',
     'kelompok_akun',
+    'saldo_normal',
     'status'
 ])]
 class Akun extends Model
