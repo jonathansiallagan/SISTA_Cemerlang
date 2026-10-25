@@ -26,7 +26,7 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($transaksis as $trx)
                 <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 font-bold text-blue-600">{{ $trx->no_invoice }}</td>
+                    <td class="px-6 py-4 font-bold text-blue-600">{{ $trx->no_referensi }}</td>
                     <td class="px-6 py-4">{{ \Carbon\Carbon::parse($trx->tanggal)->format('d M Y') }}</td>
                     <td class="px-6 py-4 font-bold">{{ $trx->nama_pelanggan }}</td>
                     <td class="px-6 py-4">{{ $trx->cabang->nama ?? '-' }}</td>
