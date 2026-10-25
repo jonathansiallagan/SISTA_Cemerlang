@@ -59,9 +59,11 @@ Route::middleware(['auth'])->group(function (){
     Route::get('/jurnal/tambah', [JurnalController::class, 'create'])->name('jurnal.create');
     Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
 
-    // === ROUTE BUKU BESAR ===
-    Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
-
+           // === ROUTE BUKU BESAR ===
+        Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
+        Route::get('/buku-besar/pdf', [BukuBesarController::class, 'cetakPdf'])->name('buku_besar.pdf');
+        Route::get('/buku-besar/csv', [BukuBesarController::class, 'cetakCsv'])->name('buku_besar.csv');
+        
 //====================================================================================================//
     // === ROUTE yang hanya bisa diakses ADMIN PUSAT ===
     Route::middleware(['role:Admin Pusat'])->group(function () {

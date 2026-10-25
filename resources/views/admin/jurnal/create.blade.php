@@ -3,30 +3,44 @@
 
     @if(session('error')) <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-4">{{ session('error') }}</div> @endif
 
+    @if($errors->any())
+        <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-4">
+            <ul class="list-disc pl-5 text-sm">
+                @foreach($errors->all() as $pesan)
+                    <li>{{ $pesan }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @php
+        $barisLama = old('akun_id', ['', '']);
+    @endphp
+
     <form action="{{ route('jurnal.store') }}" method="POST">
         @csrf
         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">No Referensi</label>
-                    <input type="text" name="no_referensi" value="{{ $no_referensi }}" class="w-full px-4 py-2 border rounded-lg bg-gray-50" readonly>
+                    <input type="text" name="no_referensi" value="{{ old('no_referensi', $no_referensi) }}" class="w-full px-4 py-2 border rounded-lg bg-gray-50" readonly>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                    <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" class="w-full px-4 py-2 border rounded-lg" required>
+                    <input type="date" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" class="w-full px-4 py-2 border rounded-lg" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Cabang</label>
                     <select name="cabang_id" class="w-full px-4 py-2 border rounded-lg" required>
                         @foreach($cabangs as $cabang)
-                            <option value="{{ $cabang->id }}" {{ Auth::user()->cabang_id == $cabang->id ? 'selected' : '' }}>{{ $cabang->nama }}</option>
+                            <option value="{{ $cabang->id }}" {{ (string) old('cabang_id', Auth::user()->cabang_id) === (string) $cabang->id ? 'selected' : '' }}>{{ $cabang->nama }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan Jurnal</label>
-                <input type="text" name="keterangan" class="w-full px-4 py-2 border rounded-lg" placeholder="Misal: Penyesuaian kas cabang..." required>
+                <input type="text" name="keterangan" value="{{ old('keterangan') }}" class="w-full px-4 py-2 border rounded-lg" placeholder="Misal: Penyesuaian kas cabang..." required>
             </div>
         </div>
 
@@ -41,30 +55,21 @@
                     </tr>
                 </thead>
                 <tbody id="jurnal-body">
-                    <!-- Baris Default 1 -->
+                    @foreach($barisLama as $i => $akunTerpilih)
                     <tr class="item-row border-b border-gray-50">
                         <td class="py-2 pr-2">
                             <select name="akun_id[]" class="w-full px-3 py-2 border rounded-lg" required>
                                 <option value="">- Pilih Akun -</option>
-                                @foreach($akuns as $akun) <option value="{{ $akun->id }}">{{ $akun->kode_akun }} - {{ $akun->nama_akun }}</option> @endforeach
+                                @foreach($akuns as $akun)
+                                    <option value="{{ $akun->id }}" {{ (string) $akunTerpilih === (string) $akun->id ? 'selected' : '' }}>{{ $akun->kode_akun }} - {{ $akun->nama_akun }}</option>
+                                @endforeach
                             </select>
                         </td>
-                        <td class="py-2 pr-2"><input type="number" name="debit[]" class="w-full px-3 py-2 border rounded-lg text-right debit-input" value="0" min="0" oninput="calculateTotal()"></td>
-                        <td class="py-2 pr-2"><input type="number" name="kredit[]" class="w-full px-3 py-2 border rounded-lg text-right kredit-input" value="0" min="0" oninput="calculateTotal()"></td>
+                        <td class="py-2 pr-2"><input type="number" name="debit[]" class="w-full px-3 py-2 border rounded-lg text-right debit-input" value="{{ old('debit.' . $i, 0) }}" min="0" step="0.01" oninput="calculateTotal()"></td>
+                        <td class="py-2 pr-2"><input type="number" name="kredit[]" class="w-full px-3 py-2 border rounded-lg text-right kredit-input" value="{{ old('kredit.' . $i, 0) }}" min="0" step="0.01" oninput="calculateTotal()"></td>
                         <td class="py-2 text-center"><button type="button" class="text-red-500 hover:text-red-700" onclick="removeRow(this)"><i class="fa-solid fa-xmark"></i></button></td>
                     </tr>
-                    <!-- Baris Default 2 -->
-                    <tr class="item-row border-b border-gray-50">
-                        <td class="py-2 pr-2">
-                            <select name="akun_id[]" class="w-full px-3 py-2 border rounded-lg" required>
-                                <option value="">- Pilih Akun -</option>
-                                @foreach($akuns as $akun) <option value="{{ $akun->id }}">{{ $akun->kode_akun }} - {{ $akun->nama_akun }}</option> @endforeach
-                            </select>
-                        </td>
-                        <td class="py-2 pr-2"><input type="number" name="debit[]" class="w-full px-3 py-2 border rounded-lg text-right debit-input" value="0" min="0" oninput="calculateTotal()"></td>
-                        <td class="py-2 pr-2"><input type="number" name="kredit[]" class="w-full px-3 py-2 border rounded-lg text-right kredit-input" value="0" min="0" oninput="calculateTotal()"></td>
-                        <td class="py-2 text-center"><button type="button" class="text-red-500 hover:text-red-700" onclick="removeRow(this)"><i class="fa-solid fa-xmark"></i></button></td>
-                    </tr>
+                    @endforeach
                 </tbody>
                 <tfoot>
                     <tr class="font-bold text-gray-800 bg-gray-50">
@@ -75,7 +80,7 @@
                     </tr>
                 </tfoot>
             </table>
-            
+
             <button type="button" onclick="addRow()" class="text-sm font-medium text-blue-600 hover:text-blue-800"><i class="fa-solid fa-plus mt-1"></i> Tambah Baris Akun</button>
         </div>
 
@@ -105,6 +110,8 @@
             }
         }
 
+        document.addEventListener('DOMContentLoaded', calculateTotal);
+
         function calculateTotal() {
             let debits = document.querySelectorAll('.debit-input');
             let kredits = document.querySelectorAll('.kredit-input');
@@ -118,7 +125,7 @@
             document.getElementById('total-kredit').innerText = 'Rp ' + totalKredit.toLocaleString('id-ID');
 
             let totalRow = document.querySelector('tfoot tr');
-            if(totalDebit !== totalKredit || totalDebit === 0) {
+            if(Math.round(totalDebit * 100) !== Math.round(totalKredit * 100) || totalDebit === 0) {
                 totalRow.classList.add('text-red-600');
                 totalRow.classList.remove('text-green-600', 'text-gray-800');
             } else {

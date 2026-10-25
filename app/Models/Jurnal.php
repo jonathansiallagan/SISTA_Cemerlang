@@ -10,5 +10,10 @@ class Jurnal extends Model
 {
     public function cabang() { return $this->belongsTo(Cabang::class); }
     public function user() { return $this->belongsTo(User::class); }
-    public function detailJurnals() { return $this->hasMany(DetailJurnal::class); }
+    public function detailJurnals() { return $this->hasMany(DetailJurnal::class)->orderBy('id'); }
+
+    public function transaksi()
+    {
+        return $this->belongsTo(Transaksi::class, 'no_referensi', 'no_referensi');
+    }
 }

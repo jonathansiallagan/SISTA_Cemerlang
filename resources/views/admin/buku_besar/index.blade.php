@@ -1,8 +1,31 @@
 <x-admin-layout>
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Buku Besar</h1>
-        <p class="text-gray-500 mt-1">Laporan mutasi dan saldo per akun perkiraan.</p>
+    <!-- JUDUL + TOMBOL CETAK (sudut kanan) -->
+    <div class="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Buku Besar</h1>
+            <p class="text-gray-500 mt-1">Laporan mutasi dan saldo per akun perkiraan.</p>
+        </div>
+
+        @if($akun_id)
+        @php
+            // Tombol cetak mengikuti filter yang sedang ditampilkan
+            $paramCetak = ['akun_id' => $akun_id, 'start_date' => $start_date, 'end_date' => $end_date];
+        @endphp
+        <div class="flex gap-2">
+            <a href="{{ route('buku_besar.pdf', $paramCetak) }}"
+               class="bg-red-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-red-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+            </a>
+            <a href="{{ route('buku_besar.csv', $paramCetak) }}"
+               class="bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-file-csv"></i> Cetak CSV
+            </a>
+        </div>
+        @endif
     </div>
+        @if(session('error'))
+        <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-4">{{ session('error') }}</div>
+    @endif
 
     <!-- FORM FILTER -->
     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
@@ -10,7 +33,6 @@
             <div class="w-full md:w-1/3">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Akun</label>
                 <select name="akun_id" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500" required>
-                    <option value="">-- Pilih Akun --</option>
                     <option value="semua" {{ $akun_id === 'semua' ? 'selected' : '' }}>Semua Akun</option>
                     @foreach($akuns as $akun)
                         <option value="{{ $akun->id }}" {{ (string) $akun_id === (string) $akun->id ? 'selected' : '' }}>
@@ -55,6 +77,10 @@
                     <p class="text-sm text-gray-500 mt-1">{{ $laporan->count() }} akun memiliki saldo atau mutasi pada periode ini.</p>
                 </div>
                 <div class="flex gap-8 text-right">
+                    <div>
+                        <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">Total</span>
+                        <div class="font-bold text-gray-800">Rp {{ number_format($grandTotal, 0, ',', '.') }}</div>
+                    </div>
                     <div>
                         <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">Total Debit</span>
                         <div class="font-bold text-gray-800">Rp {{ number_format($grandDebit, 0, ',', '.') }}</div>
