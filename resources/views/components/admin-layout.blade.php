@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="h-screen grid grid-cols-[250px_1fr] grid-rows-[70px_1fr] bg-gray-50 text-gray-800 font-sans">
     <!-- KOTAK 1: NAMA SISTEM -->
     <div class="bg-white border-b border-r border-gray-200 flex items-center px-6 z-20">
@@ -20,9 +22,27 @@
         <div class="text-sm text-gray-500 font-medium">Selamat datang, {{ Auth::user()->name }}!</div>
         <!-- PROFILE DROPDOWN -->
         <details class="relative">
-            <summary class="list-none cursor-pointer flex items-center hover:opacity-80 transition select-none">
-                <i class="fa-regular fa-circle-user text-3xl text-gray-600"></i>
+            <summary class="list-none cursor-pointer flex items-center gap-3 p-1.5 pr-3 hover:bg-gray-50 rounded-full border border-transparent hover:border-gray-200 transition select-none">
+
+                <!-- Gambar Profil Kecil -->
+                <div class="w-9 h-9 rounded-full border border-gray-200 shadow-sm overflow-hidden bg-gray-50 flex-shrink-0">
+                    @if(Auth::user()->avatar)
+                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
+                    @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=E0F2FE&color=2563EB&bold=true" alt="Initials" class="w-full h-full object-cover">
+                    @endif
+                </div>
+
+                <!-- Teks Nama (Tersembunyi di layar kecil) -->
+                <div class="hidden sm:block text-left">
+                    <p class="text-sm font-semibold text-gray-800 leading-tight">{{ Auth::user()->name }}</p>
+                    <p class="text-[10px] text-gray-500 font-medium">{{ Auth::user()->role }}</p>
+                </div>
+
+                <!-- Panah Bawah -->
+                <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 ml-1"></i>
             </summary>
+
             <div class="absolute right-0 top-12 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-9999 overflow-hidden">
                 <a href="{{ route('profile') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition">
                     <i class="fa-regular fa-user w-5 text-gray-500"></i>
@@ -41,16 +61,16 @@
         <div>
             <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3 px-3">Menu Utama</div>
             <nav class="flex flex-col gap-1 mb-8">
-               <a href="{{ route(Auth::user()->homeRoute()) }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('admin', 'cs') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                <a href="{{ route(Auth::user()->homeRoute()) }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('admin', 'cs') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
                 </a>
                 <a href="{{ route('transaksi.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('transaksi.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <i class="fa-solid fa-cash-register w-5 text-center"></i> Transaksi
-                </a>     
+                </a>
                 <a href="{{ route('pengeluaran.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('pengeluaran.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <i class="fa-solid fa-money-bill-transfer w-5 text-center"></i>Pengeluaran
                 </a>
-                 @if (Auth::user()->isAdmin())
+                @if (Auth::user()->isAdmin())
                 <a href="{{ route('produk.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition {{ request()->routeIs('produk.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <i class="fa-solid fa-box w-5 text-center"></i> Produk
                 </a>
@@ -91,4 +111,5 @@
     <!-- PANGGIL KOMPONEN LOGOUT MODAL -->
     <x-logout-modal />
 </body>
+
 </html>
