@@ -14,7 +14,11 @@ class Pengeluaran extends Model
         'no_referensi',
         'tanggal',
         'cabang_id',
+        'akun_id',
         'keterangan',
+        'qty',
+        'satuan',
+        'harga',
         'total_pengeluaran',
         'user_id',
     ];
@@ -23,6 +27,8 @@ class Pengeluaran extends Model
     {
         return [
             'tanggal' => 'date',
+            'qty' => 'decimal:2',
+            'harga' => 'decimal:2',
             'total_pengeluaran' => 'decimal:2',
         ];
     }
@@ -35,5 +41,10 @@ class Pengeluaran extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function akun(): BelongsTo
+    {
+        return $this->belongsTo(Akun::class);
     }
 }

@@ -72,31 +72,41 @@
                                 @endif
                             </td>
 
+                          
                             {{-- Quantity --}}
-                            <td class="border border-gray-300 px-3 py-3 pl-5 text-right align-middle">
-                                {{ $detail->quantity !== null
-                                    ? rtrim(rtrim(number_format($detail->quantity, 2, ',', '.'), '0'), ',')
-                                    : '-' }}
+                            <td class="border border-gray-300 px-3 py-3 text-right align-middle">
+                                @if ($index === 0 && $jurnal->pengeluaran)
+                                    {{ rtrim(rtrim(number_format((float) $jurnal->pengeluaran->qty, 2, ',', '.'), '0'), ',') }}
+                                @elseif ($index === 0 && $jurnal->transaksi)
+                                    -
+                                @else
+                                    -
+                                @endif
                             </td>
 
                             {{-- Satuan --}}
                             <td class="border border-gray-300 px-2 py-3">
-                                {{ $detail->satuan ?? '-' }}
+                                {{ $index === 0 ? ($jurnal->pengeluaran?->satuan ?? '-') : '-' }}
                             </td>
 
                             {{-- Harga --}}
                             <td class="border border-gray-300 px-2 py-3 text-right whitespace-nowrap">
-                                {{ $detail->harga !== null
-                                    ? 'Rp ' . number_format($detail->harga, 0, ',', '.')
-                                    : '-' }}
+                                @if ($index === 0 && $jurnal->pengeluaran)
+                                    Rp {{ number_format((float) $jurnal->pengeluaran->harga, 0, ',', '.') }}
+                                @else
+                                    -
+                                @endif
                             </td>
 
                             {{-- Total --}}
                             <td class="border border-gray-300 px-2 py-3 text-right whitespace-nowrap">
-                                {{ $detail->total_harga !== null
-                                    ? 'Rp ' . number_format($detail->total_harga, 0, ',', '.')
-                                    : '-' }}
+                                @if ($index === 0 && $jurnal->pengeluaran)
+                                    Rp {{ number_format((float) $jurnal->pengeluaran->total_pengeluaran, 0, ',', '.') }}
+                                @else
+                                    -
+                                @endif
                             </td>
+
 
                             {{-- Nama Akun tanpa kode --}}
                             <td class="border border-gray-300 px-2 py-3 text-left align-middle text-gray-800">

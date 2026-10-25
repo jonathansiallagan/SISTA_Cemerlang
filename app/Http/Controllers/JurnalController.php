@@ -15,11 +15,11 @@ class JurnalController extends Controller
     public function index()
     {
         $jurnals = Jurnal::with([
-            'user',
-            'cabang',
-            'detailJurnals.akun',
-            'transaksi.detailTransaksis.produk',
-        ])->latest()->get();
+    'user',
+    'cabang',
+    'detailJurnals.akun',
+    'transaksi.detailTransaksis.produk',
+])->latest()->get();
         return view('admin.jurnal.index', compact('jurnals'));
     }
 
