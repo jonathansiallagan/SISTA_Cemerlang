@@ -16,7 +16,7 @@
         <table class="w-full text-sm text-left">
             <thead class="bg-gray-50 text-gray-500 font-bold border-b border-gray-100">
                 <tr>
-                    <th class="px-6 py-4">No Invoice</th>
+                    <th class="px-6 py-4">No Referensi</th>
                     <th class="px-6 py-4">Tanggal</th>
                     <th class="px-6 py-4">Pelanggan</th>
                     <th class="px-6 py-4">Cabang</th>

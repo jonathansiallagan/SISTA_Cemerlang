@@ -1,12 +1,13 @@
 <x-admin-layout>
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Buku Besar</h1>
-        <p class="text-gray-500 mt-1">Laporan mutasi dan saldo per akun perkiraan.</p>
-    </div>
-
     
-
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        {{-- Judul Buku Besar --}}
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Buku Besar</h1>
+            <p class="text-gray-500 mt-1">
+                Laporan mutasi dan saldo per akun perkiraan.
+            </p>
+        </div>
 
         @php
             $paramCetak = [
@@ -16,23 +17,21 @@
             ];
         @endphp
 
-        {{-- Tombol Export PDF --}}
-        <a href="{{ route('buku_besar.pdf', $paramCetak) }}"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition">
-            <i class="fa-solid fa-file-pdf"></i>
-            Export PDF
-        </a>
+        {{-- Tombol Export di sebelah kanan --}}
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('buku_besar.pdf', $paramCetak) }}"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition">
+                <i class="fa-solid fa-file-pdf"></i>
+                Export PDF
+            </a>
 
-        {{-- Tombol Export Excel --}}
-        <a href="{{ route('buku_besar.excel', $paramCetak) }}"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">
-            <i class="fa-solid fa-file-excel"></i>
-            Export Excel
-        </a>
-
+            <a href="{{ route('buku_besar.excel', $paramCetak) }}"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">
+                <i class="fa-solid fa-file-excel"></i>
+                Export Excel
+            </a>
+        </div>
     </div>
-
-
 
     <!-- FORM FILTER -->
     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
