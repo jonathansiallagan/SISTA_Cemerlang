@@ -185,21 +185,31 @@ class PengeluaranController extends Controller
                 'user_id' => $user->id,
             ]);
 
+            
+            // Data detail transaksi yang disimpan pada kedua baris jurnal.
+            $detailTransaksi = [
+                'quantity' => $qty,
+                'satuan' => $data['satuan'],
+                'harga' => $harga,
+                'total_harga' => $total,
+            ];
+
             // Debit: akun beban yang dipilih.
-            DetailJurnal::create([
+            DetailJurnal::create(array_merge($detailTransaksi, [
                 'jurnal_id' => $jurnal->id,
                 'akun_id' => $akun->id,
                 'debit' => $total,
                 'kredit' => 0,
-            ]);
+            ]));
 
             // Kredit: Kas.
-            DetailJurnal::create([
+            DetailJurnal::create(array_merge($detailTransaksi, [
                 'jurnal_id' => $jurnal->id,
                 'akun_id' => $akunKas->id,
                 'debit' => 0,
                 'kredit' => $total,
-            ]);
+            ]));
+
         });
 
         return redirect()

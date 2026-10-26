@@ -20,37 +20,51 @@ class TransaksiController extends Controller
 
         $query = Transaksi::with(['user', 'cabang'])->latest();
 
-        // Customer Service hanya boleh melihat transaksi cabangnya sendiri
+        // Customer Service hanya boleh melihat transaksi cabangnya sendiri.
         if ($user->isCustomerService()) {
             $query->where('cabang_id', $user->cabang_id);
         }
 
         $transaksis = $query->get();
+
         return view('admin.transaksi.index', compact('transaksis'));
     }
 
     public function create()
     {
         $user = $this->user();
+
         $produks = Produk::all();
         $cabangs = Cabang::all();
 
-        // Customer Service hanya boleh memilih cabangnya sendiri
+        // Customer Service hanya boleh memilih cabangnya sendiri.
         if ($user->isCustomerService()) {
-            $cabangs = $cabangs->where('id', $user->cabang_id)->values();
+            $cabangs = $cabangs
+                ->where('id', $user->cabang_id)
+                ->values();
         }
-        
-        // Pembuatan Nomor Referensi Otomatis
-        $today = now()->format('Ymd');
-        $lastTransaksi = Transaksi::whereDate('created_at', now()->today())->count();
-        $no_referensi = 'INV-' . $today . '-' . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
 
-        return view('admin.transaksi.create', compact('produks', 'cabangs', 'no_referensi'));
+        // Pembuatan nomor referensi otomatis.
+        $today = now()->format('Ymd');
+
+        $lastTransaksi = Transaksi::whereDate(
+            'created_at',
+            now()->today()
+        )->count();
+
+        $no_referensi = 'INV-' . $today . '-'
+            . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
+
+        return view(
+            'admin.transaksi.create',
+            compact('produks', 'cabangs', 'no_referensi')
+        );
     }
 
     public function store(Request $request)
     {
         $user = $this->user();
+
         $request->validate([
             'no_referensi' => 'required|unique:transaksis,no_referensi',
             'tanggal' => 'required|date',
@@ -62,10 +76,18 @@ class TransaksiController extends Controller
             'jumlah.*' => 'required|numeric|min:1',
         ]);
 
-        // Customer Service tidak boleh menyimpan transaksi untuk cabang lain
-        if ($user->isCustomerService() && (int) $request->cabang_id !== (int) $user->cabang_id) {
-            abort(403, 'Anda hanya dapat mencatat transaksi untuk cabang Anda sendiri.');
+        // Customer Service tidak boleh menyimpan transaksi
+        // untuk cabang lain.
+        if (
+            $user->isCustomerService()
+            && (int) $request->cabang_id !== (int) $user->cabang_id
+        ) {
+            abort(
+                403,
+                'Anda hanya dapat mencatat transaksi untuk cabang Anda sendiri.'
+            );
         }
+
         DB::beginTransaction();
 
         try {
@@ -74,11 +96,17 @@ class TransaksiController extends Controller
                 ->where('status', 'aktif')
                 ->first();
 
-            $akunPendapatan = Akun::where('nama_akun', 'Pendapatan Penjualan')
+            $akunPendapatan = Akun::where(
+                'nama_akun',
+                'Pendapatan Penjualan'
+            )
                 ->where('status', 'aktif')
                 ->first();
 
-            $akunHpp = Akun::where('nama_akun', 'Harga Pokok Produksi')
+            $akunHpp = Akun::where(
+                'nama_akun',
+                'Harga Pokok Produksi'
+            )
                 ->where('status', 'aktif')
                 ->first();
 
@@ -86,9 +114,15 @@ class TransaksiController extends Controller
                 ->where('status', 'aktif')
                 ->first();
 
-            if (!$akunKas || !$akunPendapatan || !$akunHpp || !$akunPersediaan) {
+            if (
+                !$akunKas
+                || !$akunPendapatan
+                || !$akunHpp
+                || !$akunPersediaan
+            ) {
                 throw new \RuntimeException(
-                    'Akun Kas, Pendapatan Penjualan, Harga Pokok Produksi, atau Persediaan belum tersedia atau tidak aktif.'
+                    'Akun Kas, Pendapatan Penjualan, Harga Pokok Produksi, '
+                    . 'atau Persediaan belum tersedia atau tidak aktif.'
                 );
             }
 
@@ -120,13 +154,13 @@ class TransaksiController extends Controller
                 $subtotal = (float) $request->subtotal[$key];
                 $totalHppItem = (float) $request->total_hpp_item[$key];
 
-                // Untuk produk m2 gunakan luas sebagai quantity.
+                // Untuk produk m2, gunakan luas sebagai quantity.
                 $satuan = strtolower(trim($produk->satuan));
 
                 $quantity = (
-                    $satuan === 'm2' ||
-                    $satuan === 'meter persegi' ||
-                    str_contains($satuan, 'm²')
+                    $satuan === 'm2'
+                    || $satuan === 'meter persegi'
+                    || str_contains($satuan, 'm²')
                 ) ? $luas : $jumlah;
 
                 DetailTransaksi::create([
@@ -146,6 +180,7 @@ class TransaksiController extends Controller
                 $totalHpp += $totalHppItem;
 
                 $rincianJurnal[] = [
+                    'nama_produk' => $produk->nama_produk,
                     'quantity' => $quantity,
                     'satuan' => $produk->satuan,
                     'harga' => $harga,
@@ -155,29 +190,38 @@ class TransaksiController extends Controller
                 ];
             }
 
-            // 3. Perbarui total transaksi dari detail yang disimpan.
+            // 3. Perbarui total transaksi.
             $transaksi->update([
                 'total_transaksi' => $totalTransaksi,
                 'total_hpp' => $totalHpp,
             ]);
 
-            // 4. Buat satu header jurnal untuk transaksi ini.
+            // 4. Buat keterangan otomatis dari nama produk.
+            $namaProduk = collect($rincianJurnal)
+                ->pluck('nama_produk')
+                ->filter()
+                ->unique()
+                ->implode(', ');
+
+            $keteranganPenjualan = 'Pendapatan Jasa';
+            $keteranganHPP = 'Beban Pokok Penjualan';
+
+            // Satu header jurnal untuk satu transaksi.
             $jurnal = Jurnal::create([
                 'no_referensi' => $transaksi->no_referensi,
                 'tanggal' => $transaksi->tanggal,
-                'keterangan' => 'Penjualan - ' . $transaksi->nama_pelanggan,
+                'keterangan' => $keteranganPenjualan,
                 'cabang_id' => $transaksi->cabang_id,
                 'user_id' => $user->id,
             ]);
 
-            // 5. Buat empat baris jurnal untuk setiap produk:
-            // Kas (Debit), Pendapatan (Kredit),
-            // HPP (Debit), Persediaan (Kredit).
+            // 5. Simpan empat baris detail jurnal untuk setiap produk.
             foreach ($rincianJurnal as $rincian) {
-                // A. Pendapatan: Debit Kas.
+                // A. Debit Kas: keterangan penjualan.
                 DetailJurnal::create([
                     'jurnal_id' => $jurnal->id,
                     'akun_id' => $akunKas->id,
+                    'keterangan' => 'Pendapatan Jasa',
                     'quantity' => $rincian['quantity'],
                     'satuan' => $rincian['satuan'],
                     'harga' => $rincian['harga'],
@@ -186,10 +230,11 @@ class TransaksiController extends Controller
                     'kredit' => 0,
                 ]);
 
-                // B. Pendapatan: Kredit Pendapatan Penjualan.
+                // B. Kredit Pendapatan Penjualan.
                 DetailJurnal::create([
                     'jurnal_id' => $jurnal->id,
                     'akun_id' => $akunPendapatan->id,
+                    'keterangan' => 'Pendapatan Jasa',
                     'quantity' => $rincian['quantity'],
                     'satuan' => $rincian['satuan'],
                     'harga' => $rincian['harga'],
@@ -198,10 +243,11 @@ class TransaksiController extends Controller
                     'kredit' => $rincian['subtotal'],
                 ]);
 
-                // C. HPP: Debit Harga Pokok Produksi.
+                // C. Debit Harga Pokok Produksi.
                 DetailJurnal::create([
                     'jurnal_id' => $jurnal->id,
                     'akun_id' => $akunHpp->id,
+                    'keterangan' => 'Beban Pokok Penjualan',
                     'quantity' => $rincian['quantity'],
                     'satuan' => $rincian['satuan'],
                     'harga' => $rincian['hpp'],
@@ -210,10 +256,11 @@ class TransaksiController extends Controller
                     'kredit' => 0,
                 ]);
 
-                // D. HPP: Kredit Persediaan.
+                // D. Kredit Persediaan.
                 DetailJurnal::create([
                     'jurnal_id' => $jurnal->id,
                     'akun_id' => $akunPersediaan->id,
+                    'keterangan' => 'Beban Pokok Penjualan',
                     'quantity' => $rincian['quantity'],
                     'satuan' => $rincian['satuan'],
                     'harga' => $rincian['hpp'],
@@ -227,7 +274,10 @@ class TransaksiController extends Controller
 
             return redirect()
                 ->route('transaksi.index')
-                ->with('success', 'Transaksi dan jurnal otomatis berhasil disimpan!');
+                ->with(
+                    'success',
+                    'Transaksi dan jurnal otomatis berhasil disimpan!'
+                );
 
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -235,7 +285,10 @@ class TransaksiController extends Controller
             report($e);
 
             return back()
-                ->with('error', 'Transaksi gagal disimpan. Periksa konfigurasi akun dan struktur database.')
+                ->with(
+                    'error',
+                    'Transaksi gagal disimpan. Periksa konfigurasi akun dan struktur database.'
+                )
                 ->withInput();
         }
     }

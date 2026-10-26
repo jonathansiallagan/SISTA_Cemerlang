@@ -14,27 +14,21 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class BukuBesarController extends Controller
 {
     /**
-     * Halaman utama buku besar.
+     * Halaman utama Buku Besar.
      */
     public function index(Request $request)
     {
-        $data = $this->siapkanLaporan($request);
-
-        return view('admin.buku_besar.index', $data);
+        return view(
+            'admin.buku_besar.index',
+            $this->siapkanLaporan($request)
+        );
     }
 
     /**
-     * Export buku besar ke PDF.
+     * Export PDF.
      */
     public function cetakPdf(Request $request)
     {
-        if (!class_exists(Pdf::class)) {
-            return back()->with(
-                'error',
-                'Fitur PDF belum aktif. Jalankan composer require barryvdh/laravel-dompdf'
-            );
-        }
-
         $data = $this->siapkanLaporan($request);
 
         $pdf = Pdf::loadView(
@@ -47,23 +41,18 @@ class BukuBesarController extends Controller
         );
     }
 
-    
+    /**
+     * Export Excel.
+     */
     public function cetakExcel(Request $request)
     {
         $data = $this->siapkanLaporan($request);
 
-        $namaFile = 'buku-besar_'
-            . $data['start_date']
-            . '_sd_'
-            . $data['end_date']
-            . '.xlsx';
-
         return Excel::download(
             new BukuBesarExport($data),
-            $namaFile
+            $this->namaFile($data, 'xlsx')
         );
     }
-
 
     /**
      * Membuat nama file export.
@@ -79,99 +68,80 @@ class BukuBesarController extends Controller
     }
 
     /**
-     * Menyiapkan data untuk halaman, PDF, dan CSV.
+     * Menyiapkan data laporan.
      */
-    
-private function siapkanLaporan(Request $request): array
-{
-    $request->validate([
-        'akun_id' => 'nullable|string',
-        'start_date' => 'nullable|date',
-        'end_date' => 'nullable|date|after_or_equal:start_date',
-    ]);
+    private function siapkanLaporan(Request $request): array
+    {
+        $request->validate([
+            'akun_id' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ]);
 
-    $akuns = Akun::orderBy('kode_akun')->get();
+        $akuns = Akun::orderBy('kode_akun')->get();
 
-    $akun_id = $request->input('akun_id') ?: 'semua';
+        $akun_id = $request->input('akun_id') ?: 'semua';
+        $start_date = $request->input('start_date') ?: date('Y-m-01');
+        $end_date = $request->input('end_date') ?: date('Y-m-t');
 
-    $start_date = $request->input('start_date')
-        ?: date('Y-m-01');
+        $semuaAkun = $akun_id === 'semua';
 
-    $end_date = $request->input('end_date')
-        ?: date('Y-m-t');
+        if ($semuaAkun) {
+            $daftarAkun = $akuns;
+        } else {
+            $akunTerpilih = $akuns->firstWhere('id', (int) $akun_id);
 
-    $semuaAkun = $akun_id === 'semua';
+            abort_if(!$akunTerpilih, 404);
 
-    if ($semuaAkun) {
-        $daftarAkun = $akuns;
-    } else {
-        $akunTerpilih = $akuns->firstWhere(
-            'id',
-            (int) $akun_id
+            $daftarAkun = collect([$akunTerpilih]);
+        }
+
+        $laporan = $this->susunLaporan(
+            $daftarAkun,
+            $start_date,
+            $end_date
         );
 
-        abort_if(!$akunTerpilih, 404);
+        if ($semuaAkun) {
+            $laporan = $laporan->filter(function ($item) {
+                return abs($item['saldoAwal']) > 0
+                    || $item['baris']->isNotEmpty();
+            })->values();
+        }
 
-        $daftarAkun = collect([$akunTerpilih]);
+        $grandDebit = (float) $laporan->sum('totalDebit');
+        $grandKredit = (float) $laporan->sum('totalKredit');
+
+        $grandSaldoAwal = (float) $laporan->sum(
+            fn ($item) => $item['sisiAwal'] === 'Debit'
+                ? $item['saldoAwal']
+                : -$item['saldoAwal']
+        );
+
+        $grandSaldoAkhir = $grandSaldoAwal
+            + $grandDebit
+            - $grandKredit;
+
+        return [
+            'akuns' => $akuns,
+            'laporan' => $laporan,
+            'semuaAkun' => $semuaAkun,
+            'grandTotal' => (float) $laporan->sum(
+                fn ($item) => $item['totalNilai'] ?? 0
+            ),
+            'grandDebit' => $grandDebit,
+            'grandKredit' => $grandKredit,
+            'grandSaldoAwal' => $grandSaldoAwal,
+            'grandSaldoAkhir' => $grandSaldoAkhir,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'akun_id' => $akun_id,
+        ];
     }
-
-    $laporan = $this->susunLaporan(
-        $daftarAkun,
-        $start_date,
-        $end_date
-    );
-
-    if ($semuaAkun) {
-        $laporan = $laporan->filter(function ($item) {
-            return abs($item['saldoAwal']) > 0
-                || $item['baris']->isNotEmpty();
-        })->values();
-    }
-
-    // Total mutasi pada periode yang dipilih.
-    $grandDebit = (float) $laporan->sum('totalDebit');
-    $grandKredit = (float) $laporan->sum('totalKredit');
-
-    // Saldo awal bersih:
-    // Debit positif, Kredit negatif.
-    $grandSaldoAwal = (float) $laporan->sum(
-        fn ($item) => $item['sisiAwal'] === 'Debit'
-            ? $item['saldoAwal']
-            : -$item['saldoAwal']
-    );
-
-    // Saldo akhir bersih dihitung dari saldo awal bersih
-    // ditambah mutasi debit dikurangi mutasi kredit.
-    $grandSaldoAkhir = $grandSaldoAwal
-        + $grandDebit
-        - $grandKredit;
-
-    return [
-        'akuns' => $akuns,
-        'laporan' => $laporan,
-        'semuaAkun' => $semuaAkun,
-
-        'grandTotal' => (float) $laporan->sum(
-            fn ($item) => $item['totalNilai'] ?? 0
-        ),
-
-        'grandDebit' => $grandDebit,
-        'grandKredit' => $grandKredit,
-        'grandSaldoAwal' => $grandSaldoAwal,
-        'grandSaldoAkhir' => $grandSaldoAkhir,
-
-        'start_date' => $start_date,
-        'end_date' => $end_date,
-        'akun_id' => $akun_id,
-    ];
-}
-
 
     /**
-     * Mengubah saldo menjadi angka positif dan label sisi saldo.
+     * Mengubah saldo menjadi angka positif dan sisi saldo.
      */
-    
-    
     private function sisiSaldo(
         float $saldo,
         bool $isDebitNormal
@@ -187,10 +157,89 @@ private function siapkanLaporan(Request $request): array
         ];
     }
 
+    /**
+     * Menentukan keterangan akun lawan untuk Buku Besar.
+     *
+     * Penjualan:
+     * Kas <-> Pendapatan Penjualan
+     *
+     * HPP:
+     * Harga Pokok Produksi <-> Persediaan
+     *
+     * Beban operasional:
+     * Mengambil akun lawan yang benar-benar tercatat,
+     * misalnya Kas atau Bank.
+     */
+    private function keteranganAkunLawan(
+        DetailJurnal $detail,
+        $semuaDetailJurnal
+    ): string {
+        $kodeAkun = $detail->akun?->kode_akun;
 
+        // Pasangan khusus agar akun penjualan dan HPP
+        // tidak tercampur meskipun berada di jurnal yang sama.
+        $pasanganKhusus = match ($kodeAkun) {
+            '1-1100' => ['4-1100'], // Kas -> Pendapatan Penjualan
+            '4-1100' => ['1-1100'], // Pendapatan Penjualan -> Kas
+            '5-1100' => ['1-1300'], // HPP -> Persediaan
+            '1-1300' => ['5-1100'], // Persediaan -> HPP
+            default => null,
+        };
+
+        if ($pasanganKhusus !== null) {
+            $namaPasangan = $semuaDetailJurnal
+                ->filter(function ($item) use ($pasanganKhusus, $detail) {
+                    return $item->id !== $detail->id
+                        && in_array(
+                            $item->akun?->kode_akun,
+                            $pasanganKhusus,
+                            true
+                        );
+                })
+                ->pluck('akun.nama_akun')
+                ->filter()
+                ->unique()
+                ->values()
+                ->implode(', ');
+
+            if ($namaPasangan !== '') {
+                return $namaPasangan;
+            }
+        }
+
+        // Untuk beban operasional dan jurnal lainnya,
+        // pilih akun lawan yang memiliki mutasi berpasangan.
+        $debit = (float) $detail->debit;
+        $kredit = (float) $detail->kredit;
+
+        $akunLawan = $semuaDetailJurnal
+            ->filter(function ($item) use ($detail, $debit, $kredit) {
+                if ($item->id === $detail->id) {
+                    return false;
+                }
+
+                if ($debit > 0) {
+                    return (float) $item->kredit > 0;
+                }
+
+                if ($kredit > 0) {
+                    return (float) $item->debit > 0;
+                }
+
+                return false;
+            })
+            ->pluck('akun.nama_akun')
+            ->filter()
+            ->unique()
+            ->values()
+            ->implode(', ');
+
+        return $akunLawan
+            ?: ($detail->jurnal?->keterangan ?? '-');
+    }
 
     /**
-     * Menyusun laporan buku besar untuk satu atau banyak akun.
+     * Menyusun laporan Buku Besar untuk satu atau banyak akun.
      */
     private function susunLaporan(
         $daftarAkun,
@@ -199,10 +248,8 @@ private function siapkanLaporan(Request $request): array
     ) {
         $akunIds = $daftarAkun->pluck('id');
 
-        // 1. Menghitung saldo sebelum periode awal.
-        $sebelumnya = DetailJurnal::select(
-                'detail_jurnals.akun_id'
-            )
+        // 1. Saldo sebelum periode laporan.
+        $sebelumnya = DetailJurnal::select('detail_jurnals.akun_id')
             ->selectRaw(
                 'SUM(detail_jurnals.debit) as total_debit,
                  SUM(detail_jurnals.kredit) as total_kredit'
@@ -219,8 +266,8 @@ private function siapkanLaporan(Request $request): array
             ->get()
             ->keyBy('akun_id');
 
-        // 2. Mengambil mutasi jurnal pada periode laporan.
-        $mutasiSemua = DetailJurnal::with('jurnal')
+        // 2. Ambil semua mutasi dalam periode.
+        $mutasiSemua = DetailJurnal::with(['jurnal', 'akun'])
             ->select('detail_jurnals.*')
             ->join(
                 'jurnals',
@@ -239,74 +286,84 @@ private function siapkanLaporan(Request $request): array
             ->get()
             ->groupBy('akun_id');
 
-        // 3. Menghitung saldo awal, mutasi, dan saldo akhir.
-        return $daftarAkun->map(
-            function ($akun) use ($sebelumnya, $mutasiSemua) {
-                $isDebitNormal = $akun->saldo_normal === 'Debit';
+        // 3. Ambil semua detail jurnal pada periode yang sama,
+        // termasuk akun lawan yang tidak sedang ditampilkan.
+        $detailPeriode = DetailJurnal::with(['akun', 'jurnal'])
+            ->whereHas('jurnal', function ($query) use ($start_date, $end_date) {
+                $query->whereBetween('tanggal', [$start_date, $end_date]);
+            })
+            ->get()
+            ->groupBy('jurnal_id');
 
-                $awal = $sebelumnya->get($akun->id);
+        // 4. Hitung saldo awal, mutasi, dan saldo akhir per akun.
+        return $daftarAkun->map(function ($akun) use (
+            $sebelumnya,
+            $mutasiSemua,
+            $detailPeriode
+        ) {
+            $isDebitNormal = $akun->saldo_normal === 'Debit';
 
-                $debitAwal = (float) ($awal->total_debit ?? 0);
-                $kreditAwal = (float) ($awal->total_kredit ?? 0);
+            $awal = $sebelumnya->get($akun->id);
 
-                $saldo = $isDebitNormal
-                    ? $debitAwal - $kreditAwal
-                    : $kreditAwal - $debitAwal;
+            $debitAwal = (float) ($awal->total_debit ?? 0);
+            $kreditAwal = (float) ($awal->total_kredit ?? 0);
 
-                $awalTampil = $this->sisiSaldo(
-                    $saldo,
-                    $isDebitNormal
-                );
+            $saldo = $isDebitNormal
+                ? $debitAwal - $kreditAwal
+                : $kreditAwal - $debitAwal;
 
-                $mutasi = $mutasiSemua->get(
-                    $akun->id,
+            $awalTampil = $this->sisiSaldo($saldo, $isDebitNormal);
+
+            $mutasi = $mutasiSemua->get($akun->id, collect());
+
+            $baris = $mutasi->map(function ($detail) use (
+                &$saldo,
+                $isDebitNormal,
+                $detailPeriode
+            ) {
+                $debit = (float) $detail->debit;
+                $kredit = (float) $detail->kredit;
+
+                $saldo += $isDebitNormal
+                    ? $debit - $kredit
+                    : $kredit - $debit;
+
+                $tampil = $this->sisiSaldo($saldo, $isDebitNormal);
+
+                $detail->saldo = $tampil['nilai'];
+                $detail->sisi_saldo = $tampil['sisi'];
+
+                $semuaDetailJurnal = $detailPeriode->get(
+                    $detail->jurnal_id,
                     collect()
                 );
 
-                $baris = $mutasi->map(
-                    function ($detail) use (&$saldo, $isDebitNormal) {
-                        $debit = (float) $detail->debit;
-                        $kredit = (float) $detail->kredit;
+                $detail->keterangan_buku_besar =
+                    $this->keteranganAkunLawan(
+                        $detail,
+                        $semuaDetailJurnal
+                    );
 
-                        $saldo += $isDebitNormal
-                            ? $debit - $kredit
-                            : $kredit - $debit;
+                $detail->total_tampil = $detail->total_harga !== null
+                    ? (float) $detail->total_harga
+                    : max($debit, $kredit);
 
-                        $tampil = $this->sisiSaldo(
-                            $saldo,
-                            $isDebitNormal
-                        );
+                return $detail;
+            });
 
-                        $detail->saldo = $tampil['nilai'];
-                        $detail->sisi_saldo = $tampil['sisi'];
+            $akhirTampil = $this->sisiSaldo($saldo, $isDebitNormal);
 
-                        // Nilai total untuk export, jika kolom tersedia.
-                        $detail->total_tampil =
-                            $detail->total_harga !== null
-                                ? (float) $detail->total_harga
-                                : max($debit, $kredit);
-
-                        return $detail;
-                    }
-                );
-
-                $akhirTampil = $this->sisiSaldo(
-                    $saldo,
-                    $isDebitNormal
-                );
-
-                return [
-                    'akun' => $akun,
-                    'saldoAwal' => $awalTampil['nilai'],
-                    'sisiAwal' => $awalTampil['sisi'],
-                    'baris' => $baris,
-                    'saldoAkhir' => $akhirTampil['nilai'],
-                    'sisiAkhir' => $akhirTampil['sisi'],
-                    'totalNilai' => (float) $baris->sum('total_tampil'),
-                    'totalDebit' => (float) $mutasi->sum('debit'),
-                    'totalKredit' => (float) $mutasi->sum('kredit'),
-                ];
-            }
-        );
+            return [
+                'akun' => $akun,
+                'saldoAwal' => $awalTampil['nilai'],
+                'sisiAwal' => $awalTampil['sisi'],
+                'baris' => $baris,
+                'saldoAkhir' => $akhirTampil['nilai'],
+                'sisiAkhir' => $akhirTampil['sisi'],
+                'totalNilai' => (float) $baris->sum('total_tampil'),
+                'totalDebit' => (float) $mutasi->sum('debit'),
+                'totalKredit' => (float) $mutasi->sum('kredit'),
+            ];
+        });
     }
 }

@@ -13,7 +13,7 @@ class Jurnal extends Model
     public function detailJurnals() { return $this->hasMany(DetailJurnal::class); }
     public function transaksi()
 {
-    return $this->belongsTo(Transaksi::class, 'no_referensi', 'no_invoice');
+    return $this->belongsTo(Transaksi::class, 'no_referensi', 'no_referensi');
 }
     public function pengeluaran()
 {
