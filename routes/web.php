@@ -44,10 +44,6 @@ Route::middleware(['auth'])->group(function () {
     // Halaman Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Route untuk Register
-    Route::get('/register', [AuthController::class, 'register'])->name('register');
-    Route::post('/register', [AuthController::class, 'store'])->name('register.store');
-
     // Route untuk Profil
     Route::get('/profil', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profil/update', [ProfileController::class, 'updateProfile'])->name('profile.update');

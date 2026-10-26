@@ -15,11 +15,11 @@ class JurnalController extends Controller
     public function index()
     {
         $jurnals = Jurnal::with([
-    'user',
-    'cabang',
-    'detailJurnals.akun',
-    'transaksi.detailTransaksis.produk',
-])->latest()->get();
+            'user',
+            'cabang',
+            'detailJurnals.akun',
+            'transaksi.detailTransaksis.produk',
+        ])->latest()->get();
         return view('admin.jurnal.index', compact('jurnals'));
     }
 
@@ -27,7 +27,7 @@ class JurnalController extends Controller
     {
         $akuns = Akun::where('status', 'aktif')->orderBy('kode_akun')->get();
         $cabangs = Cabang::where('status', 'aktif')->get();
-        
+
         $today = now()->format('Ymd');
         $lastJurnal = Jurnal::whereDate('created_at', now()->today())->count();
         $no_referensi = 'JRN-' . $today . '-' . str_pad($lastJurnal + 1, 4, '0', STR_PAD_LEFT);
@@ -52,7 +52,7 @@ class JurnalController extends Controller
         $totalKredit = array_sum($request->kredit);
 
         if ($totalDebit != $totalKredit) {
-            return back()->with('error', 'Transaksi gagal disimpan! Total Debit (Rp '.number_format($totalDebit,0,',','.').') dan Kredit (Rp '.number_format($totalKredit,0,',','.').') tidak seimbang.')->withInput();
+            return back()->with('error', 'Transaksi gagal disimpan! Total Debit (Rp ' . number_format($totalDebit, 0, ',', '.') . ') dan Kredit (Rp ' . number_format($totalKredit, 0, ',', '.') . ') tidak seimbang.')->withInput();
         }
 
         if ($totalDebit <= 0) {
