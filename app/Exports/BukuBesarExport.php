@@ -9,7 +9,11 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class BukuBesarExport implements FromCollection, WithHeadings, WithTitle, WithStyles
+class BukuBesarExport implements
+    FromCollection,
+    WithHeadings,
+    WithTitle,
+    WithStyles
 {
     protected array $data;
 
@@ -31,10 +35,6 @@ class BukuBesarExport implements FromCollection, WithHeadings, WithTitle, WithSt
             'Tanggal',
             'No Referensi',
             'Keterangan',
-            'Kuantitas',
-            'Satuan',
-            'Harga',
-            'Total',
             'Debit',
             'Kredit',
             'Saldo',
@@ -49,22 +49,20 @@ class BukuBesarExport implements FromCollection, WithHeadings, WithTitle, WithSt
         foreach ($this->data['laporan'] as $item) {
             $akun = $item['akun'];
 
+            // Saldo awal
             $rows->push([
                 $akun->kode_akun,
                 $akun->nama_akun,
                 '',
                 '',
                 'Saldo Awal',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                $item['saldoAwal'],
+                0,
+                0,
+                (float) $item['saldoAwal'],
                 $item['sisiAwal'],
             ]);
 
+            // Mutasi transaksi
             foreach ($item['baris'] as $detail) {
                 $jurnal = $detail->jurnal;
 
@@ -73,14 +71,8 @@ class BukuBesarExport implements FromCollection, WithHeadings, WithTitle, WithSt
                     $akun->nama_akun,
                     $jurnal?->tanggal,
                     $jurnal?->no_referensi,
-                    $jurnal?->keterangan,
-                    $detail->quantity,
-                    $detail->satuan,
-                    $detail->harga,
-                    $detail->total_harga ?? max(
-                        (float) $detail->debit,
-                        (float) $detail->kredit
-                    ),
+                    $detail->keterangan_buku_besar
+                        ?: ($jurnal?->keterangan ?? '-'),
                     (float) $detail->debit,
                     (float) $detail->kredit,
                     (float) $detail->saldo,
@@ -88,22 +80,20 @@ class BukuBesarExport implements FromCollection, WithHeadings, WithTitle, WithSt
                 ]);
             }
 
+            // Total mutasi dan saldo akhir
             $rows->push([
                 $akun->kode_akun,
                 $akun->nama_akun,
                 '',
                 '',
                 'Total Mutasi / Saldo Akhir',
-                '',
-                '',
-                '',
-                $item['totalNilai'] ?? 0,
-                $item['totalDebit'],
-                $item['totalKredit'],
-                $item['saldoAkhir'],
+                (float) $item['totalDebit'],
+                (float) $item['totalKredit'],
+                (float) $item['saldoAkhir'],
                 $item['sisiAkhir'],
             ]);
 
+            // Baris kosong sebagai pemisah antar akun
             $rows->push([]);
         }
 
@@ -112,18 +102,24 @@ class BukuBesarExport implements FromCollection, WithHeadings, WithTitle, WithSt
 
     public function styles(Worksheet $sheet): array
     {
-        $sheet->getStyle('A1:M1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:M1')->getAlignment()
+        // Format header
+        $sheet->getStyle('A1:I1')->getFont()->setBold(true);
+
+        $sheet->getStyle('A1:I1')
+            ->getAlignment()
             ->setHorizontal('center');
 
+        // Bekukan baris judul dan aktifkan filter
         $sheet->freezePane('A2');
-        $sheet->setAutoFilter('A1:M1');
+        $sheet->setAutoFilter('A1:I1');
 
-        foreach (range('A', 'M') as $column) {
+        // Sesuaikan lebar kolom
+        foreach (range('A', 'I') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
-        foreach (['H', 'I', 'J', 'K', 'L'] as $column) {
+        // Format angka untuk Debit, Kredit, dan Saldo
+        foreach (['F', 'G', 'H'] as $column) {
             $sheet->getStyle($column . ':' . $column)
                 ->getNumberFormat()
                 ->setFormatCode('#,##0.00');

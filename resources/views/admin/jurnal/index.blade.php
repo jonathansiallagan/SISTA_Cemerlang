@@ -14,131 +14,142 @@
     @endif
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="bg-blue-600 text-white text-center font-bold py-3 border border-blue-600">
+        <div class="bg-blue-600 text-white text-center font-bold py-3">
             DAFTAR JURNAL
         </div>
-        <div class="w-full">
-            <table class="w-full table-fixed text-sm text-left border-collapse border border-gray-300">
+
+        <div class="w-full overflow-x-auto">
+            <table class="w-full min-w-262.5 text-xs md:text-sm text-left border-collapse border border-gray-300">
                 <thead class="bg-gray-100 text-gray-600 font-bold">
                     <tr>
-                        <th class="border border-gray-300 px-3 py-4 w-[10%]">Tanggal</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[12%]">No Referensi</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[20%]">Keterangan</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[6%] text-right">Qty</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[8%]">Satuan</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[9%] text-right">Harga</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[9%] text-right">Total</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[11%]">Nama Akun</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[8%] text-right">Debit</th>
-                        <th class="border border-gray-300 px-3 py-4 w-[7%] text-right">Kredit</th>
+                        <th class="border border-gray-300 px-2 py-3 w-22.5">Tanggal</th>
+                        <th class="border border-gray-300 px-2 py-3 w-36.25">No Referensi</th>
+                        <th class="border border-gray-300 px-2 py-3 min-w-50">Keterangan</th>
+                        <th class="border border-gray-300 px-2 py-3 w-15 text-right">Qty</th>
+                        <th class="border border-gray-300 px-2 py-3 w-17.5">Satuan</th>
+                        <th class="border border-gray-300 px-2 py-3 w-28.75 text-right">Harga</th>
+                        <th class="border border-gray-300 px-2 py-3 w-31.25 text-right">Total</th>
+                        <th class="border border-gray-300 px-2 py-3 min-w-40">Nama Akun</th>
+                        <th class="border border-gray-300 px-2 py-3 w-30 text-right">Debit</th>
+                        <th class="border border-gray-300 px-2 py-3 w-30 text-right">Kredit</th>
                     </tr>
                 </thead>
 
-            <tbody class="divide-y divide-gray-100">
-                @forelse ($jurnals as $jurnal)
-                    @foreach ($jurnal->detailJurnals as $index => $detail)
-                        <tr class="hover:bg-gray-50 transition
-                            {{ $index === 0 || $index === 2 ? 'border-t-2 border-gray-200' : '' }}">
+                <tbody class="divide-y divide-gray-200">
+                    @forelse ($jurnals as $jurnal)
+                        @php
+                            $details = $jurnal->detailJurnals;
 
-                            {{-- Tanggal: tampil pada baris Kas dan HPP --}}
-                            <td class="border border-gray-300 px-2 py-3 whitespace-nowrap">
-                                @if ($index === 0 || $index === 2)
-                                    {{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d M Y') }}
-                                @endif
-                            </td>
+                            // Kelompokkan detail berdasarkan keterangan.
+                            // Untuk data lama yang belum memiliki keterangan detail,
+                            // gunakan keterangan header jurnal sebagai cadangan.
+                            $groups = $details
+                                ->groupBy(function ($detail) use ($jurnal) {
+                                    return $detail->keterangan ?? ($jurnal->keterangan ?? 'Tanpa Keterangan');
+                                })
+                                // Tampilkan penjualan terlebih dahulu,
+                                // lalu kelompok HPP.
+                                ->sortBy(function ($group, $keterangan) {
+                                    return str_starts_with((string) $keterangan, 'HPP ') ? 1 : 0;
+                                });
 
-                            {{-- Referensi: tampil pada baris Kas dan HPP --}}
-                            <td class="border border-gray-300 px-2 py-3 whitespace-nowrap">
-                                @if ($index === 0 || $index === 2)
-                                    {{ $jurnal->no_referensi }}
-                                @endif
-                            </td>
+                            $jumlahBaris = $details->count();
+                            $barisGlobal = 0;
 
-                            {{-- Keterangan --}}
-                            <td class="border border-gray-300 px-2 py-3 align-middle">
-                                @if ($index === 0 || $index === 2)
-                                    @php
-                                        $detailTransaksi = $jurnal->transaksi?->detailTransaksis;
-                                    @endphp
+                            $pengeluaran = $jurnal->pengeluaran;
+                        @endphp
 
-                                    @if ($detailTransaksi && $detailTransaksi->isNotEmpty())
-                                        Penjualan
-                                        @foreach ($detailTransaksi as $item)
-                                            {{ $item->produk->nama_produk ?? 'Produk' }}
-                                            {{ $item->luas > 0 ? $item->luas . ' m²' : $item->jumlah . ' ' . ($item->produk->satuan ?? '') }}
-                                            @if (!$loop->last), @endif
-                                        @endforeach
-                                    @else
-                                        {{ $jurnal->keterangan ?? '-' }}
+                        @foreach ($groups as $keterangan => $group)
+                            @php
+                                $detailUtama = $group->first(
+                                    fn($detail) => $detail->quantity !== null ||
+                                        $detail->harga !== null ||
+                                        $detail->total_harga !== null,
+                                );
+
+                                $qty = $detailUtama?->quantity ?? $pengeluaran?->qty;
+
+                                $satuan = $detailUtama?->satuan ?? $pengeluaran?->satuan;
+
+                                $harga = $detailUtama?->harga ?? $pengeluaran?->harga;
+
+                                $total = $detailUtama?->total_harga ?? $pengeluaran?->total_pengeluaran;
+                            @endphp
+
+                            @foreach ($group as $detailIndex => $detail)
+                                <tr class="hover:bg-blue-50 transition-colors">
+                                    {{-- Tanggal dan nomor referensi digabung
+                                        untuk seluruh baris satu jurnal. --}}
+                                    @if ($barisGlobal === 0)
+                                        <td rowspan="{{ $jumlahBaris }}"
+                                            class="border border-gray-300 px-2 py-2 align-middle whitespace-normal wrap-break-words">
+                                            {{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d M Y') }}
+                                        </td>
+
+                                        <td rowspan="{{ $jumlahBaris }}"
+                                            class="border border-gray-300 px-2 py-2 align-middle whitespace-normal wrap-break-words">
+                                            {{ $jurnal->no_referensi }}
+                                        </td>
                                     @endif
-                                @endif
+
+                                    {{-- Keterangan, qty, satuan, harga,
+                                        dan total digabung per kelompok akun. --}}
+                                    @if ($detailIndex === 0)
+                                        <td rowspan="{{ $group->count() }}"
+                                            class="border border-gray-300 px-2 py-2 align-middle whitespace-normal wrap-break-words">
+                                            {{ $keterangan }}
+                                        </td>
+
+                                        <td rowspan="{{ $group->count() }}"
+                                            class="border border-gray-300 px-2 py-2 align-middle text-right">
+                                            {{ $qty !== null ? rtrim(rtrim(number_format((float) $qty, 2, ',', '.'), '0'), ',') : '-' }}
+                                        </td>
+
+                                        <td rowspan="{{ $group->count() }}"
+                                            class="border border-gray-300 px-2 py-2 align-middle">
+                                            {{ $satuan ?? '-' }}
+                                        </td>
+
+                                        <td rowspan="{{ $group->count() }}"
+                                            class="border border-gray-300 px-2 py-2 align-middle text-right whitespace-nowrap">
+                                            {{ $harga !== null ? 'Rp ' . number_format((float) $harga, 0, ',', '.') : '-' }}
+                                        </td>
+
+                                        <td rowspan="{{ $group->count() }}"
+                                            class="border border-gray-300 px-2 py-2 align-middle text-right whitespace-nowrap">
+                                            {{ $total !== null ? 'Rp ' . number_format((float) $total, 0, ',', '.') : '-' }}
+                                        </td>
+                                    @endif
+
+                                    <td
+                                        class="border border-gray-300 px-2 py-2 align-middle whitespace-normal wrap-break-words">
+                                        {{ $detail->akun->nama_akun ?? '-' }}
+                                    </td>
+
+                                    <td
+                                        class="border border-gray-300 px-2 py-2 align-middle text-right whitespace-nowrap">
+                                        {{ (float) $detail->debit > 0 ? 'Rp ' . number_format((float) $detail->debit, 0, ',', '.') : '-' }}
+                                    </td>
+
+                                    <td
+                                        class="border border-gray-300 px-2 py-2 align-middle text-right whitespace-nowrap">
+                                        {{ (float) $detail->kredit > 0 ? 'Rp ' . number_format((float) $detail->kredit, 0, ',', '.') : '-' }}
+                                    </td>
+                                </tr>
+
+                                @php
+                                    $barisGlobal++;
+                                @endphp
+                            @endforeach
+                        @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="10" class="px-6 py-8 text-center text-gray-400">
+                                Belum ada pencatatan jurnal.
                             </td>
-
-                          
-                            {{-- Quantity --}}
-                            <td class="border border-gray-300 px-3 py-3 text-right align-middle">
-                                @if ($index === 0 && $jurnal->pengeluaran)
-                                    {{ rtrim(rtrim(number_format((float) $jurnal->pengeluaran->qty, 2, ',', '.'), '0'), ',') }}
-                                @elseif ($index === 0 && $jurnal->transaksi)
-                                    -
-                                @else
-                                    -
-                                @endif
-                            </td>
-
-                            {{-- Satuan --}}
-                            <td class="border border-gray-300 px-2 py-3">
-                                {{ $index === 0 ? ($jurnal->pengeluaran?->satuan ?? '-') : '-' }}
-                            </td>
-
-                            {{-- Harga --}}
-                            <td class="border border-gray-300 px-2 py-3 text-right whitespace-nowrap">
-                                @if ($index === 0 && $jurnal->pengeluaran)
-                                    Rp {{ number_format((float) $jurnal->pengeluaran->harga, 0, ',', '.') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
-
-                            {{-- Total --}}
-                            <td class="border border-gray-300 px-2 py-3 text-right whitespace-nowrap">
-                                @if ($index === 0 && $jurnal->pengeluaran)
-                                    Rp {{ number_format((float) $jurnal->pengeluaran->total_pengeluaran, 0, ',', '.') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
-
-
-                            {{-- Nama Akun tanpa kode --}}
-                            <td class="border border-gray-300 px-2 py-3 text-left align-middle text-gray-800">
-                                {{ $detail->akun->nama_akun ?? '-' }}
-                            </td>
-
-                            {{-- Debit --}}
-                            <td class="border border-gray-300 px-2 py-3 text-right whitespace-nowrap">
-                                {{ $detail->debit > 0
-                                    ? 'Rp ' . number_format($detail->debit, 0, ',', '.')
-                                    : '-' }}
-                            </td>
-
-                            {{-- Kredit --}}
-                            <td class="border border-gray-300 px-2 py-3 text-right whitespace-nowrap">
-                                {{ $detail->kredit > 0
-                                    ? 'Rp ' . number_format($detail->kredit, 0, ',', '.')
-                                    : '-' }}
-                            </td>
-
                         </tr>
-                    @endforeach
-                @empty
-                    <tr>
-                        <td colspan="10" class="px-6 py-8 text-center text-gray-400">
-                            Belum ada pencatatan jurnal.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
+                    @endforelse
+                </tbody>
             </table>
         </div>
     </div>

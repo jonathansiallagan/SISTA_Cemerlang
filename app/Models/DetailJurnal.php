@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 #[Fillable([
     'jurnal_id',
     'akun_id',
+    'keterangan',
     'quantity',
     'satuan',
     'harga',
     'total_harga',
     'debit',
-    'kredit',
+    'kredit'
 ])]
 class DetailJurnal extends Model
 {
