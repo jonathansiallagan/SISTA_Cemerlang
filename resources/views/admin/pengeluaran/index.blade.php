@@ -30,7 +30,7 @@
                     bg-white shadow-sm">
 
             <div class="w-full overflow-x-auto">
-                <table class="w-full min-w-[800px] table-fixed border-collapse text-left text-sm">
+                <table class="w-full min-w-200 table-fixed border-collapse text-left text-sm">
 
                     <thead class="border-b border-slate-200 bg-white">
                         <tr class="text-xs font-semibold tracking-wide text-slate-500">
@@ -56,7 +56,7 @@
                         @forelse ($pengeluarans as $pengeluaran)
                         <tr class="transition-colors hover:bg-slate-50">
 
-                            <td class="break-words px-6 py-5 align-middle
+                            <td class="wrap-break-word px-6 py-5 align-middle
                                 font-semibold text-blue-600">
                                 {{ $pengeluaran->no_referensi }}
                             </td>
@@ -66,7 +66,7 @@
                                 {{ $pengeluaran->tanggal->format('d M Y') }}
                             </td>
 
-                            <td class="break-words px-5 py-5 align-middle
+                            <td class="wrap-break-word px-5 py-5 align-middle
                                 text-slate-700">
                                 {{ $pengeluaran->cabang?->nama ?? '-' }}
                             </td>

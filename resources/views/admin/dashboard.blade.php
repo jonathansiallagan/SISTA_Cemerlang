@@ -18,7 +18,7 @@
 
                 <select name="cabang_id"
                     onchange="this.form.submit()"
-                    class="min-w-[150px] rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    class="min-w-37.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500">
 
                     @if($isAdminPusat)
                     <option value="semua"
@@ -199,8 +199,8 @@
                         </div>
 
                         <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                            <div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-rose-500"
-                                style="width: {{ $persenBar }}%"></div>
+                            <div class="h-full rounded-full bg-linear-to-r from-amber-400 to-rose-500"
+                                @style(["width: {$persenBar}%"])></div>
                         </div>
                     </div>
                     @empty
@@ -243,7 +243,7 @@
             </div>
 
             <div class="overflow-x-auto px-5 pb-5 md:px-6">
-                <table class="w-full min-w-[720px] text-left text-xs">
+                <table class="w-full min-w-180 text-left text-xs">
                     <thead>
                         <tr class="border-y border-slate-100 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-400">
                             <th class="px-3 py-4 font-bold">#</th>
@@ -339,7 +339,7 @@
                 </div>
 
                 <div class="mt-5 overflow-x-auto">
-                    <table class="w-full min-w-[400px] text-left text-xs">
+                    <table class="w-full min-w-100 text-left text-xs">
                         <thead>
                             <tr class="bg-slate-50 text-[10px] text-slate-400">
                                 <th class="rounded-l-lg px-3 py-3 font-bold">Tanggal</th>
@@ -460,8 +460,8 @@
 
             if (!canvas || typeof Chart === 'undefined') return;
 
-            const labels = @json($tanggalChart);
-            const values = @json($omzetChart);
+            const labels = {{ Illuminate\Support\Js::from($tanggalChart) }};
+            const values = {{ Illuminate\Support\Js::from($omzetChart) }};
             const ctx = canvas.getContext('2d');
 
             const gradient = ctx.createLinearGradient(0, 0, 0, 280);
