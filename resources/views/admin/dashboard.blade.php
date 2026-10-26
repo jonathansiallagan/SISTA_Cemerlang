@@ -1,11 +1,10 @@
-
 <x-admin-layout>
     <div class="space-y-6">
 
         <!-- HEADER DASHBOARD -->
         <section class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
-                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
                     {{ $judulDashboard }}
                 </h1>
                 <p class="mt-1 text-sm text-slate-500">
@@ -15,36 +14,36 @@
 
             <!-- FILTER CABANG DAN TANGGAL -->
             <form method="GET" action="{{ url()->current() }}"
-                  class="flex flex-wrap items-center gap-3">
+                class="flex flex-wrap items-center gap-3">
 
                 <select name="cabang_id"
-                        onchange="this.form.submit()"
-                        class="min-w-[150px] rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    onchange="this.form.submit()"
+                    class="min-w-[150px] rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500">
 
                     @if($isAdminPusat)
-                        <option value="semua"
-                            {{ $cabangId === null ? 'selected' : '' }}>
-                            Semua Cabang
-                        </option>
+                    <option value="semua"
+                        {{ $cabangId === null ? 'selected' : '' }}>
+                        Semua Cabang
+                    </option>
                     @endif
 
                     @foreach($daftarCabang as $cabang)
-                        <option value="{{ $cabang->id }}"
-                            {{ (string) $cabangId === (string) $cabang->id ? 'selected' : '' }}>
-                            {{ $cabang->nama }}
-                        </option>
+                    <option value="{{ $cabang->id }}"
+                        {{ (string) $cabangId === (string) $cabang->id ? 'selected' : '' }}>
+                        {{ $cabang->nama }}
+                    </option>
                     @endforeach
                 </select>
 
                 <input type="date"
-                       name="tanggal"
-                       value="{{ $tanggal }}"
-                       onchange="this.form.submit()"
-                       class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    name="tanggal"
+                    value="{{ $tanggal }}"
+                    onchange="this.form.submit()"
+                    class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </form>
         </section>
 
-        
+
         <!-- KARTU STATISTIK -->
         <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
 
@@ -168,58 +167,58 @@
 
                 <div class="mt-5 space-y-3">
                     @forelse($produkTerlaris as $index => $produk)
-                        @php
-                            $maksPenjualan = collect($produkTerlaris)->max('total_terjual') ?? 0;
-                            $persenBar = $maksPenjualan > 0
-                                ? min(100, (($produk->total_terjual ?? 0) / $maksPenjualan) * 100)
-                                : 0;
-                        @endphp
+                    @php
+                    $maksPenjualan = collect($produkTerlaris)->max('total_terjual') ?? 0;
+                    $persenBar = $maksPenjualan > 0
+                    ? min(100, (($produk->total_terjual ?? 0) / $maksPenjualan) * 100)
+                    : 0;
+                    @endphp
 
-                        <div class="rounded-xl border border-amber-100 bg-amber-50/30 p-3">
-                            <div class="flex items-center gap-3">
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-sm font-bold text-white">
-                                    {{ $index + 1 }}
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="truncate text-xs font-bold text-slate-800">
-                                        {{ optional($produk->produk)->nama ?? 'Produk Dihapus' }}
-                                    </p>
-                                    <p class="mt-1 text-[11px] text-slate-500">
-                                        {{ number_format($produk->total_terjual ?? 0, 0, ',', '.') }} terjual
-                                    </p>
-                                </div>
+                    <div class="rounded-xl border border-amber-100 bg-amber-50/30 p-3">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-sm font-bold text-white">
+                                {{ $index + 1 }}
                             </div>
-
-                            <div class="mt-3 flex items-center justify-between gap-2">
-                                <span class="text-[10px] font-semibold text-emerald-600">
-                                    {{ $index === 0 ? 'Produk Teratas' : 'Peringkat ' . ($index + 1) }}
-                                </span>
-                                <span class="text-xs font-bold text-slate-700">
-                                    Rp {{ number_format($produk->total_penjualan ?? 0, 0, ',', '.') }}
-                                </span>
-                            </div>
-
-                            <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                                <div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-rose-500"
-                                     style="width: {{ $persenBar }}%"></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-xs font-bold text-slate-800">
+                                    {{ optional($produk->produk)->nama ?? 'Produk Dihapus' }}
+                                </p>
+                                <p class="mt-1 text-[11px] text-slate-500">
+                                    {{ number_format($produk->total_terjual ?? 0, 0, ',', '.') }} terjual
+                                </p>
                             </div>
                         </div>
+
+                        <div class="mt-3 flex items-center justify-between gap-2">
+                            <span class="text-[10px] font-semibold text-emerald-600">
+                                {{ $index === 0 ? 'Produk Teratas' : 'Peringkat ' . ($index + 1) }}
+                            </span>
+                            <span class="text-xs font-bold text-slate-700">
+                                Rp {{ number_format($produk->total_penjualan ?? 0, 0, ',', '.') }}
+                            </span>
+                        </div>
+
+                        <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                            <div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-rose-500"
+                                style="width: {{ $persenBar }}%"></div>
+                        </div>
+                    </div>
                     @empty
-                        <div class="rounded-xl border border-dashed border-slate-200 px-4 py-10 text-center">
-                            <i class="fa-regular fa-clock text-xl text-slate-300"></i>
-                            <p class="mt-3 text-xs font-semibold text-slate-600">
-                                Belum ada data produk
-                            </p>
-                            <p class="mt-1 text-[11px] text-slate-400">
-                                Data akan tampil setelah transaksi tersedia.
-                            </p>
-                        </div>
+                    <div class="rounded-xl border border-dashed border-slate-200 px-4 py-10 text-center">
+                        <i class="fa-regular fa-clock text-xl text-slate-300"></i>
+                        <p class="mt-3 text-xs font-semibold text-slate-600">
+                            Belum ada data produk
+                        </p>
+                        <p class="mt-1 text-[11px] text-slate-400">
+                            Data akan tampil setelah transaksi tersedia.
+                        </p>
+                    </div>
                     @endforelse
                 </div>
 
                 <div class="mt-5 border-t border-slate-100 pt-4">
                     <a href="{{ route('produk.index') }}"
-                       class="block text-center text-xs font-semibold text-blue-600 hover:text-blue-800">
+                        class="block text-center text-xs font-semibold text-blue-600 hover:text-blue-800">
                         Lihat Katalog Produk →
                     </a>
                 </div>
@@ -237,7 +236,7 @@
                 </div>
 
                 <a href="{{ route('transaksi.index') }}"
-                   class="inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100">
+                    class="inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100">
                     <span class="h-2 w-2 rounded-full bg-blue-500"></span>
                     {{ $jumlahTransaksi }} Transaksi
                 </a>
@@ -250,7 +249,7 @@
                             <th class="px-3 py-4 font-bold">#</th>
                             <th class="px-3 py-4 font-bold">Tanggal</th>
                             @if($isAdminPusat)
-                                <th class="px-3 py-4 font-bold">Cabang</th>
+                            <th class="px-3 py-4 font-bold">Cabang</th>
                             @endif
                             <th class="px-3 py-4 font-bold">User</th>
                             <th class="px-3 py-4 text-right font-bold">Omzet</th>
@@ -261,63 +260,63 @@
 
                     <tbody class="divide-y divide-slate-100">
                         @forelse($transaksiTerbaru as $index => $t)
-                            @php
-                                $omzetTransaksi = (float) ($t->total_transaksi ?? 0);
-                                $hppTransaksi = (float) ($t->total_hpp ?? 0);
-                                $labaTransaksi = $hppTransaksi > 0
-                                    ? $omzetTransaksi - $hppTransaksi
-                                    : $omzetTransaksi * 0.33;
-                            @endphp
+                        @php
+                        $omzetTransaksi = (float) ($t->total_transaksi ?? 0);
+                        $hppTransaksi = (float) ($t->total_hpp ?? 0);
+                        $labaTransaksi = $hppTransaksi > 0
+                        ? $omzetTransaksi - $hppTransaksi
+                        : $omzetTransaksi * 0.33;
+                        @endphp
 
-                            <tr class="transition hover:bg-blue-50/40">
-                                <td class="px-3 py-4">
-                                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 font-bold text-blue-600">
-                                        {{ $index + 1 }}
-                                    </span>
-                                </td>
+                        <tr class="transition hover:bg-blue-50/40">
+                            <td class="px-3 py-4">
+                                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 font-bold text-blue-600">
+                                    {{ $index + 1 }}
+                                </span>
+                            </td>
 
-                                <td class="whitespace-nowrap px-3 py-4 text-slate-600">
-                                    <i class="fa-regular fa-calendar mr-1 text-slate-400"></i>
-                                    {{ \Carbon\Carbon::parse($t->tanggal ?? $t->created_at)->format('d/m/Y') }}
-                                </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-slate-600">
+                                <i class="fa-regular fa-calendar mr-1 text-slate-400"></i>
+                                {{ \Carbon\Carbon::parse($t->tanggal ?? $t->created_at)->format('d/m/Y') }}
+                            </td>
 
-                                @if($isAdminPusat)
-                                    <td class="whitespace-nowrap px-3 py-4">
-                                        <span class="rounded-lg border border-blue-100 bg-blue-50 px-2 py-1 font-medium text-blue-600">
-                                            {{ optional($t->cabang)->nama ?? '-' }}
-                                        </span>
-                                    </td>
-                                @endif
+                            @if($isAdminPusat)
+                            <td class="whitespace-nowrap px-3 py-4">
+                                <span class="rounded-lg border border-blue-100 bg-blue-50 px-2 py-1 font-medium text-blue-600">
+                                    {{ optional($t->cabang)->nama ?? '-' }}
+                                </span>
+                            </td>
+                            @endif
 
-                                <td class="whitespace-nowrap px-3 py-4 font-semibold text-slate-700">
-                                    <i class="fa-regular fa-user mr-1 text-slate-400"></i>
-                                    {{ optional($t->user)->name ?? '-' }}
-                                </td>
+                            <td class="whitespace-nowrap px-3 py-4 font-semibold text-slate-700">
+                                <i class="fa-regular fa-user mr-1 text-slate-400"></i>
+                                {{ optional($t->user)->name ?? '-' }}
+                            </td>
 
-                                <td class="whitespace-nowrap px-3 py-4 text-right font-bold text-slate-800">
-                                    Rp {{ number_format($omzetTransaksi, 0, ',', '.') }}
-                                </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-right font-bold text-slate-800">
+                                Rp {{ number_format($omzetTransaksi, 0, ',', '.') }}
+                            </td>
 
-                                <td class="whitespace-nowrap px-3 py-4 text-right">
-                                    <span class="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 font-semibold text-amber-700">
-                                        Rp {{ number_format($hppTransaksi, 0, ',', '.') }}
-                                    </span>
-                                </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-right">
+                                <span class="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 font-semibold text-amber-700">
+                                    Rp {{ number_format($hppTransaksi, 0, ',', '.') }}
+                                </span>
+                            </td>
 
-                                <td class="whitespace-nowrap px-3 py-4 text-right">
-                                    <span class="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 font-bold text-emerald-700">
-                                        Rp {{ number_format($labaTransaksi, 0, ',', '.') }}
-                                    </span>
-                                </td>
-                            </tr>
+                            <td class="whitespace-nowrap px-3 py-4 text-right">
+                                <span class="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 font-bold text-emerald-700">
+                                    Rp {{ number_format($labaTransaksi, 0, ',', '.') }}
+                                </span>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="{{ $isAdminPusat ? 7 : 6 }}"
-                                    class="px-4 py-10 text-center text-slate-400">
-                                    <i class="fa-regular fa-folder-open mb-2 text-2xl"></i>
-                                    <p>Belum ada transaksi pada tanggal ini.</p>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="{{ $isAdminPusat ? 7 : 6 }}"
+                                class="px-4 py-10 text-center text-slate-400">
+                                <i class="fa-regular fa-folder-open mb-2 text-2xl"></i>
+                                <p>Belum ada transaksi pada tanggal ini.</p>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -346,42 +345,42 @@
                                 <th class="rounded-l-lg px-3 py-3 font-bold">Tanggal</th>
                                 <th class="px-3 py-3 font-bold">Keterangan</th>
                                 @if($isAdminPusat)
-                                    <th class="rounded-r-lg px-3 py-3 font-bold">Cabang</th>
+                                <th class="rounded-r-lg px-3 py-3 font-bold">Cabang</th>
                                 @endif
                             </tr>
                         </thead>
 
                         <tbody class="divide-y divide-slate-100">
                             @forelse($jurnalTerbaru as $jurnal)
-                                <tr class="hover:bg-slate-50">
-                                    <td class="whitespace-nowrap px-3 py-3 text-slate-600">
-                                        {{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d/m/Y') }}
-                                    </td>
-                                    <td class="px-3 py-3 font-medium text-slate-700">
-                                        {{ $jurnal->keterangan ?? 'Jurnal akuntansi' }}
-                                    </td>
-                                    @if($isAdminPusat)
-                                        <td class="whitespace-nowrap px-3 py-3 text-slate-600">
-                                            {{ optional($jurnal->cabang)->nama ?? '-' }}
-                                        </td>
-                                    @endif
-                                </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="whitespace-nowrap px-3 py-3 text-slate-600">
+                                    {{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d/m/Y') }}
+                                </td>
+                                <td class="px-3 py-3 font-medium text-slate-700">
+                                    {{ $jurnal->keterangan ?? 'Jurnal akuntansi' }}
+                                </td>
+                                @if($isAdminPusat)
+                                <td class="whitespace-nowrap px-3 py-3 text-slate-600">
+                                    {{ optional($jurnal->cabang)->nama ?? '-' }}
+                                </td>
+                                @endif
+                            </tr>
                             @empty
-                                <tr>
-                                    <td colspan="{{ $isAdminPusat ? 3 : 2 }}" class="py-8">
-                                        <div class="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center">
-                                            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
-                                                <i class="fa-solid fa-book-open text-xl"></i>
-                                            </div>
-                                            <p class="mt-3 text-xs font-semibold text-slate-700">
-                                                Belum ada mutasi jurnal
-                                            </p>
-                                            <p class="mt-1 text-[11px] text-slate-400">
-                                                Jurnal akan ditampilkan ketika data tersedia.
-                                            </p>
+                            <tr>
+                                <td colspan="{{ $isAdminPusat ? 3 : 2 }}" class="py-8">
+                                    <div class="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center">
+                                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
+                                            <i class="fa-solid fa-book-open text-xl"></i>
                                         </div>
-                                    </td>
-                                </tr>
+                                        <p class="mt-3 text-xs font-semibold text-slate-700">
+                                            Belum ada mutasi jurnal
+                                        </p>
+                                        <p class="mt-1 text-[11px] text-slate-400">
+                                            Jurnal akan ditampilkan ketika data tersedia.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -389,7 +388,7 @@
 
                 <div class="mt-4 border-t border-slate-100 pt-4">
                     <a href="{{ route('jurnal.index') }}"
-                       class="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                        class="text-xs font-semibold text-blue-600 hover:text-blue-800">
                         Lihat Jurnal Umum →
                     </a>
                 </div>
@@ -443,7 +442,7 @@
 
                 <div class="mt-5 border-t border-slate-100 pt-4">
                     <a href="{{ route('buku_besar.index') }}"
-                       class="block text-center text-xs font-semibold text-blue-600 hover:text-blue-800">
+                        class="block text-center text-xs font-semibold text-blue-600 hover:text-blue-800">
                         Lihat Buku Besar →
                     </a>
                 </div>
@@ -456,7 +455,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const canvas = document.getElementById('omzetChart');
 
             if (!canvas || typeof Chart === 'undefined') return;
@@ -496,13 +495,15 @@
                         mode: 'index'
                     },
                     plugins: {
-                        legend: { display: false },
+                        legend: {
+                            display: false
+                        },
                         tooltip: {
                             backgroundColor: '#172554',
                             padding: 12,
                             displayColors: false,
                             callbacks: {
-                                label: function (context) {
+                                label: function(context) {
                                     return 'Omzet: Rp ' +
                                         new Intl.NumberFormat('id-ID').format(context.parsed.y);
                                 }
@@ -511,21 +512,33 @@
                     },
                     scales: {
                         x: {
-                            grid: { display: false },
-                            border: { display: false },
+                            grid: {
+                                display: false
+                            },
+                            border: {
+                                display: false
+                            },
                             ticks: {
                                 color: '#94a3b8',
-                                font: { size: 11 }
+                                font: {
+                                    size: 11
+                                }
                             }
                         },
                         y: {
                             beginAtZero: true,
-                            border: { display: false },
-                            grid: { color: '#edf2f7' },
+                            border: {
+                                display: false
+                            },
+                            grid: {
+                                color: '#edf2f7'
+                            },
                             ticks: {
                                 color: '#94a3b8',
-                                font: { size: 10 },
-                                callback: function (value) {
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
                                     return 'Rp ' + new Intl.NumberFormat('id-ID', {
                                         notation: 'compact',
                                         maximumFractionDigits: 1

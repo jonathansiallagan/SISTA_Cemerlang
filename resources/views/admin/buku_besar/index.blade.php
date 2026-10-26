@@ -4,8 +4,12 @@
 
         <!-- Judul -->
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Buku Besar</h1>
-            <p class="text-gray-500 mt-1">Laporan mutasi dan saldo per akun perkiraan.</p>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                Buku Besar
+            </h1>
+            <p class="mt-1 text-sm text-slate-500">
+                Laporan mutasi dan saldo per akun perkiraan.
+            </p>
         </div>
 
         <!-- Tombol Export sejajar di kanan -->

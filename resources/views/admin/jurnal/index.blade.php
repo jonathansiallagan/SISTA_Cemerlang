@@ -1,7 +1,9 @@
 <x-admin-layout>
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Jurnal Umum</h1>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                Jurnal Umum
+            </h1>
         </div>
     </div>
 
