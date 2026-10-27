@@ -2,7 +2,7 @@
     {{-- HEADER HALAMAN DAN TOMBOL EXPORT --}}
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
                 Riwayat Transaksi
             </h1>
             <p class="mt-1 text-sm text-gray-500">

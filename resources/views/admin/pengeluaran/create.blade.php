@@ -3,7 +3,7 @@
         {{-- Header --}}
         <div>
             <a href="{{ route('pengeluaran.index') }}"
-               class="mb-4 inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600">
+                class="mb-4 inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600">
                 <i class="fa-solid fa-arrow-left"></i>
                 Kembali ke Riwayat Pengeluaran
             </a>
@@ -18,20 +18,17 @@
 
         {{-- Form --}}
         <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <form action="{{ route('pengeluaran.store') }}"
-                  method="POST" class="space-y-7">
+            <form action="{{ route('pengeluaran.store') }}" method="POST" class="space-y-7">
                 @csrf
 
                 {{-- Tanggal --}}
                 <div>
-                    <label for="tanggal"
-                           class="mb-2 block text-sm font-medium text-gray-700">
+                    <label for="tanggal" class="mb-2 block text-sm font-medium text-gray-700">
                         Tanggal Pengeluaran <span class="text-red-500">*</span>
                     </label>
-                    <input type="date" id="tanggal" name="tanggal"
-                           value="{{ old('tanggal', date('Y-m-d')) }}"
-                           required
-                           class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <input type="date" id="tanggal" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}"
+                        required
+                        class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
                     @error('tanggal')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -39,57 +36,47 @@
 
                 {{-- Nomor Referensi --}}
                 <div>
-                    <label for="no_referensi_preview"
-                           class="mb-2 block text-sm font-medium text-gray-700">
+                    <label for="no_referensi_preview" class="mb-2 block text-sm font-medium text-gray-700">
                         Nomor Referensi
                     </label>
-                    <input type="text" id="no_referensi_preview"
-                           value=""
-                           placeholder="Dibuat otomatis saat disimpan"
-                           readonly
-                           class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-600">
+                    <input type="text" id="no_referensi_preview" value=""
+                        placeholder="Dibuat otomatis saat disimpan" readonly
+                        class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-600">
                     <p class="mt-1 text-xs text-gray-500">
                         Nomor referensi ditentukan otomatis berdasarkan jenis beban dan tanggal.
                     </p>
                 </div>
 
-                
-{{-- Cabang --}}
-<div>
-    <label for="cabang_id"
-           class="mb-2 block text-sm font-medium text-gray-700">
-        Cabang <span class="text-red-500">*</span>
-    </label>
 
-    <input type="hidden"
-           id="cabang_id"
-           name="cabang_id"
-           value="{{ old('cabang_id', Auth::user()->cabang_id) }}">
+                {{-- Cabang --}}
+                <div>
+                    <label for="cabang_id" class="mb-2 block text-sm font-medium text-gray-700">
+                        Cabang <span class="text-red-500">*</span>
+                    </label>
 
-    <input type="text"
-           value="{{ Auth::user()->cabang?->nama ?? 'Cabang belum diatur' }}"
-           readonly
-           class="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-sm text-gray-600">
+                    <input type="hidden" id="cabang_id" name="cabang_id"
+                        value="{{ old('cabang_id', Auth::user()->cabang_id) }}">
 
-    @error('cabang_id')
-        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-    @enderror
-</div>
+                    <input type="text" value="{{ Auth::user()->cabang?->nama ?? 'Cabang belum diatur' }}" readonly
+                        class="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-sm text-gray-600">
+
+                    @error('cabang_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
 
                 {{-- Jenis Beban --}}
                 <div>
-                    <label for="akun_id"
-                           class="mb-2 block text-sm font-medium text-gray-700">
+                    <label for="akun_id" class="mb-2 block text-sm font-medium text-gray-700">
                         Jenis Beban <span class="text-red-500">*</span>
                     </label>
 
                     <select id="akun_id" name="akun_id" required
-                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="">Pilih Jenis Beban</option>
                         @foreach ($akuns as $akun)
-                            <option value="{{ $akun->id }}"
-                                    data-kode="{{ $akun->kode_akun }}"
+                            <option value="{{ $akun->id }}" data-kode="{{ $akun->kode_akun }}"
                                 {{ old('akun_id') == $akun->id ? 'selected' : '' }}>
                                 {{ $akun->kode_akun }} — {{ $akun->nama_akun }}
                             </option>
@@ -103,14 +90,12 @@
 
                 {{-- Keterangan --}}
                 <div>
-                    <label for="keterangan"
-                           class="mb-2 block text-sm font-medium text-gray-700">
+                    <label for="keterangan" class="mb-2 block text-sm font-medium text-gray-700">
                         Keterangan <span class="text-red-500">*</span>
                     </label>
-                    <textarea id="keterangan" name="keterangan" rows="3"
-                              maxlength="1000" required
-                              placeholder="Masukkan keterangan pengeluaran"
-                              class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('keterangan') }}</textarea>
+                    <textarea id="keterangan" name="keterangan" rows="3" maxlength="1000" required
+                        placeholder="Masukkan keterangan pengeluaran"
+                        class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('keterangan') }}</textarea>
                     @error('keterangan')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -119,8 +104,7 @@
                 {{-- Qty dan Satuan --}}
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <div>
-                        <label for="qty"
-                               class="mb-2 block text-sm font-medium text-gray-700">
+                        <label for="qty" class="mb-2 block text-sm font-medium text-gray-700">
                             Qty <span class="text-red-500">*</span>
                         </label>
                         <input type="number" id="qty" name="qty"
@@ -135,17 +119,14 @@
                     </div>
 
                     <div>
-                        <label for="satuan"
-                               class="mb-2 block text-sm font-medium text-gray-700">
+                        <label for="satuan" class="mb-2 block text-sm font-medium text-gray-700">
                             Satuan <span class="text-red-500">*</span>
                         </label>
-                        
-                <input type="text" id="satuan" name="satuan"
-                    value="{{ old('satuan') }}"
-                    maxlength="30" required
-                    placeholder="Contoh: Orang, Unit, Pcs"
-                    oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
-                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
+
+                        <input type="text" id="satuan" name="satuan" value="{{ old('satuan') }}" maxlength="30"
+                            required placeholder="Contoh: Orang, Unit, Pcs"
+                            oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
+                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
 
                         @error('satuan')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -156,12 +137,12 @@
 
                 {{-- Harga --}}
                 <div class="mb-5">
-                    <label for="harga"
-                           class="mb-2 block text-sm font-medium text-gray-700">
+                    <label for="harga" class="mb-2 block text-sm font-medium text-gray-700">
                         Harga per Satuan (Rp) <span class="text-red-500">*</span>
                     </label>
                     <div class="flex">
-                        <span class="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-4 text-sm text-gray-600">
+                        <span
+                            class="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-4 text-sm text-gray-600">
                             Rp
                         </span>
                         <input type="number" id="harga" name="harga"
@@ -178,15 +159,13 @@
 
                 {{-- Total Pengeluaran --}}
                 <div class="rounded-xl border border-blue-100 bg-blue-50 p-6">
-                    <label for="total_pengeluaran"
-                           class="mb-2 block text-sm font-semibold text-gray-700">
+                    <label for="total_pengeluaran" class="mb-2 block text-sm font-semibold text-gray-700">
                         Total Pengeluaran
                     </label>
                     <div class="flex items-center gap-5">
                         <span class="font-semibold text-gray-600">Rp</span>
-                        <input type="text" id="total_pengeluaran"
-                               value="0" readonly
-                               class="w-full rounded-lg border border-blue-200 bg-white px-4 py-3 text-xl font-bold text-blue-700">
+                        <input type="text" id="total_pengeluaran" value="0" readonly
+                            class="w-full rounded-lg border border-blue-200 bg-white px-4 py-3 text-xl font-bold text-blue-700">
                     </div>
                     <p class="mt-2 text-xs text-gray-500">
                         Total dihitung otomatis dari Qty × Harga per Satuan.
@@ -196,11 +175,11 @@
                 {{-- Tombol --}}
                 <div class="mt-3 flex flex-col-reverse gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:justify-end">
                     <a href="{{ route('pengeluaran.index') }}"
-                       class="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        class="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50">
                         Batal
                     </a>
                     <button type="submit"
-                            class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+                        class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
                         <i class="fa-solid fa-floppy-disk mr-1"></i>
                         Simpan Pengeluaran
                     </button>
@@ -210,7 +189,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const qtyInput = document.getElementById('qty');
             const hargaInput = document.getElementById('harga');
             const totalInput = document.getElementById('total_pengeluaran');
@@ -240,9 +219,9 @@
 
             function updateReferensiPreview() {
                 const option = akunSelect.options[akunSelect.selectedIndex];
-                const prefix = option?.dataset?.kode
-                    ? prefixMap[option.dataset.kode]
-                    : null;
+                const prefix = option?.dataset?.kode ?
+                    prefixMap[option.dataset.kode] :
+                    null;
 
                 const tanggal = tanggalInput.value;
 

@@ -1,7 +1,9 @@
 <x-admin-layout>
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Bagan Akun (Chart of Accounts)</h1>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                Bagan Akun (Chart of Accounts)
+            </h1>
         </div>
         <a href="{{ route('akun.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> Tambah Akun

@@ -1,8 +1,12 @@
 <x-admin-layout>
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Data Cabang</h1>
-            <p class="text-gray-500 mt-1">Kelola daftar cabang percetakan CV Cemerlang.</p>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                Data Cabang
+            </h1>
+            <p class="mt-1 text-sm text-slate-500">
+                Kelola daftar cabang percetakan CV Cemerlang.
+            </p>
         </div>
         <a href="{{ route('cabang.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> Tambah Cabang
