@@ -108,25 +108,25 @@
         </div>
 
         <div class="w-full overflow-x-auto">
-            <table class="w-full min-w-[850px] text-sm text-left border-collapse">
+            <table class="w-full min-w-212.5 text-sm text-left border-collapse">
                 <thead class="font-bold text-gray-700 bg-gray-100">
                     <tr>
-                        <th class="px-4 py-3 border border-gray-300 w-[110px]">
+                        <th class="px-4 py-3 border border-gray-300 w-27.5">
                             Tanggal
                         </th>
-                        <th class="px-4 py-3 border border-gray-300 w-[175px]">
+                        <th class="px-4 py-3 border border-gray-300 w-43.75">
                             No Referensi
                         </th>
-                        <th class="px-4 py-3 border border-gray-300 min-w-[220px]">
+                        <th class="px-4 py-3 border border-gray-300 min-w-55">
                             Keterangan
                         </th>
-                        <th class="px-4 py-3 border border-gray-300 min-w-[190px]">
+                        <th class="px-4 py-3 border border-gray-300 min-w-47.5">
                             Nama Akun
                         </th>
-                        <th class="px-4 py-3 border border-gray-300 w-[150px] text-right">
+                        <th class="px-4 py-3 border border-gray-300 w-37.5 text-right">
                             Debit
                         </th>
-                        <th class="px-4 py-3 border border-gray-300 w-[150px] text-right">
+                        <th class="px-4 py-3 border border-gray-300 w-37.5 text-right">
                             Kredit
                         </th>
                     </tr>
@@ -177,7 +177,7 @@
                                         </td>
 
                                         <td rowspan="{{ $jumlahBaris }}"
-                                            class="px-4 py-3 font-medium text-blue-600 align-middle border border-gray-300 break-words">
+                                            class="px-4 py-3 font-medium text-blue-600 align-middle border border-gray-300 wrap-break-words">
                                             {{ $jurnal->no_referensi }}
                                         </td>
                                     @endif
