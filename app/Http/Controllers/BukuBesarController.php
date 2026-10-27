@@ -3,21 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Models\Akun;
+use App\Models\Cabang;
 use App\Models\DetailJurnal;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\BukuBesarExport;
 use Maatwebsite\Excel\Facades\Excel;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BukuBesarController extends Controller
 {
+    /**
+     * Batasi akses Buku Besar.
+     */
+    private function batasiAkses(): void
+    {
+        $user = Auth::user();
+
+        abort_unless(
+            $user && in_array(
+                $user->role,
+                ['Admin Pusat', 'Admin Cabang'],
+                true
+            ),
+            403
+        );
+
+        if ($user->role === 'Admin Cabang' && !$user->cabang_id) {
+            abort(403, 'Akun belum terhubung dengan cabang.');
+        }
+    }
+
     /**
      * Halaman utama Buku Besar.
      */
     public function index(Request $request)
     {
+        $this->batasiAkses();
+
         return view(
             'admin.buku_besar.index',
             $this->siapkanLaporan($request)
@@ -29,6 +52,8 @@ class BukuBesarController extends Controller
      */
     public function cetakPdf(Request $request)
     {
+        $this->batasiAkses();
+
         $data = $this->siapkanLaporan($request);
 
         $pdf = Pdf::loadView(
@@ -46,6 +71,8 @@ class BukuBesarController extends Controller
      */
     public function cetakExcel(Request $request)
     {
+        $this->batasiAkses();
+
         $data = $this->siapkanLaporan($request);
 
         return Excel::download(
@@ -76,10 +103,17 @@ class BukuBesarController extends Controller
             'akun_id' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'cabang_id' => 'nullable|integer|exists:cabangs,id',
         ]);
 
         $akuns = Akun::orderBy('kode_akun')->get();
 
+        // Ambil daftar cabang aktif untuk dropdown Admin Pusat.
+        $cabangs = Cabang::where('status', 'aktif')
+            ->orderBy('nama')
+            ->get();
+
+        // Filter akun dan periode.
         $akun_id = $request->input('akun_id') ?: 'semua';
         $start_date = $request->input('start_date') ?: date('Y-m-01');
         $end_date = $request->input('end_date') ?: date('Y-m-t');
@@ -96,12 +130,28 @@ class BukuBesarController extends Controller
             $daftarAkun = collect([$akunTerpilih]);
         }
 
+        $user = Auth::user();
+
+        // Admin Cabang hanya melihat cabangnya sendiri.
+        // Admin Pusat dapat memilih cabang atau melihat semua cabang.
+        $cabangId = $user->role === 'Admin Cabang'
+            ? (int) $user->cabang_id
+            : (
+                $user->role === 'Admin Pusat' && $request->filled('cabang_id')
+                    ? (int) $request->input('cabang_id')
+                    : null
+            );
+
+        // Susun laporan berdasarkan akun, periode, dan cabang.
         $laporan = $this->susunLaporan(
             $daftarAkun,
             $start_date,
-            $end_date
+            $end_date,
+            $cabangId
         );
 
+        // Jika semua akun dipilih, tampilkan akun yang memiliki saldo
+        // awal atau transaksi dalam periode laporan.
         if ($semuaAkun) {
             $laporan = $laporan->filter(function ($item) {
                 return abs($item['saldoAwal']) > 0
@@ -109,21 +159,25 @@ class BukuBesarController extends Controller
             })->values();
         }
 
+        // Total debit dan kredit.
         $grandDebit = (float) $laporan->sum('totalDebit');
         $grandKredit = (float) $laporan->sum('totalKredit');
 
+        // Total saldo awal dengan memperhitungkan sisi normal saldo.
         $grandSaldoAwal = (float) $laporan->sum(
             fn ($item) => $item['sisiAwal'] === 'Debit'
                 ? $item['saldoAwal']
                 : -$item['saldoAwal']
         );
 
+        // Total saldo akhir.
         $grandSaldoAkhir = $grandSaldoAwal
             + $grandDebit
             - $grandKredit;
 
         return [
             'akuns' => $akuns,
+            'cabangs' => $cabangs,
             'laporan' => $laporan,
             'semuaAkun' => $semuaAkun,
             'grandTotal' => (float) $laporan->sum(
@@ -136,6 +190,7 @@ class BukuBesarController extends Controller
             'start_date' => $start_date,
             'end_date' => $end_date,
             'akun_id' => $akun_id,
+            'cabang_id' => $cabangId,
         ];
     }
 
@@ -159,16 +214,6 @@ class BukuBesarController extends Controller
 
     /**
      * Menentukan keterangan akun lawan untuk Buku Besar.
-     *
-     * Penjualan:
-     * Kas <-> Pendapatan Penjualan
-     *
-     * HPP:
-     * Harga Pokok Produksi <-> Persediaan
-     *
-     * Beban operasional:
-     * Mengambil akun lawan yang benar-benar tercatat,
-     * misalnya Kas atau Bank.
      */
     private function keteranganAkunLawan(
         DetailJurnal $detail,
@@ -176,13 +221,11 @@ class BukuBesarController extends Controller
     ): string {
         $kodeAkun = $detail->akun?->kode_akun;
 
-        // Pasangan khusus agar akun penjualan dan HPP
-        // tidak tercampur meskipun berada di jurnal yang sama.
         $pasanganKhusus = match ($kodeAkun) {
-            '1-1100' => ['4-1100'], // Kas -> Pendapatan Penjualan
-            '4-1100' => ['1-1100'], // Pendapatan Penjualan -> Kas
-            '5-1100' => ['1-1300'], // HPP -> Persediaan
-            '1-1300' => ['5-1100'], // Persediaan -> HPP
+            '1-1100' => ['4-1100'],
+            '4-1100' => ['1-1100'],
+            '5-1100' => ['1-1300'],
+            '1-1300' => ['5-1100'],
             default => null,
         };
 
@@ -207,8 +250,6 @@ class BukuBesarController extends Controller
             }
         }
 
-        // Untuk beban operasional dan jurnal lainnya,
-        // pilih akun lawan yang memiliki mutasi berpasangan.
         $debit = (float) $detail->debit;
         $kredit = (float) $detail->kredit;
 
@@ -244,7 +285,8 @@ class BukuBesarController extends Controller
     private function susunLaporan(
         $daftarAkun,
         $start_date,
-        $end_date
+        $end_date,
+        ?int $cabangId = null
     ) {
         $akunIds = $daftarAkun->pluck('id');
 
@@ -262,11 +304,18 @@ class BukuBesarController extends Controller
             )
             ->whereIn('detail_jurnals.akun_id', $akunIds)
             ->where('jurnals.tanggal', '<', $start_date)
+            ->when(
+                $cabangId !== null,
+                fn ($query) => $query->where(
+                    'jurnals.cabang_id',
+                    $cabangId
+                )
+            )
             ->groupBy('detail_jurnals.akun_id')
             ->get()
             ->keyBy('akun_id');
 
-        // 2. Ambil semua mutasi dalam periode.
+        // 2. Ambil mutasi dalam periode laporan.
         $mutasiSemua = DetailJurnal::with(['jurnal', 'akun'])
             ->select('detail_jurnals.*')
             ->join(
@@ -280,17 +329,34 @@ class BukuBesarController extends Controller
                 'jurnals.tanggal',
                 [$start_date, $end_date]
             )
+            ->when(
+                $cabangId !== null,
+                fn ($query) => $query->where(
+                    'jurnals.cabang_id',
+                    $cabangId
+                )
+            )
             ->orderBy('jurnals.tanggal')
             ->orderBy('jurnals.id')
             ->orderBy('detail_jurnals.id')
             ->get()
             ->groupBy('akun_id');
 
-        // 3. Ambil semua detail jurnal pada periode yang sama,
-        // termasuk akun lawan yang tidak sedang ditampilkan.
+        // 3. Detail jurnal periode untuk menentukan akun lawan.
         $detailPeriode = DetailJurnal::with(['akun', 'jurnal'])
-            ->whereHas('jurnal', function ($query) use ($start_date, $end_date) {
-                $query->whereBetween('tanggal', [$start_date, $end_date]);
+            ->whereHas('jurnal', function ($query) use (
+                $start_date,
+                $end_date,
+                $cabangId
+            ) {
+                $query->whereBetween(
+                    'tanggal',
+                    [$start_date, $end_date]
+                );
+
+                if ($cabangId !== null) {
+                    $query->where('cabang_id', $cabangId);
+                }
             })
             ->get()
             ->groupBy('jurnal_id');
@@ -344,9 +410,7 @@ class BukuBesarController extends Controller
                         $semuaDetailJurnal
                     );
 
-                $detail->total_tampil = $detail->total_harga !== null
-                    ? (float) $detail->total_harga
-                    : max($debit, $kredit);
+                $detail->total_tampil = max($debit, $kredit);
 
                 return $detail;
             });

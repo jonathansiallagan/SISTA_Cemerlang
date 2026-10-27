@@ -68,6 +68,27 @@
                 <input type="date" name="end_date" value="{{ $end_date }}"
                     class="w-full px-4 py-2 border rounded-lg" required>
             </div>
+
+            @if (Auth::user()->role === 'Admin Pusat')
+                <div class="w-full md:w-1/3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Pilih Cabang
+                    </label>
+
+                    <select name="cabang_id"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500">
+                        <option value="">Semua Cabang</option>
+
+                        @foreach ($cabangs as $cabang)
+                            <option value="{{ $cabang->id }}"
+                                {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
+                                {{ $cabang->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+            
             <div class="w-full md:w-auto">
                 <button type="submit"
                     class="w-full bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center gap-2 justify-center">

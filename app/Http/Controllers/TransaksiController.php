@@ -11,24 +11,67 @@ use App\Models\DetailJurnal;
 use App\Models\Akun;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TransaksiController extends Controller
 {
-    public function index()
+    
+    public function index(Request $request)
     {
         $user = $this->user();
 
-        $query = Transaksi::with(['user', 'cabang'])->latest();
+        $query = Transaksi::with([
+            'user',
+            'cabang',
+            'detailTransaksis.produk',
+        ]);
 
         // Customer Service hanya boleh melihat transaksi cabangnya sendiri.
-        if ($user->isCustomerService()) {
+        // Batasi akses data berdasarkan role dan cabang.
+        if ($user->role === 'Admin Cabang' || $user->isCustomerService()) {
             $query->where('cabang_id', $user->cabang_id);
+        } elseif ($user->role === 'Admin Pusat' && $request->filled('cabang_id')) {
+            $query->where('cabang_id', $request->cabang_id);
         }
 
-        $transaksis = $query->get();
+        // Filter pencarian berdasarkan nomor referensi atau nama pelanggan.
+        if ($request->filled('search')) {
+            $search = $request->search;
 
-        return view('admin.transaksi.index', compact('transaksis'));
+            $query->where(function ($q) use ($search) {
+                $q->where('no_referensi', 'like', "%{$search}%")
+                    ->orWhere('nama_pelanggan', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter tanggal mulai.
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
+        }
+
+        // Filter tanggal akhir.
+        if ($request->filled('tanggal_akhir')) {
+            $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
+        }
+
+        // Urutkan transaksi terbaru terlebih dahulu.
+        $transaksis = $query
+            ->orderByDesc('tanggal')
+            ->orderByDesc('id')
+            ->get();
+
+        // Data cabang untuk dropdown filter.
+        // Customer Service hanya melihat cabangnya sendiri.
+        $cabangs = $user->isCustomerService()
+            ? \App\Models\Cabang::where('id', $user->cabang_id)->get()
+            : \App\Models\Cabang::orderBy('nama')->get();
+
+        return view('admin.transaksi.index', compact(
+            'transaksis',
+            'cabangs'
+        ));
     }
+
 
     public function create()
     {
@@ -61,6 +104,7 @@ class TransaksiController extends Controller
         );
     }
 
+    
     public function store(Request $request)
     {
         $user = $this->user();
@@ -76,8 +120,7 @@ class TransaksiController extends Controller
             'jumlah.*' => 'required|numeric|min:1',
         ]);
 
-        // Customer Service tidak boleh menyimpan transaksi
-        // untuk cabang lain.
+        // Customer Service hanya boleh mencatat transaksi cabangnya sendiri.
         if (
             $user->isCustomerService()
             && (int) $request->cabang_id !== (int) $user->cabang_id
@@ -91,7 +134,7 @@ class TransaksiController extends Controller
         DB::beginTransaction();
 
         try {
-            // Cari akun yang diperlukan untuk jurnal otomatis.
+            // 1. Cari akun yang diperlukan untuk jurnal otomatis.
             $akunKas = Akun::where('nama_akun', 'Kas')
                 ->where('status', 'aktif')
                 ->first();
@@ -126,7 +169,7 @@ class TransaksiController extends Controller
                 );
             }
 
-            // 1. Simpan transaksi induk.
+            // 2. Simpan transaksi induk.
             $transaksi = Transaksi::create([
                 'no_referensi' => $request->no_referensi,
                 'tanggal' => $request->tanggal,
@@ -139,9 +182,8 @@ class TransaksiController extends Controller
 
             $totalTransaksi = 0;
             $totalHpp = 0;
-            $rincianJurnal = [];
 
-            // 2. Simpan detail produk dan siapkan rincian jurnal.
+            // 3. Simpan detail setiap produk dan hitung total transaksi.
             foreach ($request->produk_id as $key => $produkId) {
                 $produk = Produk::findOrFail($produkId);
 
@@ -154,7 +196,7 @@ class TransaksiController extends Controller
                 $subtotal = (float) $request->subtotal[$key];
                 $totalHppItem = (float) $request->total_hpp_item[$key];
 
-                // Untuk produk m2, gunakan luas sebagai quantity.
+                // Tentukan quantity berdasarkan satuan produk.
                 $satuan = strtolower(trim($produk->satuan));
 
                 $quantity = (
@@ -163,6 +205,7 @@ class TransaksiController extends Controller
                     || str_contains($satuan, 'm²')
                 ) ? $luas : $jumlah;
 
+                // Simpan rincian produk ke tabel detail_transaksis.
                 DetailTransaksi::create([
                     'transaksi_id' => $transaksi->id,
                     'produk_id' => $produkId,
@@ -176,99 +219,63 @@ class TransaksiController extends Controller
                     'total_hpp' => $totalHppItem,
                 ]);
 
+                // Akumulasi total seluruh produk.
                 $totalTransaksi += $subtotal;
                 $totalHpp += $totalHppItem;
-
-                $rincianJurnal[] = [
-                    'nama_produk' => $produk->nama_produk,
-                    'quantity' => $quantity,
-                    'satuan' => $produk->satuan,
-                    'harga' => $harga,
-                    'subtotal' => $subtotal,
-                    'hpp' => $hpp,
-                    'total_hpp' => $totalHppItem,
-                ];
             }
 
-            // 3. Perbarui total transaksi.
+            // 4. Perbarui total transaksi induk.
             $transaksi->update([
                 'total_transaksi' => $totalTransaksi,
                 'total_hpp' => $totalHpp,
             ]);
 
-            // 4. Buat keterangan otomatis dari nama produk.
-            $namaProduk = collect($rincianJurnal)
-                ->pluck('nama_produk')
-                ->filter()
-                ->unique()
-                ->implode(', ');
-
-            $keteranganPenjualan = 'Pendapatan Jasa';
-            $keteranganHPP = 'Beban Pokok Penjualan';
-
-            // Satu header jurnal untuk satu transaksi.
+            // 5. Buat satu header jurnal untuk satu transaksi.
             $jurnal = Jurnal::create([
                 'no_referensi' => $transaksi->no_referensi,
                 'tanggal' => $transaksi->tanggal,
-                'keterangan' => $keteranganPenjualan,
+                'keterangan' => 'Pendapatan Jasa',
                 'cabang_id' => $transaksi->cabang_id,
                 'user_id' => $user->id,
             ]);
 
-            // 5. Simpan empat baris detail jurnal untuk setiap produk.
-            foreach ($rincianJurnal as $rincian) {
-                // A. Debit Kas: keterangan penjualan.
-                DetailJurnal::create([
-                    'jurnal_id' => $jurnal->id,
-                    'akun_id' => $akunKas->id,
-                    'keterangan' => 'Pendapatan Jasa',
-                    'quantity' => $rincian['quantity'],
-                    'satuan' => $rincian['satuan'],
-                    'harga' => $rincian['harga'],
-                    'total_harga' => $rincian['subtotal'],
-                    'debit' => $rincian['subtotal'],
-                    'kredit' => 0,
-                ]);
+            // 6. Buat empat baris jurnal berdasarkan total transaksi.
 
-                // B. Kredit Pendapatan Penjualan.
-                DetailJurnal::create([
-                    'jurnal_id' => $jurnal->id,
-                    'akun_id' => $akunPendapatan->id,
-                    'keterangan' => 'Pendapatan Jasa',
-                    'quantity' => $rincian['quantity'],
-                    'satuan' => $rincian['satuan'],
-                    'harga' => $rincian['harga'],
-                    'total_harga' => $rincian['subtotal'],
-                    'debit' => 0,
-                    'kredit' => $rincian['subtotal'],
-                ]);
+            // A. Debit Kas sebesar total penjualan.
+            DetailJurnal::create([
+                'jurnal_id' => $jurnal->id,
+                'akun_id' => $akunKas->id,
+                'keterangan' => 'Pendapatan Jasa',
+                'debit' => $totalTransaksi,
+                'kredit' => 0,
+            ]);
 
-                // C. Debit Harga Pokok Produksi.
-                DetailJurnal::create([
-                    'jurnal_id' => $jurnal->id,
-                    'akun_id' => $akunHpp->id,
-                    'keterangan' => 'Beban Pokok Penjualan',
-                    'quantity' => $rincian['quantity'],
-                    'satuan' => $rincian['satuan'],
-                    'harga' => $rincian['hpp'],
-                    'total_harga' => $rincian['total_hpp'],
-                    'debit' => $rincian['total_hpp'],
-                    'kredit' => 0,
-                ]);
+            // B. Kredit Pendapatan Penjualan.
+            DetailJurnal::create([
+                'jurnal_id' => $jurnal->id,
+                'akun_id' => $akunPendapatan->id,
+                'keterangan' => 'Pendapatan Jasa',
+                'debit' => 0,
+                'kredit' => $totalTransaksi,
+            ]);
 
-                // D. Kredit Persediaan.
-                DetailJurnal::create([
-                    'jurnal_id' => $jurnal->id,
-                    'akun_id' => $akunPersediaan->id,
-                    'keterangan' => 'Beban Pokok Penjualan',
-                    'quantity' => $rincian['quantity'],
-                    'satuan' => $rincian['satuan'],
-                    'harga' => $rincian['hpp'],
-                    'total_harga' => $rincian['total_hpp'],
-                    'debit' => 0,
-                    'kredit' => $rincian['total_hpp'],
-                ]);
-            }
+            // C. Debit Harga Pokok Produksi sebesar total HPP.
+            DetailJurnal::create([
+                'jurnal_id' => $jurnal->id,
+                'akun_id' => $akunHpp->id,
+                'keterangan' => 'Beban Pokok Penjualan',
+                'debit' => $totalHpp,
+                'kredit' => 0,
+            ]);
+
+            // D. Kredit Persediaan sebesar total HPP.
+            DetailJurnal::create([
+                'jurnal_id' => $jurnal->id,
+                'akun_id' => $akunPersediaan->id,
+                'keterangan' => 'Beban Pokok Penjualan',
+                'debit' => 0,
+                'kredit' => $totalHpp,
+            ]);
 
             DB::commit();
 
@@ -292,4 +299,62 @@ class TransaksiController extends Controller
                 ->withInput();
         }
     }
+
+    public function exportPdf(Request $request)
+    {
+        $user = $this->user();
+
+        $query = Transaksi::with([
+            'user',
+            'cabang',
+            'detailTransaksis.produk',
+        ]);
+
+        // Batasi akses data berdasarkan role dan cabang.
+        if ($user->role === 'Admin Cabang' || $user->isCustomerService()) {
+            $query->where('cabang_id', $user->cabang_id);
+        } elseif ($user->role === 'Admin Pusat' && $request->filled('cabang_id')) {
+            $query->where('cabang_id', $request->cabang_id);
+        }
+
+        // Filter pencarian.
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('no_referensi', 'like', "%{$search}%")
+                    ->orWhere('nama_pelanggan', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter tanggal.
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
+        }
+
+        if ($request->filled('tanggal_akhir')) {
+            $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
+        }
+
+        $transaksis = $query
+            ->orderByDesc('tanggal')
+            ->orderByDesc('id')
+            ->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+            'admin.transaksi.pdf',
+            compact('transaksis')
+        )->setPaper('a4', 'landscape');
+
+        return $pdf->download('riwayat-transaksi.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        return Excel::download(
+            new \App\Exports\TransaksiExport($request, $this->user()),
+            'riwayat-transaksi.xlsx'
+        );
+    }
+
 }

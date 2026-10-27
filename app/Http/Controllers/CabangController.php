@@ -30,4 +30,28 @@ class CabangController extends Controller
 
         return redirect()->route('cabang.index')->with('success', 'Data cabang berhasil ditambahkan!');
     }
+
+    public function edit($id)
+    {
+        $cabang = Cabang::findOrFail($id);
+
+        return view('admin.cabang.edit', compact('cabang'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $cabang = Cabang::findOrFail($id);
+
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'no_hp' => 'required|string|max:20',
+            'alamat' => 'required|string',
+        ]);
+
+        $cabang->update($validated);
+
+        return redirect()
+            ->route('cabang.index')
+            ->with('success', 'Data cabang berhasil diperbarui.');
+    }
 }

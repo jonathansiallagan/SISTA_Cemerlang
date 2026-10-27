@@ -107,9 +107,12 @@
                         <label for="qty" class="mb-2 block text-sm font-medium text-gray-700">
                             Qty <span class="text-red-500">*</span>
                         </label>
-                        <input type="number" id="qty" name="qty" value="{{ old('qty', '1') }}"
-                            min="0.01" max="9999999999" step="0.01" required placeholder="Masukkan jumlah"
-                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        <input type="number" id="qty" name="qty"
+                               value="{{ old('qty', '1') }}"
+                               min="1" max="9999999999" step="1"
+                               required
+                               placeholder="Masukkan jumlah"
+                               class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
                         @error('qty')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -142,9 +145,12 @@
                             class="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-4 text-sm text-gray-600">
                             Rp
                         </span>
-                        <input type="number" id="harga" name="harga" value="{{ old('harga') }}" min="0.01"
-                            max="9999999999999.99" step="0.01" required placeholder="Masukkan harga"
-                            class="w-full min-w-0 rounded-r-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        <input type="number" id="harga" name="harga"
+                               value="{{ old('harga') }}"
+                               min="1" max="9999999999999.99"
+                               step="1" required
+                               placeholder="Masukkan harga"
+                               class="w-full min-w-0 rounded-r-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     @error('harga')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
