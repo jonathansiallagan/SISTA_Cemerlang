@@ -35,44 +35,77 @@
                 </div>
             </div>
 
-            {{-- FILTER TANGGAL --}}
+            
+            {{-- FILTER TANGGAL DAN CABANG --}}
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 mb-6">
                 <form action="{{ route('laporan_laba_rugi.index') }}"
                     method="GET"
-                    class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
+                    {{-- FILTER CABANG: KHUSUS ADMIN PUSAT --}}
+                    @if (Auth::user()->role === 'Admin Pusat')
+                        <div>
+                            <label for="cabang_id"
+                                class="block text-sm font-semibold text-slate-700 mb-2">
+                                Cabang
+                            </label>
+
+                            <select
+                                name="cabang_id"
+                                id="cabang_id"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none">
+
+                                <option value="">Semua Cabang</option>
+
+                                @foreach ($cabangs as $cabang)
+                                    <option
+                                        value="{{ $cabang->id }}"
+                                        {{ (string) request('cabang_id') === (string) $cabang->id ? 'selected' : '' }}>
+                                        {{ $cabang->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
+                    {{-- TANGGAL MULAI --}}
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <label for="start_date"
+                            class="block text-sm font-semibold text-slate-700 mb-2">
                             Tanggal Mulai
                         </label>
+
                         <input
                             type="date"
+                            id="start_date"
                             name="start_date"
                             value="{{ $start_date }}"
                             required
-                            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                        >
+                            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none">
                     </div>
 
+                    {{-- TANGGAL AKHIR --}}
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <label for="end_date"
+                            class="block text-sm font-semibold text-slate-700 mb-2">
                             Tanggal Akhir
                         </label>
+
                         <input
                             type="date"
+                            id="end_date"
                             name="end_date"
                             value="{{ $end_date }}"
                             min="{{ $start_date }}"
                             required
-                            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                        >
+                            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none">
                     </div>
 
+                    {{-- TOMBOL FILTER DAN RESET --}}
                     <div class="flex gap-2">
                         <button
                             type="submit"
-                            class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition"
-                        >
+                            class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition">
                             <i class="fa-solid fa-filter"></i>
                             Tampilkan
                         </button>
@@ -80,13 +113,14 @@
                         <a
                             href="{{ route('laporan_laba_rugi.index') }}"
                             class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition"
-                            title="Reset filter"
-                        >
+                            title="Reset filter">
                             <i class="fa-solid fa-rotate-left"></i>
                         </a>
                     </div>
+
                 </form>
             </div>
+
 
             {{-- TABEL LAPORAN --}}
             <div id="laporan-laba-rugi" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">

@@ -9,10 +9,6 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'jurnal_id',
     'akun_id',
     'keterangan',
-    'quantity',
-    'satuan',
-    'harga',
-    'total_harga',
     'debit',
     'kredit'
 ])]

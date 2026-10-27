@@ -16,6 +16,100 @@
             </a>
         </div>
 
+        
+    {{-- Filter Periode dan Cabang --}}
+    <form action="{{ route('pengeluaran.index') }}" method="GET"
+        class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+        <div class="mb-4">
+            <h2 class="text-base font-semibold text-slate-800">
+                Filter Pengeluaran
+            </h2>
+            <p class="mt-1 text-sm text-slate-500">
+                Pilih periode untuk melihat riwayat pengeluaran.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2
+                    {{ Auth::user()->role === 'Admin Pusat' ? 'lg:grid-cols-4' : 'lg:grid-cols-3' }}">
+
+            <div>
+                <label for="start_date"
+                    class="mb-2 block text-sm font-medium text-slate-700">
+                    Dari Tanggal
+                </label>
+                <input type="date"
+                    id="start_date"
+                    name="start_date"
+                    value="{{ $startDate }}"
+                    required
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5
+                            text-sm focus:border-blue-500 focus:outline-none
+                            focus:ring-2 focus:ring-blue-100">
+            </div>
+
+            <div>
+                <label for="end_date"
+                    class="mb-2 block text-sm font-medium text-slate-700">
+                    Sampai Tanggal
+                </label>
+                <input type="date"
+                    id="end_date"
+                    name="end_date"
+                    value="{{ $endDate }}"
+                    min="{{ $startDate }}"
+                    required
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5
+                            text-sm focus:border-blue-500 focus:outline-none
+                            focus:ring-2 focus:ring-blue-100">
+            </div>
+
+            @if (Auth::user()->role === 'Admin Pusat')
+                <div>
+                    <label for="cabang_id"
+                        class="mb-2 block text-sm font-medium text-slate-700">
+                        Cabang
+                    </label>
+
+                    <select id="cabang_id"
+                            name="cabang_id"
+                            class="w-full rounded-lg border border-slate-300 px-3 py-2.5
+                                text-sm focus:border-blue-500 focus:outline-none
+                                focus:ring-2 focus:ring-blue-100">
+                        <option value="">Semua Cabang</option>
+
+                        @foreach ($cabangs as $cabang)
+                            <option value="{{ $cabang->id }}"
+                                {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
+                                {{ $cabang->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+
+            <div class="flex items-end gap-2">
+                <button type="submit"
+                        class="inline-flex flex-1 items-center justify-center gap-2
+                            rounded-lg bg-blue-700 px-4 py-2.5 text-sm
+                            font-semibold text-white hover:bg-blue-800">
+                    <i class="fa-solid fa-filter"></i>
+                    Filter
+                </button>
+
+                <a href="{{ route('pengeluaran.index') }}"
+                class="inline-flex items-center justify-center gap-2
+                        rounded-lg border border-slate-300 px-4 py-2.5
+                        text-sm font-semibold text-slate-700
+                        hover:bg-slate-50">
+                    Reset
+                </a>
+            </div>
+
+        </div>
+    </form>
+
+
         {{-- Notifikasi --}}
         @if (session('success'))
             <div class="mb-5 rounded-lg border border-green-200 bg-green-50

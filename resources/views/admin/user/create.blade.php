@@ -5,6 +5,24 @@
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl">
         <form action="{{ route('user.store') }}" method="POST">
+            
+            @if ($errors->any())
+                <div class="alert alert-danger d-flex align-items-start gap-2 mb-4"
+                    role="alert"
+                    style="border-radius: 12px; border: 1px solid #fecaca;
+                            background: #fef2f2; color: #991b1b; padding: 14px 16px;">
+
+                    <i class="fas fa-exclamation-circle mt-1"></i>
+
+                    <div>
+                        <strong>Gagal menyimpan pengguna</strong>
+                        <div class="small mt-1">
+                            {{ $errors->first() }}
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @csrf
             
             <div class="grid grid-cols-2 gap-4 mb-4">

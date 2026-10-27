@@ -14,6 +14,48 @@ use Illuminate\Validation\ValidationException;
 
 class PengeluaranController extends Controller
 {
+    /**
+     * Memastikan hanya Admin Pusat dan Admin Cabang
+     * yang dapat mengakses fitur pengeluaran.
+     */
+    private function authorizePengeluaran(): void
+    {
+        $user = Auth::user();
+
+        abort_unless(
+            $user && in_array(
+                $user->role,
+                ['Admin Pusat', 'Admin Cabang'],
+                true
+            ),
+            403,
+            'Anda tidak memiliki akses ke fitur pengeluaran.'
+        );
+
+        if ($user->role === 'Admin Cabang' && !$user->cabang_id) {
+            abort(403, 'Akun Anda belum terhubung ke cabang.');
+        }
+    }
+
+    /**
+     * Menentukan cabang yang boleh digunakan.
+     */
+    private function cabangAktifQuery()
+    {
+        $user = Auth::user();
+
+        $query = Cabang::where('status', 'aktif');
+
+        if ($user->role === 'Admin Cabang') {
+            $query->where('id', $user->cabang_id);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Menentukan prefix referensi berdasarkan akun beban.
+     */
     private function kodePrefix(Akun $akun): string
     {
         return match ($akun->kode_akun) {
@@ -29,32 +71,76 @@ class PengeluaranController extends Controller
         };
     }
 
-    public function index()
+    /**
+     * Daftar pengeluaran.
+     */
+    public function index(Request $request)
     {
         $user = Auth::user();
 
+        $request->validate([
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'cabang_id' => ['nullable', 'integer', 'exists:cabangs,id'],
+        ]);
+
+        // Default periode: bulan berjalan.
+        $startDate = $request->input(
+            'start_date',
+            now()->startOfMonth()->toDateString()
+        );
+
+        $endDate = $request->input(
+            'end_date',
+            now()->endOfMonth()->toDateString()
+        );
+
         $query = Pengeluaran::with(['cabang', 'user', 'akun'])
+            ->whereBetween('tanggal', [$startDate, $endDate])
             ->latest('tanggal')
             ->latest('id');
 
+        // Admin Cabang hanya bisa melihat pengeluaran cabangnya sendiri.
         if ($user->role === 'Admin Cabang') {
             $query->where('cabang_id', $user->cabang_id);
         }
 
+        // Hanya Admin Pusat yang dapat memfilter cabang.
+        if (
+            $user->role === 'Admin Pusat'
+            && $request->filled('cabang_id')
+        ) {
+            $query->where('cabang_id', $request->input('cabang_id'));
+        }
+
         $pengeluarans = $query->get();
 
-        return view('admin.pengeluaran.index', compact('pengeluarans'));
+        // Dropdown cabang hanya dibutuhkan Admin Pusat.
+        $cabangs = $user->role === 'Admin Pusat'
+            ? Cabang::where('status', 'aktif')->orderBy('nama')->get()
+            : collect();
+
+        return view('admin.pengeluaran.index', compact(
+            'pengeluarans',
+            'cabangs',
+            'startDate',
+            'endDate'
+        ));
     }
 
+    /**
+     * Form tambah pengeluaran.
+     */
     public function create()
     {
+        $this->authorizePengeluaran();
+
         $user = Auth::user();
 
-        $cabangs = Cabang::where('status', 'aktif')
-            ->when(
-                $user->role === 'Admin Cabang',
-                fn ($query) => $query->where('id', $user->cabang_id)
-            )
+        // Admin Pusat dapat memilih semua cabang aktif.
+        // Admin Cabang hanya mendapatkan cabangnya sendiri.
+        $cabangs = $this->cabangAktifQuery()
+            ->orderBy('nama')
             ->get();
 
         $akuns = Akun::where('status', 'aktif')
@@ -77,25 +163,60 @@ class PengeluaranController extends Controller
         );
     }
 
+    /**
+     * Menyimpan pengeluaran beserta jurnal otomatis.
+     */
     public function store(Request $request)
     {
+        $this->authorizePengeluaran();
+
         $user = Auth::user();
 
-        $data = $request->validate([
+        $rules = [
             'tanggal' => ['required', 'date'],
-            'cabang_id' => ['required', 'exists:cabangs,id'],
-            'akun_id' => ['required', 'exists:akuns,id'],
+            'akun_id' => ['required', 'integer', 'exists:akuns,id'],
             'keterangan' => ['required', 'string', 'max:1000'],
-            'qty' => ['required', 'numeric', 'gt:0', 'max:9999999999'],
+            'qty' => [
+                'required',
+                'numeric',
+                'gt:0',
+                'max:9999999999',
+            ],
             'satuan' => ['required', 'in:Orang,Unit,Pcs'],
-            'harga' => ['required', 'numeric', 'gt:0', 'max:9999999999999.99'],
-        ]);
+            'harga' => [
+                'required',
+                'numeric',
+                'gt:0',
+                'max:9999999999999.99',
+            ],
+        ];
 
-        // Admin Cabang hanya boleh mencatat pengeluaran cabangnya sendiri.
+        // Cabang wajib dipilih oleh Admin Pusat.
+        if ($user->role === 'Admin Pusat') {
+            $rules['cabang_id'] = [
+                'required',
+                'exists:cabangs,id',
+            ];
+        }
+
+        $data = $request->validate($rules);
+
+        // Tentukan cabang berdasarkan role.
         if ($user->role === 'Admin Cabang') {
             $data['cabang_id'] = $user->cabang_id;
         }
 
+        // Pastikan cabang yang dipilih Admin Pusat aktif.
+        $cabang = Cabang::where('status', 'aktif')
+            ->find($data['cabang_id']);
+
+        if (!$cabang) {
+            throw ValidationException::withMessages([
+                'cabang_id' => 'Cabang tidak ditemukan atau tidak aktif.',
+            ]);
+        }
+
+        // Validasi akun beban yang diperbolehkan.
         $akun = Akun::where('status', 'aktif')
             ->where('tipe_akun', 'Beban/Biaya')
             ->where('kelompok_akun', 'Beban Operasional')
@@ -109,7 +230,7 @@ class PengeluaranController extends Controller
             ])
             ->findOrFail($data['akun_id']);
 
-        // Akun Kas berdasarkan kode akun, bukan ID yang diasumsikan.
+        // Cari akun Kas berdasarkan kode akun.
         $akunKas = Akun::where('kode_akun', '1-1100')
             ->where('status', 'aktif')
             ->first();
@@ -123,12 +244,16 @@ class PengeluaranController extends Controller
         $prefix = $this->kodePrefix($akun);
         $tanggalReferensi = str_replace('-', '', $data['tanggal']);
 
-        // Total dihitung ulang di server agar tidak bisa dimanipulasi.
+        // Hitung total di server.
         $qty = (float) $data['qty'];
         $harga = (float) $data['harga'];
         $total = round($qty * $harga, 2);
 
-        if (!is_finite($total) || $total <= 0 || $total > 9999999999999.99) {
+        if (
+            !is_finite($total)
+            || $total <= 0
+            || $total > 9999999999999.99
+        ) {
             throw ValidationException::withMessages([
                 'harga' => 'Total pengeluaran tidak valid atau melebihi batas.',
             ]);
@@ -145,14 +270,20 @@ class PengeluaranController extends Controller
             $harga,
             $total
         ) {
-            // Referensi mengikuti jenis beban dan tanggal pengeluaran.
+            // Buat nomor referensi berdasarkan jenis beban dan tanggal.
             $referensiTerakhir = Jurnal::where(
                 'no_referensi',
                 'like',
                 $prefix . '-' . $tanggalReferensi . '-%'
             )
+                ->lockForUpdate()
                 ->get()
-                ->map(fn ($item) => (int) substr($item->no_referensi, -4))
+                ->map(
+                    fn ($item) => (int) substr(
+                        $item->no_referensi,
+                        -4
+                    )
+                )
                 ->max() ?? 0;
 
             $noReferensi = sprintf(
@@ -162,7 +293,7 @@ class PengeluaranController extends Controller
                 $referensiTerakhir + 1
             );
 
-            // Simpan data pengeluaran.
+            // Simpan pengeluaran.
             Pengeluaran::create([
                 'no_referensi' => $noReferensi,
                 'tanggal' => $data['tanggal'],
@@ -176,7 +307,7 @@ class PengeluaranController extends Controller
                 'user_id' => $user->id,
             ]);
 
-            // Buat jurnal otomatis dengan nomor referensi yang sama.
+            // Buat jurnal otomatis untuk cabang yang sama.
             $jurnal = Jurnal::create([
                 'no_referensi' => $noReferensi,
                 'tanggal' => $data['tanggal'],
@@ -185,8 +316,7 @@ class PengeluaranController extends Controller
                 'user_id' => $user->id,
             ]);
 
-            
-            // Data detail transaksi yang disimpan pada kedua baris jurnal.
+            // Informasi detail pengeluaran pada kedua baris jurnal.
             $detailTransaksi = [
                 'quantity' => $qty,
                 'satuan' => $data['satuan'],
@@ -195,21 +325,26 @@ class PengeluaranController extends Controller
             ];
 
             // Debit: akun beban yang dipilih.
-            DetailJurnal::create(array_merge($detailTransaksi, [
-                'jurnal_id' => $jurnal->id,
-                'akun_id' => $akun->id,
-                'debit' => $total,
-                'kredit' => 0,
-            ]));
+            DetailJurnal::create(array_merge(
+                $detailTransaksi,
+                [
+                    'jurnal_id' => $jurnal->id,
+                    'akun_id' => $akun->id,
+                    'debit' => $total,
+                    'kredit' => 0,
+                ]
+            ));
 
             // Kredit: Kas.
-            DetailJurnal::create(array_merge($detailTransaksi, [
-                'jurnal_id' => $jurnal->id,
-                'akun_id' => $akunKas->id,
-                'debit' => 0,
-                'kredit' => $total,
-            ]));
-
+            DetailJurnal::create(array_merge(
+                $detailTransaksi,
+                [
+                    'jurnal_id' => $jurnal->id,
+                    'akun_id' => $akunKas->id,
+                    'debit' => 0,
+                    'kredit' => $total,
+                ]
+            ));
         });
 
         return redirect()

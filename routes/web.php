@@ -62,6 +62,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::get('/transaksi/tambah', [TransaksiController::class, 'create'])->name('transaksi.create');
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
+    Route::get('/transaksi/export/pdf', [TransaksiController::class, 'exportPdf',])->name('transaksi.export.pdf');
+    Route::get('/transaksi/export/excel', [TransaksiController::class,'exportExcel',])->name('transaksi.export.excel');
 
 //====================================================================================================//
     // === ROUTE yang bisa diakses ADMIN PUSAT & ADMIN CABANG ===
@@ -108,9 +110,22 @@ Route::middleware(['auth'])->group(function () {
     // === ROUTE yang hanya bisa diakses ADMIN PUSAT ===
     Route::middleware(['role:Admin Pusat'])->group(function () {
         // === ROUTE MASTER DATA CABANG ===
-        Route::get('/cabang', [CabangController::class, 'index'])->name('cabang.index');
-        Route::get('/cabang/tambah', [CabangController::class, 'create'])->name('cabang.create');
-        Route::post('/cabang', [CabangController::class, 'store'])->name('cabang.store');
+        
+        // === ROUTE MASTER DATA CABANG ===
+        Route::get('/cabang', [CabangController::class, 'index'])
+            ->name('cabang.index');
+
+        Route::get('/cabang/tambah', [CabangController::class, 'create'])
+            ->name('cabang.create');
+
+        Route::post('/cabang', [CabangController::class, 'store'])
+            ->name('cabang.store');
+
+        Route::get('/cabang/{id}/edit', [CabangController::class, 'edit'])
+            ->name('cabang.edit');
+
+        Route::put('/cabang/{id}', [CabangController::class, 'update'])
+            ->name('cabang.update');
 
         // === ROUTE MASTER DATA USER ===
         Route::get('/user', [UserController::class, 'index'])->name('user.index');

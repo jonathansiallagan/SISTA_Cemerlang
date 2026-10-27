@@ -40,7 +40,13 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <button class="text-blue-500 hover:text-blue-700 mx-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <a
+                            href="{{ route('cabang.edit', $cabang->id) }}"
+                            class="text-blue-500 hover:text-blue-700 mx-1"
+                            title="Edit Cabang"
+                        >
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
                     </td>
                 </tr>
                 @empty
