@@ -26,8 +26,8 @@ class TransaksiController extends Controller
             'detailTransaksis.produk',
         ]);
 
-        // Customer Service hanya boleh melihat transaksi cabangnya sendiri.
-        // Batasi akses data berdasarkan role dan cabang.
+        // Customer Service dan Admin Cabang hanya melihat
+        // transaksi dari cabang masing-masing.
         if ($user->role === 'Admin Cabang' || $user->isCustomerService()) {
             $query->where('cabang_id', $user->cabang_id);
         } elseif ($user->role === 'Admin Pusat' && $request->filled('cabang_id')) {
@@ -61,11 +61,20 @@ class TransaksiController extends Controller
             ->get();
 
         // Data cabang untuk dropdown filter.
-        // Customer Service hanya melihat cabangnya sendiri.
+        // Customer Service hanya mendapatkan data cabangnya sendiri.
         $cabangs = $user->isCustomerService()
             ? \App\Models\Cabang::where('id', $user->cabang_id)->get()
             : \App\Models\Cabang::orderBy('nama')->get();
 
+        // Pilih halaman berdasarkan role pengguna.
+        if ($user->isCustomerService()) {
+            return view('cs.transaksi.index', compact(
+                'transaksis',
+                'cabangs'
+            ));
+        }
+
+        // Admin Pusat dan Admin Cabang tetap menggunakan halaman Admin.
         return view('admin.transaksi.index', compact(
             'transaksis',
             'cabangs'

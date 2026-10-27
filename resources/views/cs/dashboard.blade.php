@@ -1,51 +1,6 @@
 <x-cs-layout>
     <div class="cs-home">
 
-        {{-- HEADER DASHBOARD --}}
-        <header class="cs-home-header">
-
-            <a href="{{ route('cs.dashboard') }}" class="cs-home-logo">
-                <span class="cs-logo-icon">
-                    <i class="fa-solid fa-print"></i>
-                </span>
-                <span>SISTA</span>
-            </a>
-
-            <div class="cs-navbar-title">
-                WELCOME TO SISTA
-            </div>
-
-            <!-- PROFILE BUTTON -->
-            <button type="button"
-                class="cs-profile-button"
-                id="csProfileButton"
-                aria-label="Menu profil">
-                <i class="fa-regular fa-circle-user"></i>
-            </button>
-
-            <div class="cs-profile-menu" id="csProfileMenu">
-                <div class="cs-profile-details">
-                    <div class="cs-profile-avatar">
-                        {{ strtoupper(substr(auth()->user()->name ?? 'C', 0, 1)) }}
-                    </div>
-                    <div>
-                        <strong>{{ auth()->user()->name ?? 'Customer Service' }}</strong>
-                        <small>Customer Service</small>
-                    </div>
-                </div>
-
-                <div class="cs-profile-divider"></div>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="cs-profile-logout">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        Keluar
-                    </button>
-                </form>
-            </div>
-        </header>
-
         {{-- TIGA MENU UTAMA --}}
 
         <main class="cs-menu-container">
@@ -77,23 +32,6 @@
                 <span class="cs-menu-description">
                     Lihat transaksi sebelumnya
                 </span>
-                <span class="cs-menu-arrow">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </span>
-            </a>
-
-            {{-- PENGATURAN --}}
-            <a href="#" class="cs-menu-card">
-                <span class="cs-menu-icon">
-                    <i class="fa-solid fa-gear"></i>
-                </span>
-
-                <span class="cs-menu-title">PENGATURAN</span>
-
-                <span class="cs-menu-description">
-                    Kelola profil dan akun
-                </span>
-
                 <span class="cs-menu-arrow">
                     <i class="fa-solid fa-arrow-right"></i>
                 </span>
