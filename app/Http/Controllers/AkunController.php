@@ -274,18 +274,4 @@ class AkunController extends Controller
                 'Akun berhasil diperbarui!'
             );
     }
-
-    public function destroy($id)
-    {
-        $akun = Akun::findOrFail($id);
-
-        $akun->delete();
-
-        return redirect()
-            ->route('akun.index')
-            ->with(
-                'success',
-                'Akun berhasil dihapus!'
-            );
-    }
 }

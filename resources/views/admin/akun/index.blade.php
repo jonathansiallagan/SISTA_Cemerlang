@@ -1,64 +1,159 @@
-<x-admin-layout>
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-                Bagan Akun (Chart of Accounts)
-            </h1>
+
+<x-admin-layout-stisla>
+
+    {{-- HEADER HALAMAN --}}
+    <div class="section-header">
+        <h1>Bagan Akun (Chart of Accounts)</h1>
+
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active">Akuntansi</div>
+            <div class="breadcrumb-item">Bagan Akun</div>
         </div>
-        <a href="{{ route('akun.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i> Tambah Akun
-        </a>
     </div>
 
-    @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
+    <div class="section-body">
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <table class="w-full text-sm text-left">
-            <thead class="bg-gray-50 text-gray-500 font-bold border-b border-gray-100">
-                <tr>
-                    <th class="px-6 py-4">Kode</th>
-                    <th class="px-6 py-4">Nama Akun</th>
-                    <th class="px-6 py-4">Tipe</th>
-                    <th class="px-6 py-4 text-center">Status</th>
-                    <th class="px-6 py-4 text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse ($akuns as $akun)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 font-bold text-blue-600">{{ $akun->kode_akun }}</td>
-                    <td class="px-6 py-4 font-bold text-gray-800">{{ $akun->nama_akun }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $akun->tipe_akun }}</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="{{ $akun->status == 'aktif' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide">
-                            {{ $akun->status }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center flex justify-center gap-2">
-                        <a href="{{ route('akun.edit', $akun->id) }}" class="text-blue-500 hover:text-blue-700">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
-                        <form action="{{ route('akun.destroy', $akun->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus akun ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-gray-400">
-                        Belum ada data akun perkiraan.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+        {{-- DESKRIPSI DAN TOMBOL TAMBAH --}}
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+            <p class="text-muted mb-2">
+                Kelola daftar akun perkiraan untuk pencatatan transaksi dan laporan keuangan CV Cemerlang.
+            </p>
+
+            <a href="{{ route('akun.create') }}"
+               class="btn btn-primary btn-sm mb-2">
+                <i class="fas fa-plus mr-1"></i>
+                Tambah Akun
+            </a>
+        </div>
+
+        {{-- NOTIFIKASI SUKSES --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show py-2 mb-3"
+                 role="alert">
+                <i class="fas fa-check-circle mr-2"></i>
+                {{ session('success') }}
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="alert"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+        {{-- NOTIFIKASI ERROR --}}
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3"
+                 role="alert">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                Terdapat kesalahan pada proses yang dilakukan.
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="alert"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+        {{-- TABEL BAGAN AKUN --}}
+        <div class="card">
+            <div class="card-header bg-primary py-2">
+                <h4 class="text-white mb-0">
+                    <i class="fas fa-book mr-2"></i>
+                    Daftar Akun Perkiraan
+                </h4>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sista">
+                        <thead>
+                            <tr>
+                                <th width="5%" class="text-center">#</th>
+                                <th width="17%">Kode Akun</th>
+                                <th width="30%">Nama Akun</th>
+                                <th width="20%">Tipe Akun</th>
+                                <th width="15%" class="text-center">Status</th>
+                                <th width="13%" class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse ($akuns as $akun)
+                                <tr>
+                                    {{-- NOMOR URUT --}}
+                                    <td class="text-center align-middle text-muted">
+                                        {{ $loop->iteration }}
+                                    </td>
+
+                                    {{-- KODE AKUN --}}
+                                    <td class="align-middle">
+                                        <strong class="text-primary">
+                                            {{ $akun->kode_akun }}
+                                        </strong>
+                                    </td>
+
+                                    {{-- NAMA AKUN --}}
+                                    <td class="align-middle font-weight-bold">
+                                        {{ $akun->nama_akun }}
+                                    </td>
+
+                                    {{-- TIPE AKUN --}}
+                                    <td class="align-middle">
+                                        {{ $akun->tipe_akun }}
+                                    </td>
+
+                                    {{-- STATUS AKUN --}}
+                                    <td class="text-center align-middle">
+                                        @if (strtolower($akun->status) === 'aktif')
+                                            <span class="badge badge-success">
+                                                Aktif
+                                            </span>
+                                        @else
+                                            <span class="badge badge-secondary">
+                                                Nonaktif
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    {{-- AKSI --}}
+                                    <td class="text-center align-middle text-nowrap">
+                                        <a href="{{ route('akun.edit', $akun->id) }}"
+                                           class="btn btn-primary btn-sm"
+                                           title="Edit Akun">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6"
+                                        class="text-center text-muted py-4">
+                                        <i class="fas fa-book fa-2x mb-2"></i>
+                                        <p class="mb-0">
+                                            Belum ada data akun perkiraan.
+                                            Silakan tambah akun baru.
+                                        </p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{-- FOOTER TABEL --}}
+            <div class="card-footer text-muted">
+                <small>
+                    Total akun:
+                    <strong>{{ $akuns->count() }}</strong>
+                </small>
+            </div>
+        </div>
+
     </div>
-</x-admin-layout>
+
+</x-admin-layout-stisla>

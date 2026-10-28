@@ -1,52 +1,138 @@
-<x-admin-layout>
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-                Data Produk & Layanan
-            </h1>
+
+<x-admin-layout-stisla>
+    {{-- HEADER HALAMAN --}}
+    <div class="section-header">
+        <h1>Data Produk &amp; Layanan</h1>
+
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active">Produk &amp; Layanan</div>
         </div>
-        <a href="{{ route('produk.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i> Tambah Produk
-        </a>
     </div>
 
-    @if (session('success'))
-        <div class="bg-green-100 text-green-700 px-4 py-3 rounded mb-4">{{ session('success') }}</div>
-    @endif
+    <div class="section-body">
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <table class="w-full text-sm text-left">
-            <thead class="bg-gray-50 text-gray-500 font-bold border-b border-gray-100">
-                <tr>
-                    <th class="px-6 py-4">Nama Produk/Layanan</th>
-                    <th class="px-6 py-4">Satuan</th>
-                    <th class="px-6 py-4 text-right">Harga Jual</th>
-                    <th class="px-6 py-4 text-right">HPP</th>
-                    <th class="px-6 py-4 text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse ($produks as $produk)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 font-bold text-gray-800">{{ $produk->nama_produk }}</td>
-                    <td class="px-6 py-4">{{ $produk->satuan }}</td>
-                    <td class="px-6 py-4 text-right font-bold text-green-600">Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-right text-gray-600">Rp {{ number_format($produk->hpp, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-center flex justify-center gap-2">
-                        <a href="{{ route('produk.edit', $produk->id) }}" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></a>
-                        <form action="{{ route('produk.destroy', $produk->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-gray-400">Belum ada data produk.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+        {{-- DESKRIPSI DAN TOMBOL TAMBAH --}}
+        <div class="row align-items-center mb-3">
+            <div class="col-md-7">
+                <p class="text-muted mb-0">
+                    Data Produk &amp; Layanan
+                </p>
+            </div>
+
+            <div class="col-md-5 text-md-right mt-1 mt-md-0">
+                <a href="{{ route('produk.create') }}"
+                   class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus mr-1"></i>
+                    Tambah Produk
+                </a>
+            </div>
+        </div>
+
+        {{-- NOTIFIKASI SUKSES --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show py-2 mb-3"
+                 role="alert">
+                <i class="fas fa-check-circle mr-1"></i>
+                {{ session('success') }}
+
+                <button type="button" class="close"
+                        data-dismiss="alert" aria-label="Tutup">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+
+    {{-- TABEL PRODUK --}}
+    <div class="card">
+        <div class="card-header bg-primary py-2">
+            <h4 class="text-white mb-0">
+                <i class="fas fa-box mr-2"></i>
+                Data Produk &amp; Layanan
+            </h4>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sista">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>Nama Produk/Layanan</th>
+                            <th>Satuan</th>
+                            <th class="text-right">Harga Jual</th>
+                            <th class="text-right">HPP</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse ($produks as $produk)
+                            <tr>
+                                {{-- NOMOR URUT --}}
+                                <td class="text-center text-muted">
+                                    {{ $loop->iteration }}
+                                </td>
+
+                                {{-- NAMA PRODUK --}}
+                                <td class="font-weight-bold">
+                                    {{ $produk->nama_produk }}
+                                </td>
+
+                                {{-- SATUAN --}}
+                                <td>
+                                    {{ $produk->satuan }}
+                                </td>
+
+                                {{-- HARGA JUAL --}}
+                                <td class="text-right text-nowrap font-weight-bold text-success">
+                                    Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}
+                                </td>
+
+                                {{-- HPP --}}
+                                <td class="text-right text-nowrap">
+                                    Rp {{ number_format($produk->hpp, 0, ',', '.') }}
+                                </td>
+
+                                {{-- AKSI --}}
+                                <td class="text-center text-nowrap">
+                                    <a href="{{ route('produk.edit', $produk->id) }}"
+                                    class="btn btn-primary btn-sm"
+                                    title="Edit Produk">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <form action="{{ route('produk.destroy', $produk->id) }}"
+                                        method="POST"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm"
+                                                title="Hapus Produk">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="fas fa-box-open fa-2x mb-2"></i>
+                                    <p class="mb-0">
+                                        Belum ada data produk.
+                                    </p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</x-admin-layout>
+
+
+    </div>
+</x-admin-layout-stisla>

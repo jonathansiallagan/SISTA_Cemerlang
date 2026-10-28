@@ -1,549 +1,435 @@
-<x-admin-layout>
-    <div class="space-y-6">
 
-        <!-- HEADER DASHBOARD -->
-        <section class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-                    {{ $judulDashboard }}
-                </h1>
-                <p class="mt-1 text-sm text-slate-500">
-                    Pantau seluruh aktivitas transaksi, laba, dan performa percetakan CV Cemerlang.
-                </p>
+<x-admin-layout-stisla>
+    <div class="section-header">
+        <h1>{{ $judulDashboard }}</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active">Dashboard</div>
+            <div class="breadcrumb-item">SISTA</div>
+        </div>
+    </div>
+
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="GET" action="{{ url()->current() }}">
+                            <div class="row align-items-end">
+                                <div class="form-group col-md-5 mb-2">
+                                    <label>Cabang</label>
+                                    <select name="cabang_id"
+                                            class="form-control"
+                                            onchange="this.form.submit()">
+                                        @if ($isAdminPusat)
+                                            <option value="semua"
+                                                {{ $cabangId === null ? 'selected' : '' }}>
+                                                Semua Cabang
+                                            </option>
+                                        @endif
+
+                                        @foreach ($daftarCabang as $cabang)
+                                            <option value="{{ $cabang->id }}"
+                                                {{ (string) $cabangId === (string) $cabang->id ? 'selected' : '' }}>
+                                                {{ $cabang->nama }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-4 mb-2">
+                                    <label>Tanggal</label>
+                                    <input type="date" name="tanggal"
+                                           value="{{ $tanggal }}"
+                                           class="form-control"
+                                           onchange="this.form.submit()">
+                                </div>
+
+                                <div class="form-group col-md-3 mb-2">
+                                    <a href="{{ url()->current() }}"
+                                       class="btn btn-light btn-block">
+                                        <i class="fas fa-sync-alt"></i> Reset Filter
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <!-- FILTER CABANG DAN TANGGAL -->
-            <form method="GET" action="{{ url()->current() }}"
-                class="flex flex-wrap items-center gap-3">
-
-                <select name="cabang_id"
-                    onchange="this.form.submit()"
-                    class="min-w-37.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-
-                    @if($isAdminPusat)
-                    <option value="semua"
-                        {{ $cabangId === null ? 'selected' : '' }}>
-                        Semua Cabang
-                    </option>
-                    @endif
-
-                    @foreach($daftarCabang as $cabang)
-                    <option value="{{ $cabang->id }}"
-                        {{ (string) $cabangId === (string) $cabang->id ? 'selected' : '' }}>
-                        {{ $cabang->nama }}
-                    </option>
-                    @endforeach
-                </select>
-
-                <input type="date"
-                    name="tanggal"
-                    value="{{ $tanggal }}"
-                    onchange="this.form.submit()"
-                    class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </form>
-        </section>
-
-
-        <!-- KARTU STATISTIK -->
-        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-
-            <!-- LABA KOTOR (POSISI PERTAMA) -->
-            <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <span class="rounded-lg bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-600">
-                            Laba Kotor
-                        </span>
-                        <h2 class="mt-4 text-xl font-extrabold text-emerald-600">
+        {{-- KARTU STATISTIK --}}
+        <div class="row">
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="card card-statistic-1">
+                    <div class="card-icon bg-success">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="card-header">
+                            <h4>Laba Kotor</h4>
+                        </div>
+                        <div class="card-body">
                             Rp {{ number_format($laba, 0, ',', '.') }}
-                        </h2>
+                        </div>
+                        <div class="px-4 pb-3">
+                            <span class="badge {{ $persenLaba < 0 ? 'badge-danger' : 'badge-success' }}">
+                                {{ $persenLaba >= 0 ? '+' : '' }}{{ number_format($persenLaba, 1, ',', '.') }}%
+                            </span>
+                            <small class="text-muted">dari hari sebelumnya</small>
+                        </div>
                     </div>
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
-                        <i class="fa-solid fa-arrow-trend-up text-lg"></i>
-                    </div>
-                </div>
-                <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
-                    <span class="rounded-md px-2 py-1 text-xs font-bold {{ $persenLaba < 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }}">
-                        {{ $persenLaba >= 0 ? '↗ +' : '↘ ' }}{{ number_format(abs($persenLaba), 1, ',', '.') }}%
-                    </span>
-                    <span class="text-[11px] text-slate-400">dari hari sebelumnya</span>
                 </div>
             </div>
 
-            <!-- OMZET (POSISI KEDUA) -->
-            <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <span class="rounded-lg bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-600">
-                            Omzet
-                        </span>
-                        <h2 class="mt-4 text-xl font-extrabold text-slate-900">
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="card card-statistic-1">
+                    <div class="card-icon bg-primary">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="card-header">
+                            <h4>Omzet</h4>
+                        </div>
+                        <div class="card-body">
                             Rp {{ number_format($omzet, 0, ',', '.') }}
-                        </h2>
+                        </div>
+                        <div class="px-4 pb-3">
+                            <span class="badge {{ $persenOmzet < 0 ? 'badge-danger' : 'badge-success' }}">
+                                {{ $persenOmzet >= 0 ? '+' : '' }}{{ number_format($persenOmzet, 1, ',', '.') }}%
+                            </span>
+                            <small class="text-muted">dari hari sebelumnya</small>
+                        </div>
                     </div>
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg shadow-blue-500/20">
-                        <i class="fa-solid fa-chart-line text-lg"></i>
-                    </div>
-                </div>
-                <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
-                    <span class="rounded-md px-2 py-1 text-xs font-bold {{ $persenOmzet < 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }}">
-                        {{ $persenOmzet >= 0 ? '↗ +' : '↘ ' }}{{ number_format(abs($persenOmzet), 1, ',', '.') }}%
-                    </span>
-                    <span class="text-[11px] text-slate-400">dari hari sebelumnya</span>
                 </div>
             </div>
 
-            <!-- TRANSAKSI (POSISI KETIGA) -->
-            <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <span class="rounded-lg bg-purple-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-purple-600">
-                            Transaksi
-                        </span>
-                        <h2 class="mt-4 text-xl font-extrabold text-slate-900">
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="card card-statistic-1">
+                    <div class="card-icon bg-warning">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="card-header">
+                            <h4>Transaksi</h4>
+                        </div>
+                        <div class="card-body">
                             {{ number_format($jumlahTransaksi, 0, ',', '.') }}
-                        </h2>
-                    </div>
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white shadow-lg shadow-violet-500/20">
-                        <i class="fa-solid fa-receipt text-lg"></i>
+                        </div>
+                        <div class="px-4 pb-3">
+                            <span class="badge {{ $persenTransaksi < 0 ? 'badge-danger' : 'badge-success' }}">
+                                {{ $persenTransaksi >= 0 ? '+' : '' }}{{ number_format($persenTransaksi, 1, ',', '.') }}%
+                            </span>
+                            <small class="text-muted">dari hari sebelumnya</small>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
-                    <span class="rounded-md px-2 py-1 text-xs font-bold {{ $persenTransaksi < 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }}">
-                        {{ $persenTransaksi >= 0 ? '↗ +' : '↘ ' }}{{ number_format(abs($persenTransaksi), 1, ',', '.') }}%
-                    </span>
-                    <span class="text-[11px] text-slate-400">dari hari sebelumnya</span>
+            </div>
+        </div>
+
+        {{-- GRAFIK OMZET DAN PRODUK TERLARIS --}}
+        <div class="row align-items-stretch">
+            <div class="col-lg-8 col-md-12 d-flex">
+                <div class="card w-100">
+                    <div class="card-header">
+                        <h4>Performa Omzet</h4>
+                        <div class="card-header-action">
+                            <span class="badge badge-primary">7 Hari Terakhir</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">
+                            Tren pendapatan selama tujuh hari terakhir
+                        </p>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="omzetChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-        </section>
-
-
-        <!-- GRAFIK DAN PRODUK TERLARIS -->
-        <section class="grid grid-cols-1 gap-5 xl:grid-cols-3">
-
-            <!-- GRAFIK OMZET -->
-            <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:p-6 xl:col-span-2">
-                <div class="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                        <h2 class="text-base font-bold text-slate-900">Performa Omzet</h2>
-                        <p class="mt-1 text-xs text-slate-400">
-                            Tren pendapatan selama 7 hari terakhir
-                        </p>
+            
+            <div class="col-lg-4 col-md-12 d-flex">
+                <div class="card w-100">
+                    <div class="card-header">
+                        <h4>Produk Terlaris</h4>
+                        <div class="card-header-action">
+                            <span class="badge badge-primary">Hari Ini</span>
+                        </div>
                     </div>
-                    <span class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[11px] font-semibold text-blue-600">
-                        7 Hari Terakhir
-                    </span>
-                </div>
 
-                <div class="mt-5 flex flex-wrap items-center gap-3">
-                    <span class="flex items-center gap-2 text-xs font-medium text-slate-600">
-                        <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span>
-                        Omzet Masuk
-                    </span>
-                    <span class="rounded-full bg-blue-600 px-3 py-1 text-[11px] font-semibold text-white">
-                        Puncak: Rp {{ number_format(collect($omzetChart)->max() ?? 0, 0, ',', '.') }}
-                    </span>
-                </div>
-
-                <div class="relative mt-5 h-64 w-full">
-                    <canvas id="omzetChart"></canvas>
-                </div>
-            </div>
-
-            <!-- PRODUK TERLARIS -->
-            <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:p-6">
-                <div class="flex items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-base font-bold text-slate-900">Produk Terlaris</h2>
-                        <p class="mt-1 text-xs text-slate-400">
-                            Produk dengan penjualan tertinggi
-                        </p>
-                    </div>
-                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-50 text-amber-500">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                </div>
-
-                <div class="mt-5 space-y-3">
-                    @forelse($produkTerlaris as $index => $produk)
                     @php
-                    $maksPenjualan = collect($produkTerlaris)->max('total_terjual') ?? 0;
-                    $persenBar = $maksPenjualan > 0
-                    ? min(100, (($produk->total_terjual ?? 0) / $maksPenjualan) * 100)
-                    : 0;
+                        $maksPenjualan = collect($produkTerlaris)->max('total_penjualan') ?: 1;
                     @endphp
 
-                    <div class="rounded-xl border border-amber-100 bg-amber-50/30 p-3">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-sm font-bold text-white">
-                                {{ $index + 1 }}
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <p class="truncate text-xs font-bold text-slate-800">
-                                    {{ optional($produk->produk)->nama ?? 'Produk Dihapus' }}
-                                </p>
-                                <p class="mt-1 text-[11px] text-slate-500">
-                                    {{ number_format($produk->total_terjual ?? 0, 0, ',', '.') }} terjual
-                                </p>
-                            </div>
-                        </div>
+                    <div class="card-body" id="top-5-scroll">
+                        <ul class="list-unstyled list-unstyled-border">
+                            @forelse ($produkTerlaris as $index => $produk)
+                                @php
+                                    $totalPenjualan = (float) ($produk->total_penjualan ?? 0);
+                                    $jumlahTerjual = (float) ($produk->total_terjual ?? 0);
 
-                        <div class="mt-3 flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-semibold text-emerald-600">
-                                {{ $index === 0 ? 'Produk Teratas' : 'Peringkat ' . ($index + 1) }}
-                            </span>
-                            <span class="text-xs font-bold text-slate-700">
-                                Rp {{ number_format($produk->total_penjualan ?? 0, 0, ',', '.') }}
-                            </span>
-                        </div>
+                                    $persenBar = min(
+                                        100,
+                                        ($totalPenjualan / $maksPenjualan) * 100
+                                    );
+                                @endphp
 
-                        <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                            <div class="h-full rounded-full bg-linear-to-r from-amber-400 to-rose-500"
-                                @style(["width: {$persenBar}%"])></div>
-                        </div>
+                                <li class="media mb-3 pb-3">
+                                    <div class="mr-3 d-flex align-items-center justify-content-center"
+                                        style="width: 40px; height: 40px; flex-shrink: 0;">
+                                        <span class="badge badge-primary"
+                                            style="font-size: 16px;">
+                                            {{ $index + 1 }}
+                                        </span>
+                                    </div>
+
+                                    <div class="media-body">
+                                        <div class="float-right">
+                                            <div class="font-weight-600 text-muted text-small">
+                                                {{ number_format($jumlahTerjual, 0, ',', '.') }} Terjual
+                                            </div>
+                                        </div>
+
+                                        <div class="media-title">
+                                            {{ optional($produk->produk)->nama_produk ?? 'Produk Dihapus' }}
+                                        </div>
+
+                                        <div class="mt-1">
+                                            <div class="budget-price">
+                                                <div class="budget-price-square bg-primary"
+                                                    data-width="{{ $persenBar }}%">
+                                                </div>
+
+                                                <div class="budget-price-label">
+                                                    Rp {{ number_format($totalPenjualan, 0, ',', '.') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            @empty
+                                <li class="text-center py-4">
+                                    <i class="fas fa-box-open fa-2x text-muted mb-3"></i>
+                                    <p class="text-muted mb-0">
+                                        Belum ada data produk terlaris.
+                                    </p>
+                                </li>
+                            @endforelse
+                        </ul>
+
+                        <a href="{{ route('produk.index') }}"
+                        class="btn btn-outline-primary btn-block mt-3">
+                            Lihat Katalog Produk
+                        </a>
                     </div>
-                    @empty
-                    <div class="rounded-xl border border-dashed border-slate-200 px-4 py-10 text-center">
-                        <i class="fa-regular fa-clock text-xl text-slate-300"></i>
-                        <p class="mt-3 text-xs font-semibold text-slate-600">
-                            Belum ada data produk
-                        </p>
-                        <p class="mt-1 text-[11px] text-slate-400">
-                            Data akan tampil setelah transaksi tersedia.
-                        </p>
-                    </div>
-                    @endforelse
                 </div>
+            </div>
 
-                <div class="mt-5 border-t border-slate-100 pt-4">
-                    <a href="{{ route('produk.index') }}"
-                        class="block text-center text-xs font-semibold text-blue-600 hover:text-blue-800">
-                        Lihat Katalog Produk →
+        </div>
+
+        {{-- TRANSAKSI TERBARU --}}
+        <div class="card">
+            <div class="card-header">
+                <h4>Transaksi Terbaru</h4>
+                <div class="card-header-action">
+                    <a href="{{ route('transaksi.index') }}" class="btn btn-primary">
+                        {{ number_format($jumlahTransaksi) }} Transaksi
                     </a>
                 </div>
             </div>
-        </section>
 
-        <!-- TRANSAKSI TERBARU -->
-        <section class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-            <div class="flex flex-col gap-3 p-5 md:flex-row md:items-center md:justify-between md:px-6">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900">Transaksi Terbaru</h2>
-                    <p class="mt-1 text-xs text-slate-400">
-                        Daftar transaksi pada {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}
-                    </p>
-                </div>
-
-                <a href="{{ route('transaksi.index') }}"
-                    class="inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100">
-                    <span class="h-2 w-2 rounded-full bg-blue-500"></span>
-                    {{ $jumlahTransaksi }} Transaksi
-                </a>
-            </div>
-
-            <div class="overflow-x-auto px-5 pb-5 md:px-6">
-                <table class="w-full min-w-180 text-left text-xs">
-                    <thead>
-                        <tr class="border-y border-slate-100 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-400">
-                            <th class="px-3 py-4 font-bold">#</th>
-                            <th class="px-3 py-4 font-bold">Tanggal</th>
-                            @if($isAdminPusat)
-                            <th class="px-3 py-4 font-bold">Cabang</th>
-                            @endif
-                            <th class="px-3 py-4 font-bold">User</th>
-                            <th class="px-3 py-4 text-right font-bold">Omzet</th>
-                            <th class="px-3 py-4 text-right font-bold">HPP</th>
-                            <th class="px-3 py-4 text-right font-bold">Laba</th>
-                        </tr>
-                    </thead>
-
-                    <tbody class="divide-y divide-slate-100">
-                        @forelse($transaksiTerbaru as $index => $t)
-                        @php
-                        $omzetTransaksi = (float) ($t->total_transaksi ?? 0);
-                        $hppTransaksi = (float) ($t->total_hpp ?? 0);
-                        $labaTransaksi = $hppTransaksi > 0
-                        ? $omzetTransaksi - $hppTransaksi
-                        : $omzetTransaksi * 0.33;
-                        @endphp
-
-                        <tr class="transition hover:bg-blue-50/40">
-                            <td class="px-3 py-4">
-                                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 font-bold text-blue-600">
-                                    {{ $index + 1 }}
-                                </span>
-                            </td>
-
-                            <td class="whitespace-nowrap px-3 py-4 text-slate-600">
-                                <i class="fa-regular fa-calendar mr-1 text-slate-400"></i>
-                                {{ \Carbon\Carbon::parse($t->tanggal ?? $t->created_at)->format('d/m/Y') }}
-                            </td>
-
-                            @if($isAdminPusat)
-                            <td class="whitespace-nowrap px-3 py-4">
-                                <span class="rounded-lg border border-blue-100 bg-blue-50 px-2 py-1 font-medium text-blue-600">
-                                    {{ optional($t->cabang)->nama ?? '-' }}
-                                </span>
-                            </td>
-                            @endif
-
-                            <td class="whitespace-nowrap px-3 py-4 font-semibold text-slate-700">
-                                <i class="fa-regular fa-user mr-1 text-slate-400"></i>
-                                {{ optional($t->user)->name ?? '-' }}
-                            </td>
-
-                            <td class="whitespace-nowrap px-3 py-4 text-right font-bold text-slate-800">
-                                Rp {{ number_format($omzetTransaksi, 0, ',', '.') }}
-                            </td>
-
-                            <td class="whitespace-nowrap px-3 py-4 text-right">
-                                <span class="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 font-semibold text-amber-700">
-                                    Rp {{ number_format($hppTransaksi, 0, ',', '.') }}
-                                </span>
-                            </td>
-
-                            <td class="whitespace-nowrap px-3 py-4 text-right">
-                                <span class="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 font-bold text-emerald-700">
-                                    Rp {{ number_format($labaTransaksi, 0, ',', '.') }}
-                                </span>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="{{ $isAdminPusat ? 7 : 6 }}"
-                                class="px-4 py-10 text-center text-slate-400">
-                                <i class="fa-regular fa-folder-open mb-2 text-2xl"></i>
-                                <p>Belum ada transaksi pada tanggal ini.</p>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- JURNAL TERBARU DAN RINGKASAN JURNAL -->
-        <section class="grid grid-cols-1 gap-5 xl:grid-cols-3">
-
-            <!-- JURNAL TERBARU -->
-            <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:p-6 xl:col-span-2">
-                <div class="flex items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-base font-bold text-slate-900">Jurnal Terbaru</h2>
-                        <p class="mt-1 text-xs text-slate-400">Jurnal akuntansi terbaru</p>
-                    </div>
-                    <span class="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-semibold text-slate-500">
-                        {{ $jurnalTerbaru->count() }} Catatan
-                    </span>
-                </div>
-
-                <div class="mt-5 overflow-x-auto">
-                    <table class="w-full min-w-100 text-left text-xs">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-md">
                         <thead>
-                            <tr class="bg-slate-50 text-[10px] text-slate-400">
-                                <th class="rounded-l-lg px-3 py-3 font-bold">Tanggal</th>
-                                <th class="px-3 py-3 font-bold">Keterangan</th>
-                                @if($isAdminPusat)
-                                <th class="rounded-r-lg px-3 py-3 font-bold">Cabang</th>
+                            <tr>
+                                <th>#</th>
+                                <th>Tanggal</th>
+                                @if ($isAdminPusat)
+                                    <th>Cabang</th>
                                 @endif
+                                <th>User</th>
+                                <th class="text-right">Omzet</th>
+                                <th class="text-right">HPP</th>
+                                <th class="text-right">Laba</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            @forelse ($transaksiTerbaru as $index => $t)
+                                @php
+                                    $omzetTransaksi = (float) ($t->total_transaksi ?? 0);
+                                    $hppTransaksi = (float) ($t->total_hpp ?? 0);
+                                    $labaTransaksi = $hppTransaksi > 0
+                                        ? $omzetTransaksi - $hppTransaksi
+                                        : $omzetTransaksi * 0.33;
+                                @endphp
 
-                        <tbody class="divide-y divide-slate-100">
-                            @forelse($jurnalTerbaru as $jurnal)
-                            <tr class="hover:bg-slate-50">
-                                <td class="whitespace-nowrap px-3 py-3 text-slate-600">
-                                    {{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d/m/Y') }}
-                                </td>
-                                <td class="px-3 py-3 font-medium text-slate-700">
-                                    {{ $jurnal->keterangan ?? 'Jurnal akuntansi' }}
-                                </td>
-                                @if($isAdminPusat)
-                                <td class="whitespace-nowrap px-3 py-3 text-slate-600">
-                                    {{ optional($jurnal->cabang)->nama ?? '-' }}
-                                </td>
-                                @endif
-                            </tr>
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($t->tanggal ?? $t->created_at)->format('d/m/Y') }}</td>
+                                    @if ($isAdminPusat)
+                                        <td>{{ optional($t->cabang)->nama ?? '-' }}</td>
+                                    @endif
+                                    <td>{{ optional($t->user)->name ?? '-' }}</td>
+                                    <td class="text-right">
+                                        Rp {{ number_format($omzetTransaksi, 0, ',', '.') }}
+                                    </td>
+                                    <td class="text-right">
+                                        Rp {{ number_format($hppTransaksi, 0, ',', '.') }}
+                                    </td>
+                                    <td class="text-right">
+                                        <strong class="text-success">
+                                            Rp {{ number_format($labaTransaksi, 0, ',', '.') }}
+                                        </strong>
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="{{ $isAdminPusat ? 3 : 2 }}" class="py-8">
-                                    <div class="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center">
-                                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
-                                            <i class="fa-solid fa-book-open text-xl"></i>
-                                        </div>
-                                        <p class="mt-3 text-xs font-semibold text-slate-700">
-                                            Belum ada mutasi jurnal
-                                        </p>
-                                        <p class="mt-1 text-[11px] text-slate-400">
-                                            Jurnal akan ditampilkan ketika data tersedia.
-                                        </p>
-                                    </div>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="{{ $isAdminPusat ? 7 : 6 }}" class="text-center py-4">
+                                        Belum ada transaksi pada tanggal ini.
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
 
-                <div class="mt-4 border-t border-slate-100 pt-4">
-                    <a href="{{ route('jurnal.index') }}"
-                        class="text-xs font-semibold text-blue-600 hover:text-blue-800">
-                        Lihat Jurnal Umum →
-                    </a>
+        {{-- JURNAL TERBARU DAN RINGKASAN --}}
+        <div class="row">
+            <div class="col-lg-8 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Jurnal Terbaru</h4>
+                        <div class="card-header-action">
+                            <span class="badge badge-light">
+                                {{ $jurnalTerbaru->count() }} Catatan
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-md">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Keterangan</th>
+                                        @if ($isAdminPusat)
+                                            <th>Cabang</th>
+                                        @endif
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($jurnalTerbaru as $jurnal)
+                                        <tr>
+                                            <td>{{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d/m/Y') }}</td>
+                                            <td>{{ $jurnal->keterangan ?? 'Jurnal akuntansi' }}</td>
+                                            @if ($isAdminPusat)
+                                                <td>{{ optional($jurnal->cabang)->nama ?? '-' }}</td>
+                                            @endif
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="{{ $isAdminPusat ? 3 : 2 }}" class="text-center py-4">
+                                                Belum ada mutasi jurnal.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-right">
+                        <a href="{{ route('jurnal.index') }}" class="btn btn-outline-primary">
+                            Lihat Jurnal Umum
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- RINGKASAN JURNAL -->
-            <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-base font-bold text-slate-900">Ringkasan Jurnal</h2>
-                        <p class="mt-1 text-xs text-slate-400">Total debit dan kredit</p>
+            <div class="col-lg-4 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Ringkasan Jurnal</h4>
                     </div>
-                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                        <i class="fa-solid fa-file-invoice"></i>
-                    </div>
-                </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <div class="text-small">Total Debit</div>
+                            <h5 class="mb-0">Rp {{ number_format($totalDebit ?? 0, 0, ',', '.') }}</h5>
+                        </div>
 
-                <div class="mt-5 flex items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white">
-                            <i class="fa-solid fa-arrow-down"></i>
+                        <div class="alert alert-primary">
+                            <div class="text-small">Total Kredit</div>
+                            <h5 class="mb-0">Rp {{ number_format($totalKredit ?? 0, 0, ',', '.') }}</h5>
                         </div>
-                        <div>
-                            <p class="text-[10px] font-bold uppercase text-slate-500">Total Debit</p>
-                            <p class="mt-1 text-base font-extrabold text-slate-900">
-                                Rp {{ number_format($totalDebit ?? 0, 0, ',', '.') }}
-                            </p>
-                        </div>
-                    </div>
-                    <span class="rounded-md border border-emerald-200 bg-white px-2 py-1 text-[10px] font-semibold text-emerald-600">
-                        Debit
-                    </span>
-                </div>
 
-                <div class="mt-3 flex items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50/40 p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
-                            <i class="fa-solid fa-arrow-up"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold uppercase text-slate-500">Total Kredit</p>
-                            <p class="mt-1 text-base font-extrabold text-slate-900">
-                                Rp {{ number_format($totalKredit ?? 0, 0, ',', '.') }}
-                            </p>
-                        </div>
+                        <a href="{{ route('buku_besar.index') }}" class="btn btn-outline-primary btn-block">
+                            Lihat Buku Besar
+                        </a>
                     </div>
-                    <span class="rounded-md border border-blue-200 bg-white px-2 py-1 text-[10px] font-semibold text-blue-600">
-                        Kredit
-                    </span>
-                </div>
-
-                <div class="mt-5 border-t border-slate-100 pt-4">
-                    <a href="{{ route('buku_besar.index') }}"
-                        class="block text-center text-xs font-semibold text-blue-600 hover:text-blue-800">
-                        Lihat Buku Besar →
-                    </a>
                 </div>
             </div>
-
-        </section>
+        </div>
     </div>
 
-    <!-- CHART.JS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    {{-- Grafik omzet --}}
+    <script src="{{ asset('stisla/assets/modules/chart.min.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const canvas = document.getElementById('omzetChart');
 
-            if (!canvas || typeof Chart === 'undefined') return;
+            if (!canvas || typeof Chart === 'undefined') {
+                return;
+            }
 
-            const labels = {{ Illuminate\Support\Js::from($tanggalChart) }};
-            const values = {{ Illuminate\Support\Js::from($omzetChart) }};
-            const ctx = canvas.getContext('2d');
+            const labels = {{ \Illuminate\Support\Js::from($tanggalChart) }};
+            const values = {{ \Illuminate\Support\Js::from($omzetChart) }};
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 280);
-            gradient.addColorStop(0, 'rgba(37, 99, 235, 0.22)');
-            gradient.addColorStop(1, 'rgba(37, 99, 235, 0.00)');
-
-            new Chart(ctx, {
+            new Chart(canvas.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Omzet',
                         data: values,
-                        borderColor: '#2563eb',
-                        backgroundColor: gradient,
-                        fill: true,
-                        tension: 0.35,
-                        borderWidth: 2.5,
+                        borderColor: '#6777ef',
+                        backgroundColor: 'rgba(103, 119, 239, 0.12)',
+                        borderWidth: 2,
                         pointRadius: 3,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#2563eb',
-                        pointBorderWidth: 2
+                        pointBackgroundColor: '#6777ef',
+                        fill: true,
+                        lineTension: 0.3
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#172554',
-                            padding: 12,
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Omzet: Rp ' +
-                                        new Intl.NumberFormat('id-ID').format(context.parsed.y);
-                                }
-                            }
-                        }
-                    },
+                    legend: { display: false },
                     scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            border: {
-                                display: false
-                            },
+                        yAxes: [{
                             ticks: {
-                                color: '#94a3b8',
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            border: {
-                                display: false
-                            },
-                            grid: {
-                                color: '#edf2f7'
-                            },
-                            ticks: {
-                                color: '#94a3b8',
-                                font: {
-                                    size: 10
-                                },
-                                callback: function(value) {
+                                beginAtZero: true,
+                                callback: function (value) {
                                     return 'Rp ' + new Intl.NumberFormat('id-ID', {
                                         notation: 'compact',
                                         maximumFractionDigits: 1
                                     }).format(value);
                                 }
+                            },
+                            gridLines: { color: '#f2f2f2' }
+                        }],
+                        xAxes: [{
+                            gridLines: { display: false }
+                        }]
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return 'Omzet: Rp ' +
+                                    new Intl.NumberFormat('id-ID').format(tooltipItem.yLabel);
                             }
                         }
                     }
@@ -551,5 +437,4 @@
             });
         });
     </script>
-
-</x-admin-layout>
+</x-admin-layout-stisla>

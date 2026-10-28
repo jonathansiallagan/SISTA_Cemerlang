@@ -9,7 +9,9 @@ class CabangController extends Controller
 {
     public function index()
     {
+        // Tampilkan cabang aktif dan nonaktif
         $cabangs = Cabang::all();
+
         return view('admin.cabang.index', compact('cabangs'));
     }
 
@@ -24,11 +26,17 @@ class CabangController extends Controller
             'nama' => 'required|string|max:255',
             'alamat' => 'required|string',
             'no_hp' => 'required|string|max:20',
+            'status' => [
+                'required',
+                Rule::in(['aktif', 'nonaktif']),
+            ],
         ]);
 
         Cabang::create($validated);
 
-        return redirect()->route('cabang.index')->with('success', 'Data cabang berhasil ditambahkan!');
+        return redirect()
+            ->route('cabang.index')
+            ->with('success', 'Data cabang berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -44,8 +52,12 @@ class CabangController extends Controller
 
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'no_hp' => 'required|string|max:20',
             'alamat' => 'required|string',
+            'no_hp' => 'required|string|max:20',
+            'status' => [
+                'required',
+                Rule::in(['aktif', 'nonaktif']),
+            ],
         ]);
 
         $cabang->update($validated);
@@ -53,5 +65,25 @@ class CabangController extends Controller
         return redirect()
             ->route('cabang.index')
             ->with('success', 'Data cabang berhasil diperbarui.');
+    }
+
+    public function toggleStatus($id)
+    {
+        $cabang = Cabang::findOrFail($id);
+
+        $statusBaru = $cabang->status === 'aktif'
+            ? 'nonaktif'
+            : 'aktif';
+
+        $cabang->update([
+            'status' => $statusBaru,
+        ]);
+
+        return redirect()
+            ->route('cabang.index')
+            ->with(
+                'success',
+                'Status cabang berhasil diubah menjadi ' . ucfirst($statusBaru) . '.'
+            );
     }
 }

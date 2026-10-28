@@ -63,8 +63,8 @@ class AdminLayout extends Component
                         'route'  => $this->user->homeRoute(),
                         'active' => request()->is('admin', 'admin/*', 'cs', 'cs/*'),
                     ],
-                    ['label' => 'Transaksi',   'icon' => 'fa-cash-register',       'route' => 'transaksi.index'],
-                    ['label' => 'Pengeluaran', 'icon' => 'fa-money-bill-transfer', 'route' => 'pengeluaran.index'],
+                    ['label' => 'Transaksi',   'icon' => 'fa-exchange-alt', 'route' => 'transaksi.index'],
+                    ['label' => 'Pengeluaran', 'icon' => 'fa-wallet',       'route' => 'pengeluaran.index'],
                     
                     // Modul spesifik Admin
                     ['label' => 'Produk',            'icon' => 'fa-box',        'route' => 'produk.index',            'visible' => $isAdmin],

@@ -80,8 +80,6 @@ Route::middleware(['auth'])->group(function () {
 
         // === ROUTE JURNAL UMUM ===
         Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
-        Route::get('/jurnal/tambah', [JurnalController::class, 'create'])->name('jurnal.create');
-        Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
 
         // === ROUTE BUKU BESAR ===
         Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
@@ -123,6 +121,9 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/cabang/{id}', [CabangController::class, 'update'])
             ->name('cabang.update');
 
+        Route::patch('/cabang/{id}/status', [CabangController::class, 'toggleStatus'])
+            ->name('cabang.toggle-status');
+
         // === ROUTE MASTER DATA USER ===
         Route::get('/user', [UserController::class, 'index'])->name('user.index');
         Route::get('/user/tambah', [UserController::class, 'create'])->name('user.create');
@@ -137,7 +138,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/akun', [AkunController::class, 'store'])->name('akun.store');
         Route::get('/akun/{id}/edit', [AkunController::class, 'edit'])->name('akun.edit');
         Route::put('/akun/{id}', [AkunController::class, 'update'])->name('akun.update');
-        Route::delete('/akun/{id}', [AkunController::class, 'destroy'])->name('akun.destroy');
         Route::get('/akun/preview-kode', [AkunController::class, 'previewKode'])->name('akun.preview-kode');
     });
 });

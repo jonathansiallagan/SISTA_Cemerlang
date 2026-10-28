@@ -7,3 +7,43 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+
+/* ========================================
+   TABEL GLOBAL SISTA
+   Gunakan class: table-sista
+======================================== */
+
+.table-sista {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+    border: 1px solid #b8c2cc;
+}
+
+.table-sista th,
+.table-sista td {
+    border: 1px solid #c5cdd5;
+    padding: 0.65rem 0.75rem;
+    vertical-align: middle;
+}
+
+.table-sista thead th {
+    background-color: #e9ecef;
+    color: #343a40;
+    font-weight: 600;
+    border-bottom: 2px solid #aeb8c2;
+    white-space: nowrap;
+}
+
+.table-sista tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.table-sista tbody tr:hover {
+    background-color: #edf3ff;
+}
+
+.table-sista .text-nowrap {
+    white-space: nowrap;
+}

@@ -1,228 +1,240 @@
-<x-admin-layout>
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-                Jurnal Umum
-            </h1>
+<x-admin-layout-stisla>
+
+    {{-- HEADER HALAMAN --}}
+    <div class="section-header">
+        <h1>Jurnal Umum</h1>
+
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active">Jurnal Umum</div>
         </div>
     </div>
 
-    
-    {{-- Filter Periode dan Cabang --}}
-    <form action="{{ route('jurnal.index') }}" method="GET"
-        class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="section-body">
 
-        <h2 class="mb-1 text-base font-semibold text-slate-800">
-            Filter Jurnal
-        </h2>
-        <p class="mb-4 text-sm text-slate-500">
-            Pilih periode pencatatan jurnal yang ingin ditampilkan.
-        </p>
+        {{-- FILTER PERIODE DAN CABANG --}}
+        <div class="card mb-2">
+            <div class="card-body p-3">
+                <form action="{{ route('jurnal.index') }}" method="GET">
+                    <div class="form-row align-items-end">
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2
-                    {{ Auth::user()->role === 'Admin Pusat' ? 'lg:grid-cols-4' : 'lg:grid-cols-3' }}">
+                        {{-- TANGGAL MULAI --}}
+                        <div class="form-group col-lg-{{ Auth::user()->role === 'Admin Pusat' ? '3' : '4' }} col-md-6 mb-2">
+                            <label for="start_date" class="d-block mb-1">
+                                Dari Tanggal
+                            </label>
 
-            <div>
-                <label for="start_date"
-                    class="mb-2 block text-sm font-medium text-slate-700">
-                    Dari Tanggal
-                </label>
-                <input type="date"
-                    id="start_date"
-                    name="start_date"
-                    value="{{ $startDate }}"
-                    required
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5
-                            text-sm focus:border-blue-500 focus:outline-none
-                            focus:ring-2 focus:ring-blue-100">
+                            <input type="date"
+                                id="start_date"
+                                name="start_date"
+                                value="{{ $startDate }}"
+                                required
+                                class="form-control">
+                        </div>
+
+                        {{-- TANGGAL AKHIR --}}
+                        <div class="form-group col-lg-{{ Auth::user()->role === 'Admin Pusat' ? '3' : '4' }} col-md-6 mb-2">
+                            <label for="end_date" class="d-block mb-1">
+                                Sampai Tanggal
+                            </label>
+
+                            <input type="date"
+                                id="end_date"
+                                name="end_date"
+                                value="{{ $endDate }}"
+                                min="{{ $startDate }}"
+                                required
+                                class="form-control">
+                        </div>
+
+                        {{-- CABANG ADMIN PUSAT --}}
+                        @if (Auth::user()->role === 'Admin Pusat')
+                            <div class="form-group col-lg-3 col-md-6 mb-2">
+                                <label for="cabang_id" class="d-block mb-1">
+                                    Cabang
+                                </label>
+
+                                <select id="cabang_id"
+                                        name="cabang_id"
+                                        class="form-control">
+                                    <option value="">Semua Cabang</option>
+
+                                    @foreach ($cabangs as $cabang)
+                                        <option value="{{ $cabang->id }}"
+                                            {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
+                                            {{ $cabang->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
+                        {{-- TOMBOL FILTER DAN RESET --}}
+                        <div class="form-group col-lg-{{ Auth::user()->role === 'Admin Pusat' ? '3' : '4' }} col-md-6 mb-2">
+                            <div class="d-flex align-items-center flex-wrap">
+                                <button type="submit"
+                                        class="btn btn-primary mr-2 mb-1">
+                                    <i class="fas fa-filter mr-1"></i>
+                                    Filter
+                                </button>
+
+                                <a href="{{ route('jurnal.index') }}"
+                                class="btn btn-light mb-1">
+                                    <i class="fas fa-redo mr-1"></i>
+                                    Reset
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
             </div>
+        </div>
 
-            <div>
-                <label for="end_date"
-                    class="mb-2 block text-sm font-medium text-slate-700">
-                    Sampai Tanggal
-                </label>
-                <input type="date"
-                    id="end_date"
-                    name="end_date"
-                    value="{{ $endDate }}"
-                    min="{{ $startDate }}"
-                    required
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5
-                            text-sm focus:border-blue-500 focus:outline-none
-                            focus:ring-2 focus:ring-blue-100">
-            </div>
+        {{-- NOTIFIKASI SUKSES --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show py-2 mb-3"
+                 role="alert">
+                <i class="fas fa-check-circle mr-1"></i>
+                {{ session('success') }}
 
-            @if (Auth::user()->role === 'Admin Pusat')
-                <div>
-                    <label for="cabang_id"
-                        class="mb-2 block text-sm font-medium text-slate-700">
-                        Cabang
-                    </label>
-                    <select id="cabang_id"
-                            name="cabang_id"
-                            class="w-full rounded-lg border border-slate-300 px-3 py-2.5
-                                text-sm focus:border-blue-500 focus:outline-none
-                                focus:ring-2 focus:ring-blue-100">
-                        <option value="">Semua Cabang</option>
-
-                        @foreach ($cabangs as $cabang)
-                            <option value="{{ $cabang->id }}"
-                                {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
-                                {{ $cabang->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            @endif
-
-            <div class="flex items-end gap-2">
-                <button type="submit"
-                        class="inline-flex flex-1 items-center justify-center gap-2
-                            rounded-lg bg-blue-700 px-4 py-2.5 text-sm
-                            font-semibold text-white hover:bg-blue-800">
-                    <i class="fa-solid fa-filter"></i>
-                    Filter
+                <button type="button"
+                        class="close"
+                        data-dismiss="alert"
+                        aria-label="Tutup">
+                    <span aria-hidden="true">&times;</span>
                 </button>
-
-                <a href="{{ route('jurnal.index') }}"
-                class="inline-flex items-center justify-center rounded-lg
-                        border border-slate-300 px-4 py-2.5 text-sm
-                        font-semibold text-slate-700 hover:bg-slate-50">
-                    Reset
-                </a>
             </div>
-        </div>
-    </form>
+        @endif
 
+        {{-- TABEL JURNAL UMUM --}}
+        <div class="card">
+            <div class="card-header bg-primary py-2">
+                <h4 class="text-white mb-0">
+                    <i class="fas fa-book-open mr-2"></i>
+                    Daftar Jurnal
+                </h4>
+            </div>
 
-    @if (session('success'))
-        <div class="px-4 py-3 mb-4 text-green-700 bg-green-100 rounded-lg">
-            {{ session('success') }}
-        </div>
-    @endif
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sista">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Tanggal</th>
+                                <th>No Referensi</th>
+                                <th>Keterangan</th>
+                                <th>Nama Akun</th>
+                                <th class="text-right">Debit</th>
+                                <th class="text-right">Kredit</th>
+                            </tr>
+                        </thead>
 
-    <div class="overflow-hidden bg-white border border-gray-300 shadow-sm rounded-xl">
-        <div class="py-3 font-bold text-center text-white bg-blue-600">
-            DAFTAR JURNAL
-        </div>
+                        <tbody>
+                            @forelse ($jurnals as $jurnal)
+                                @php
+                                    $nomorJurnal = $loop->iteration;
+                                    $details = $jurnal->detailJurnals;
 
-        <div class="w-full overflow-x-auto">
-            <table class="w-full min-w-212.5 text-sm text-left border-collapse">
-                <thead class="font-bold text-gray-700 bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-3 border border-gray-300 w-27.5">
-                            Tanggal
-                        </th>
-                        <th class="px-4 py-3 border border-gray-300 w-43.75">
-                            No Referensi
-                        </th>
-                        <th class="px-4 py-3 border border-gray-300 min-w-55">
-                            Keterangan
-                        </th>
-                        <th class="px-4 py-3 border border-gray-300 min-w-47.5">
-                            Nama Akun
-                        </th>
-                        <th class="px-4 py-3 border border-gray-300 w-37.5 text-right">
-                            Debit
-                        </th>
-                        <th class="px-4 py-3 border border-gray-300 w-37.5 text-right">
-                            Kredit
-                        </th>
-                    </tr>
-                </thead>
+                                    /*
+                                     * Kelompokkan detail berdasarkan keterangan detail.
+                                     * Jika keterangan detail kosong, gunakan keterangan
+                                     * header jurnal sebagai cadangan.
+                                     */
+                                    $groups = $details->groupBy(function ($detail) use ($jurnal) {
+                                        return $detail->keterangan
+                                            ?: ($jurnal->keterangan ?: 'Tanpa Keterangan');
+                                    });
 
-                <tbody>
-                    @forelse ($jurnals as $jurnal)
-                        @php
-                            $details = $jurnal->detailJurnals;
+                                    /*
+                                     * Urutkan kelompok agar keterangan HPP muncul
+                                     * setelah kelompok pendapatan/penjualan.
+                                     */
+                                    $groups = $groups->sortBy(function ($group, $keterangan) {
+                                        return str_starts_with(
+                                            mb_strtolower(trim((string) $keterangan)),
+                                            'hpp '
+                                        ) || str_contains(
+                                            mb_strtolower((string) $keterangan),
+                                            'beban pokok penjualan'
+                                        ) ? 1 : 0;
+                                    });
 
-                            /*
-                             * Kelompokkan detail berdasarkan keterangan detail.
-                             * Jika keterangan detail kosong, gunakan keterangan
-                             * header jurnal sebagai cadangan.
-                             */
-                            $groups = $details->groupBy(function ($detail) use ($jurnal) {
-                                return $detail->keterangan
-                                    ?: ($jurnal->keterangan ?: 'Tanpa Keterangan');
-                            });
+                                    $jumlahBaris = $details->count();
+                                    $barisGlobal = 0;
+                                @endphp
 
-                            /*
-                             * Urutkan kelompok agar keterangan HPP muncul
-                             * setelah kelompok pendapatan/penjualan.
-                             */
-                            $groups = $groups->sortBy(function ($group, $keterangan) {
-                                return str_starts_with(
-                                    mb_strtolower(trim((string) $keterangan)),
-                                    'hpp '
-                                ) || str_contains(
-                                    mb_strtolower((string) $keterangan),
-                                    'beban pokok penjualan'
-                                ) ? 1 : 0;
-                            });
+                                @foreach ($groups as $keterangan => $group)
+                                    @foreach ($group as $detail)
+                                        <tr>
+                                            
+                                            {{-- TANGGAL DAN REFERENSI SEKALI PER JURNAL --}}
+                                            @if ($barisGlobal === 0)
+                                                <td rowspan="{{ $jumlahBaris }}"
+                                                    class="text-center text-muted align-middle">
+                                                    {{ $nomorJurnal }}
+                                                </td>
+                                                <td rowspan="{{ $jumlahBaris }}"
+                                                    class="align-middle text-nowrap">
+                                                    {{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d M Y') }}
+                                                </td>
 
-                            $jumlahBaris = $details->count();
-                            $barisGlobal = 0;
-                        @endphp
+                                                <td rowspan="{{ $jumlahBaris }}"
+                                                    class="font-weight-bold text-primary align-middle">
+                                                    {{ $jurnal->no_referensi }}
+                                                </td>
+                                            @endif
 
-                        @foreach ($groups as $keterangan => $group)
-                            @foreach ($group as $detail)
-                                <tr class="{{ $barisGlobal % 2 === 0 ? 'bg-white' : 'bg-blue-50' }} hover:bg-blue-100 transition-colors">
+                                            {{-- KETERANGAN SEKALI PER KELOMPOK --}}
+                                            @if ($loop->first)
+                                                <td rowspan="{{ $group->count() }}"
+                                                    class="font-weight-bold align-middle">
+                                                    {{ $keterangan }}
+                                                </td>
+                                            @endif
 
-                                    {{-- Tanggal dan referensi sekali per jurnal --}}
-                                    @if ($barisGlobal === 0)
-                                        <td rowspan="{{ $jumlahBaris }}"
-                                            class="px-4 py-3 align-middle border border-gray-300">
-                                            {{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d M Y') }}
-                                        </td>
+                                            {{-- NAMA AKUN --}}
+                                            <td class="align-middle">
+                                                {{ $detail->akun->nama_akun ?? '-' }}
+                                            </td>
 
-                                        <td rowspan="{{ $jumlahBaris }}"
-                                            class="px-4 py-3 font-medium text-blue-600 align-middle border border-gray-300 wrap-break-words">
-                                            {{ $jurnal->no_referensi }}
-                                        </td>
-                                    @endif
+                                            {{-- DEBIT --}}
+                                            <td class="text-right align-middle text-nowrap">
+                                                {{ (float) $detail->debit > 0
+                                                    ? 'Rp ' . number_format((float) $detail->debit, 0, ',', '.')
+                                                    : '-' }}
+                                            </td>
 
-                                    {{-- Keterangan sekali per kelompok --}}
-                                    @if ($loop->first)
-                                        <td rowspan="{{ $group->count() }}"
-                                            class="px-4 py-3 font-medium text-gray-800 align-middle border border-gray-300">
-                                            {{ $keterangan }}
-                                        </td>
-                                    @endif
+                                            {{-- KREDIT --}}
+                                            <td class="text-right align-middle text-nowrap">
+                                                {{ (float) $detail->kredit > 0
+                                                    ? 'Rp ' . number_format((float) $detail->kredit, 0, ',', '.')
+                                                    : '-' }}
+                                            </td>
+                                        </tr>
 
-                                    <td class="px-4 py-3 align-middle border border-gray-300">
-                                        {{ $detail->akun->nama_akun ?? '-' }}
-                                    </td>
+                                        @php
+                                            $barisGlobal++;
+                                        @endphp
+                                    @endforeach
+                                @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6"
+                                        class="text-center text-muted py-4">
+                                        <i class="fas fa-book-open fa-2x mb-2"></i>
 
-                                    <td class="px-4 py-3 text-right align-middle border border-gray-300 whitespace-nowrap">
-                                        {{ (float) $detail->debit > 0
-                                            ? 'Rp ' . number_format((float) $detail->debit, 0, ',', '.')
-                                            : '-' }}
-                                    </td>
-
-                                    <td class="px-4 py-3 text-right align-middle border border-gray-300 whitespace-nowrap">
-                                        {{ (float) $detail->kredit > 0
-                                            ? 'Rp ' . number_format((float) $detail->kredit, 0, ',', '.')
-                                            : '-' }}
+                                        <p class="mb-0">
+                                            Belum ada pencatatan jurnal.
+                                        </p>
                                     </td>
                                 </tr>
-
-                                @php
-                                    $barisGlobal++;
-                                @endphp
-                            @endforeach
-                        @endforeach
-
-                    @empty
-                        <tr>
-                            <td colspan="6"
-                                class="px-6 py-10 text-center text-gray-500 border border-gray-300">
-                                Belum ada pencatatan jurnal.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+
     </div>
-</x-admin-layout>
+</x-admin-layout-stisla>

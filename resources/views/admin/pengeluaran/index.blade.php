@@ -1,218 +1,229 @@
-<x-admin-layout>
-    <div class="w-full">
+<x-admin-layout-stisla>
+    {{-- HEADER HALAMAN --}}
+    <div class="section-header">
+        <h1>Riwayat Pengeluaran</h1>
 
-        {{-- Header --}}
-        <div class="mb-6 flex items-center justify-between gap-4">
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-                Riwayat Pengeluaran
-            </h1>
-
-            <a href="{{ route('pengeluaran.create') }}"
-                class="inline-flex shrink-0 items-center gap-2 rounded-lg
-                    bg-blue-700 px-5 py-3 text-sm font-semibold text-white
-                    shadow-sm hover:bg-blue-800 transition-colors">
-                <i class="fa-solid fa-plus"></i>
-                Tambah Pengeluaran
-            </a>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item">
+                <a href="{{ route('pengeluaran.index') }}">Pengeluaran</a>
+            </div>
+            <div class="breadcrumb-item active">Riwayat Pengeluaran</div>
         </div>
+    </div>
 
-        
-    {{-- Filter Periode dan Cabang --}}
-    <form action="{{ route('pengeluaran.index') }}" method="GET"
-        class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="section-body">
 
-        <div class="mb-4">
-            <h2 class="text-base font-semibold text-slate-800">
-                Filter Pengeluaran
-            </h2>
-            <p class="mt-1 text-sm text-slate-500">
-                Pilih periode untuk melihat riwayat pengeluaran.
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2
-                    {{ Auth::user()->role === 'Admin Pusat' ? 'lg:grid-cols-4' : 'lg:grid-cols-3' }}">
-
-            <div>
-                <label for="start_date"
-                    class="mb-2 block text-sm font-medium text-slate-700">
-                    Dari Tanggal
-                </label>
-                <input type="date"
-                    id="start_date"
-                    name="start_date"
-                    value="{{ $startDate }}"
-                    required
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5
-                            text-sm focus:border-blue-500 focus:outline-none
-                            focus:ring-2 focus:ring-blue-100">
+        {{-- DESKRIPSI DAN TOMBOL TAMBAH --}}
+        <div class="row align-items-center mb-2">
+            <div class="col-md-7">
+                <p class="text-muted mb-0">
+                    Riwayat dan rincian pengeluaran operasional perusahaan.
+                </p>
             </div>
 
-            <div>
-                <label for="end_date"
-                    class="mb-2 block text-sm font-medium text-slate-700">
-                    Sampai Tanggal
-                </label>
-                <input type="date"
-                    id="end_date"
-                    name="end_date"
-                    value="{{ $endDate }}"
-                    min="{{ $startDate }}"
-                    required
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5
-                            text-sm focus:border-blue-500 focus:outline-none
-                            focus:ring-2 focus:ring-blue-100">
-            </div>
-
-            @if (Auth::user()->role === 'Admin Pusat')
-                <div>
-                    <label for="cabang_id"
-                        class="mb-2 block text-sm font-medium text-slate-700">
-                        Cabang
-                    </label>
-
-                    <select id="cabang_id"
-                            name="cabang_id"
-                            class="w-full rounded-lg border border-slate-300 px-3 py-2.5
-                                text-sm focus:border-blue-500 focus:outline-none
-                                focus:ring-2 focus:ring-blue-100">
-                        <option value="">Semua Cabang</option>
-
-                        @foreach ($cabangs as $cabang)
-                            <option value="{{ $cabang->id }}"
-                                {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
-                                {{ $cabang->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            @endif
-
-            <div class="flex items-end gap-2">
-                <button type="submit"
-                        class="inline-flex flex-1 items-center justify-center gap-2
-                            rounded-lg bg-blue-700 px-4 py-2.5 text-sm
-                            font-semibold text-white hover:bg-blue-800">
-                    <i class="fa-solid fa-filter"></i>
-                    Filter
-                </button>
-
-                <a href="{{ route('pengeluaran.index') }}"
-                class="inline-flex items-center justify-center gap-2
-                        rounded-lg border border-slate-300 px-4 py-2.5
-                        text-sm font-semibold text-slate-700
-                        hover:bg-slate-50">
-                    Reset
+            <div class="col-md-5 text-md-right mt-1 mt-md-0">
+                <a href="{{ route('pengeluaran.create') }}"
+                   class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus mr-1"></i>
+                    Tambah Pengeluaran
                 </a>
             </div>
-
         </div>
-    </form>
 
-
-        {{-- Notifikasi --}}
+        {{-- NOTIFIKASI SUKSES --}}
         @if (session('success'))
-        <div class="mb-5 rounded-lg border border-green-200 bg-green-50
-                        px-4 py-3 text-sm text-green-700">
-            <i class="fa-solid fa-circle-check mr-2"></i>
-            {{ session('success') }}
-        </div>
+            <div class="alert alert-success alert-dismissible fade show py-2 mb-3"
+                 role="alert">
+                <i class="fas fa-check-circle mr-1"></i>
+                {{ session('success') }}
+
+                <button type="button" class="close" data-dismiss="alert"
+                        aria-label="Tutup">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         @endif
 
-        {{-- Tabel --}}
-        <div class="w-full overflow-hidden rounded-2xl border border-slate-200
-                    bg-white shadow-sm">
+        {{-- NOTIFIKASI ERROR --}}
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3"
+                 role="alert">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ session('error') }}
 
-            <div class="w-full overflow-x-auto">
-                <table class="w-full min-w-200 table-fixed border-collapse text-left text-sm">
+                <button type="button" class="close" data-dismiss="alert"
+                        aria-label="Tutup">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
 
-                    <thead class="border-b border-slate-200 bg-white">
-                        <tr class="text-xs font-semibold tracking-wide text-slate-500">
-                            <th class="w-[17%] px-6 py-5">
-                                No Referensi
-                            </th>
-                            <th class="w-[13%] px-5 py-5">
-                                Tanggal
-                            </th>
-                            <th class="w-[17%] px-5 py-5">
-                                Cabang
-                            </th>
-                            <th class="w-[35%] px-5 py-5">
-                                Keterangan
-                            </th>
-                            <th class="w-[18%] px-6 py-5 text-right">
-                                Total Pengeluaran
-                            </th>
-                        </tr>
-                    </thead>
+        {{-- FILTER PENGELUARAN --}}
+        <div class="card mb-2">
+            <div class="card-body p-3">
+                <form action="{{ route('pengeluaran.index') }}" method="GET">
+                    <div class="form-row align-items-end">
 
-                    <tbody class="divide-y divide-slate-100">
-                        @forelse ($pengeluarans as $pengeluaran)
-                        <tr class="transition-colors hover:bg-slate-50">
+                        {{-- TANGGAL MULAI --}}
+                        <div class="form-group col-lg-3 col-md-6 mb-2">
+                            <label for="start_date" class="d-block mb-1">
+                                Dari Tanggal
+                            </label>
 
-                            <td class="wrap-break-word px-6 py-5 align-middle
-                                font-semibold text-blue-600">
-                                {{ $pengeluaran->no_referensi }}
-                            </td>
+                            <input type="date"
+                                id="start_date"
+                                name="start_date"
+                                value="{{ $startDate }}"
+                                required
+                                class="form-control">
+                        </div>
 
-                            <td class="whitespace-nowrap px-5 py-5
-                                align-middle text-slate-600">
-                                {{ $pengeluaran->tanggal->format('d M Y') }}
-                            </td>
+                        {{-- TANGGAL AKHIR --}}
+                        <div class="form-group col-lg-3 col-md-6 mb-2">
+                            <label for="end_date" class="d-block mb-1">
+                                Sampai Tanggal
+                            </label>
 
-                            <td class="wrap-break-word px-5 py-5 align-middle
-                                text-slate-700">
-                                {{ $pengeluaran->cabang?->nama ?? '-' }}
-                            </td>
+                            <input type="date"
+                                id="end_date"
+                                name="end_date"
+                                value="{{ $endDate }}"
+                                min="{{ $startDate }}"
+                                required
+                                class="form-control">
+                        </div>
 
-                            <td class="px-5 py-5 align-middle text-slate-600">
-                                <div class="truncate"
-                                    title="{{ $pengeluaran->keterangan }}">
-                                    {{ $pengeluaran->keterangan }}
-                                </div>
-                            </td>
+                        {{-- CABANG ADMIN PUSAT --}}
+                        @if (Auth::user()->role === 'Admin Pusat')
+                            <div class="form-group col-lg-3 col-md-6 mb-2">
+                                <label for="cabang_id" class="d-block mb-1">
+                                    Cabang
+                                </label>
 
-                            <td class="whitespace-nowrap px-6 py-5 text-right
-                                align-middle font-bold text-slate-900">
-                                Rp {{ number_format(
-                                        (float) $pengeluaran->total_pengeluaran,
-                                        0,
-                                        ',',
-                                        '.'
-                                    ) }}
-                            </td>
+                                <select id="cabang_id"
+                                        name="cabang_id"
+                                        class="form-control">
+                                    <option value="">Semua Cabang</option>
 
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-14 text-center">
-                                <div class="flex flex-col items-center">
-                                    <div class="mb-4 flex h-14 w-14 items-center
-                                                    justify-center rounded-full bg-slate-100">
-                                        <i class="fa-solid fa-receipt text-2xl text-slate-400"></i>
-                                    </div>
+                                    @foreach ($cabangs as $cabang)
+                                        <option value="{{ $cabang->id }}"
+                                            @selected((string) request('cabang_id') === (string) $cabang->id)>
+                                            {{ $cabang->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
 
-                                    <p class="font-semibold text-slate-700">
-                                        Belum ada data pengeluaran
-                                    </p>
+                        {{-- TOMBOL FILTER DAN RESET --}}
+                        <div class="form-group col-lg-3 col-md-6 mb-2">
+                            <div class="d-flex align-items-center flex-wrap">
+                                <button type="submit"
+                                        class="btn btn-primary mr-2 mb-1">
+                                    <i class="fas fa-filter mr-1"></i>
+                                    Filter
+                                </button>
 
-                                    <p class="mt-2 text-sm text-slate-500">
-                                        Klik tombol Tambah Pengeluaran untuk mencatat pengeluaran baru.
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
+                                <a href="{{ route('pengeluaran.index') }}"
+                                class="btn btn-light mb-1">
+                                    <i class="fas fa-redo mr-1"></i>
+                                    Reset
+                                </a>
+                            </div>
+                        </div>
 
-                </table>
+                    </div>
+                </form>
             </div>
         </div>
 
-        {{-- Jumlah data --}}
-        <p class="mt-4 text-sm text-slate-500">
-            Menampilkan {{ $pengeluarans->count() }} data pengeluaran
+        {{-- TABEL RIWAYAT PENGELUARAN --}}
+        <div class="card">
+            <div class="card-header bg-primary py-2">
+                <h4 class="text-white mb-0">
+                    <i class="fas fa-receipt mr-2"></i>
+                    Data Riwayat Pengeluaran
+                </h4>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sista">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>No Referensi</th>
+                                <th>Tanggal</th>
+                                <th>Cabang</th>
+                                <th>Keterangan</th>
+                                <th class="text-right">Total Pengeluaran</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse ($pengeluarans as $pengeluaran)
+                                <tr>
+                                    {{-- NOMOR URUT --}}
+                                    <td class="text-center text-muted">
+                                        {{ $loop->iteration }}
+                                    </td>
+
+                                    {{-- NO REFERENSI --}}
+                                    <td class="font-weight-bold text-primary">
+                                        {{ $pengeluaran->no_referensi }}
+                                    </td>
+
+                                    {{-- TANGGAL --}}
+                                    <td class="text-nowrap">
+                                        {{ $pengeluaran->tanggal->format('d M Y') }}
+                                    </td>
+
+                                    {{-- CABANG --}}
+                                    <td>
+                                        {{ $pengeluaran->cabang?->nama ?? '-' }}
+                                    </td>
+
+                                    {{-- KETERANGAN --}}
+                                    <td>
+                                        {{ $pengeluaran->keterangan ?: '-' }}
+                                    </td>
+
+                                    {{-- TOTAL PENGELUARAN --}}
+                                    <td class="text-right font-weight-bold text-nowrap">
+                                        Rp {{ number_format(
+                                            (float) $pengeluaran->total_pengeluaran,
+                                            0,
+                                            ',',
+                                            '.'
+                                        ) }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="fas fa-receipt fa-2x mb-2"></i>
+
+                                        <p class="font-weight-bold mb-1">
+                                            Belum ada data pengeluaran
+                                        </p>
+
+                                        <p class="mb-0">
+                                            Klik tombol Tambah Pengeluaran
+                                            untuk mencatat pengeluaran baru.
+                                        </p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {{-- JUMLAH DATA --}}
+        <p class="text-muted small mt-3">
+            Menampilkan {{ $pengeluarans->count() }} data pengeluaran.
         </p>
 
     </div>
-</x-admin-layout>
+</x-admin-layout-stisla>

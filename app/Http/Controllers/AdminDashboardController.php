@@ -180,33 +180,55 @@ class AdminDashboardController extends Controller
             ->limit(5)
             ->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | JURNAL TERBARU & TOTAL DEBIT KREDIT
-        |--------------------------------------------------------------------------
-        */
+        
+    /*
+    |--------------------------------------------------------------------------
+    | JURNAL TERBARU
+    |--------------------------------------------------------------------------
+    */
 
-        $jurnalQuery = Jurnal::query();
-        if ($cabangId !== null) {
-            $jurnalQuery->where('cabang_id', $cabangId);
-        }
+    $jurnalQuery = Jurnal::query();
 
-        $jurnalTerbaru = $jurnalQuery
-            ->with(['cabang', 'user', 'detailJurnals.akun'])
-            ->orderByDesc('tanggal')
-            ->orderByDesc('id')
-            ->limit(5)
-            ->get();
+    if ($cabangId !== null) {
+        $jurnalQuery->where('cabang_id', $cabangId);
+    }
 
-        $totalDebit = 0;
-        $totalKredit = 0;
+    $jurnalTerbaru = (clone $jurnalQuery)
+        ->with(['cabang', 'user', 'detailJurnals.akun'])
+        ->orderByDesc('tanggal')
+        ->orderByDesc('id')
+        ->limit(5)
+        ->get();
 
-        foreach ($jurnalTerbaru as $jurnal) {
-            foreach ($jurnal->detailJurnals as $detail) {
-                $totalDebit += (float) $detail->debit;
-                $totalKredit += (float) $detail->kredit;
-            }
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | RINGKASAN DEBIT DAN KREDIT BERDASARKAN TANGGAL TERPILIH
+    |--------------------------------------------------------------------------
+    */
+
+    $jurnalTanggalQuery = Jurnal::query()
+        ->whereDate('tanggal', $tanggal);
+
+    if ($cabangId !== null) {
+        $jurnalTanggalQuery->where('cabang_id', $cabangId);
+    }
+
+    $totalDebit = (clone $jurnalTanggalQuery)
+        ->whereHas('detailJurnals')
+        ->with('detailJurnals')
+        ->get()
+        ->sum(function ($jurnal) {
+            return $jurnal->detailJurnals->sum('debit');
+        });
+
+    $totalKredit = (clone $jurnalTanggalQuery)
+        ->whereHas('detailJurnals')
+        ->with('detailJurnals')
+        ->get()
+        ->sum(function ($jurnal) {
+            return $jurnal->detailJurnals->sum('kredit');
+        });
+
 
         /*
         |--------------------------------------------------------------------------

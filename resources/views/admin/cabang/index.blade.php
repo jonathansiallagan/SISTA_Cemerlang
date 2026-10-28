@@ -1,66 +1,129 @@
-<x-admin-layout>
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-                Data Cabang
-            </h1>
-            <p class="mt-1 text-sm text-slate-500">
+<x-admin-layout-stisla>
+
+    {{-- HEADER HALAMAN --}}
+    <div class="section-header">
+        <h1>Data Cabang</h1>
+
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active">Data Cabang</div>
+        </div>
+    </div>
+
+    <div class="section-body">
+
+        {{-- DESKRIPSI DAN TOMBOL TAMBAH --}}
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+            <p class="text-muted mb-2">
                 Kelola daftar cabang percetakan CV Cemerlang.
             </p>
-        </div>
-        <a href="{{ route('cabang.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i> Tambah Cabang
-        </a>
-    </div>
 
-    @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-            {{ session('success') }}
+            <a href="{{ route('cabang.create') }}"
+               class="btn btn-primary btn-sm mb-2">
+                <i class="fas fa-plus mr-1"></i>
+                Tambah Cabang
+            </a>
         </div>
-    @endif
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <table class="w-full text-sm text-left">
-            <thead class="bg-gray-50 text-gray-500 font-bold border-b border-gray-100">
-                <tr>
-                    <th class="px-6 py-4">No</th>
-                    <th class="px-6 py-4">Nama Cabang</th>
-                    <th class="px-6 py-4">Alamat</th>
-                    <th class="px-6 py-4">No. HP</th>
-                    <th class="px-6 py-4 text-center">Status</th>
-                    <th class="px-6 py-4 text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse ($cabangs as $index => $cabang)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 text-gray-500">{{ $index + 1 }}</td>
-                    <td class="px-6 py-4 font-bold text-gray-800">{{ $cabang->nama }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $cabang->alamat }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $cabang->no_hp }}</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide">
-                            {{ $cabang->status }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <a
-                            href="{{ route('cabang.edit', $cabang->id) }}"
-                            class="text-blue-500 hover:text-blue-700 mx-1"
-                            title="Edit Cabang"
-                        >
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-gray-400">
-                        Belum ada data cabang. Silakan tambah cabang baru.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+        {{-- NOTIFIKASI SUKSES --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show py-2 mb-3"
+                 role="alert">
+                <i class="fas fa-check-circle mr-2"></i>
+                {{ session('success') }}
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="alert"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+        {{-- TABEL DATA CABANG --}}
+        <div class="card">
+            <div class="card-header bg-primary py-2">
+                <h4 class="text-white mb-0">
+                    <i class="fas fa-store mr-2"></i>
+                    Daftar Cabang
+                </h4>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sista">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Nama Cabang</th>
+                                <th>Alamat</th>
+                                <th>No. HP</th>
+                                <th class="text-center">Status Cabang</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse ($cabangs as $cabang)
+                                <tr>
+                                    {{-- NOMOR URUT --}}
+                                    <td class="text-center text-muted align-middle">
+                                        {{ $loop->iteration }}
+                                    </td>
+
+                                    {{-- NAMA CABANG --}}
+                                    <td class="font-weight-bold align-middle">
+                                        {{ $cabang->nama }}
+                                    </td>
+
+                                    {{-- ALAMAT --}}
+                                    <td class="align-middle">
+                                        {{ $cabang->alamat ?: '-' }}
+                                    </td>
+
+                                    {{-- NOMOR HP --}}
+                                    <td class="align-middle text-nowrap">
+                                        {{ $cabang->no_hp ?: '-' }}
+                                    </td>
+
+                                    {{-- STATUS --}}
+                                    <td class="text-center align-middle">
+                                        @if (strtolower($cabang->status) === 'aktif')
+                                            <span class="badge badge-success">
+                                                {{ $cabang->status }}
+                                            </span>
+                                        @else
+                                            <span class="badge badge-secondary">
+                                                {{ $cabang->status }}
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    {{-- AKSI --}}
+                                    <td class="text-center align-middle text-nowrap">
+                                        <a href="{{ route('cabang.edit', $cabang->id) }}"
+                                           class="btn btn-primary btn-sm"
+                                           title="Edit Cabang">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6"
+                                        class="text-center text-muted py-4">
+                                        <i class="fas fa-store fa-2x mb-2"></i>
+                                        <p class="mb-0">
+                                            Belum ada data cabang. Silakan tambah cabang baru.
+                                        </p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
-</x-admin-layout>
+</x-admin-layout-stisla>
