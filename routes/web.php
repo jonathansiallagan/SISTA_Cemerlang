@@ -15,6 +15,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\CsDashboardController;
 use App\Http\Controllers\LaporanLabaRugiController;
+use App\Http\Controllers\BahanBakuController;
+use App\Http\Controllers\PersediaanController;
 
 // Halaman awal: arahkan sesuai status login & role
 Route::get('/', function () {
@@ -67,12 +69,10 @@ Route::middleware(['auth'])->group(function () {
 
         // === ROUTE PENGELUARAN ===
         Route::get('/pengeluaran', [PengeluaranController::class, 'index'])->name('pengeluaran.index');
-        Route::get('/pengeluaran/tambah', [PengeluaranController::class, 'create'])->name('pengeluaran.create');
         Route::post('/pengeluaran', [PengeluaranController::class, 'store'])->name('pengeluaran.store');
     
         // === ROUTE MASTER DATA PRODUK ===
         Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
-        Route::get('/produk/tambah', [ProdukController::class, 'create'])->name('produk.create');
         Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
         Route::get('/produk/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit');
         Route::put('/produk/{id}', [ProdukController::class, 'update'])->name('produk.update');
@@ -100,17 +100,25 @@ Route::middleware(['auth'])->group(function () {
         ])->name('laporan_laba_rugi.index');
             });
 
+        // === ROUTE BAHAN BAKU ===
+        Route::resource('bahan-baku', BahanBakuController::class)
+            ->names('bahan-baku')
+            ->except(['show']);
+
+        // === ROUTE PERSEDIAAN ===
+        Route::get('/persediaan', [PersediaanController::class, 'index'])
+            ->name('persediaan.index');
+
+        Route::post('/persediaan', [PersediaanController::class, 'store'])
+            ->name('persediaan.store');
+
 //====================================================================================================//
     // === ROUTE yang hanya bisa diakses ADMIN PUSAT ===
     Route::middleware(['role:Admin Pusat'])->group(function () {
-        // === ROUTE MASTER DATA CABANG ===
         
         // === ROUTE MASTER DATA CABANG ===
         Route::get('/cabang', [CabangController::class, 'index'])
             ->name('cabang.index');
-
-        Route::get('/cabang/tambah', [CabangController::class, 'create'])
-            ->name('cabang.create');
 
         Route::post('/cabang', [CabangController::class, 'store'])
             ->name('cabang.store');
@@ -126,7 +134,6 @@ Route::middleware(['auth'])->group(function () {
 
         // === ROUTE MASTER DATA USER ===
         Route::get('/user', [UserController::class, 'index'])->name('user.index');
-        Route::get('/user/tambah', [UserController::class, 'create'])->name('user.create');
         Route::post('/user', [UserController::class, 'store'])->name('user.store');
         Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
         Route::put('/user/{id}', [UserController::class, 'update'])->name('user.update');
@@ -134,7 +141,6 @@ Route::middleware(['auth'])->group(function () {
 
         // === ROUTE MASTER DATA AKUN ===
         Route::get('/akun', [AkunController::class, 'index'])->name('akun.index');
-        Route::get('/akun/tambah', [AkunController::class, 'create'])->name('akun.create');
         Route::post('/akun', [AkunController::class, 'store'])->name('akun.store');
         Route::get('/akun/{id}/edit', [AkunController::class, 'edit'])->name('akun.edit');
         Route::put('/akun/{id}', [AkunController::class, 'update'])->name('akun.update');

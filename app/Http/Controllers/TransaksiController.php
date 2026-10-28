@@ -9,13 +9,17 @@ use App\Models\Cabang;
 use App\Models\Jurnal;
 use App\Models\DetailJurnal;
 use App\Models\Akun;
+use App\Models\BahanBaku;
+use App\Models\KomposisiProduk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TransaksiController extends Controller
 {
-    
+    /**
+     * Daftar transaksi.
+     */
     public function index(Request $request)
     {
         $user = $this->user();
@@ -26,15 +30,12 @@ class TransaksiController extends Controller
             'detailTransaksis.produk',
         ]);
 
-        // Customer Service dan Admin Cabang hanya melihat
-        // transaksi dari cabang masing-masing.
         if ($user->role === 'Admin Cabang' || $user->isCustomerService()) {
             $query->where('cabang_id', $user->cabang_id);
         } elseif ($user->role === 'Admin Pusat' && $request->filled('cabang_id')) {
             $query->where('cabang_id', $request->cabang_id);
         }
 
-        // Filter pencarian berdasarkan nomor referensi atau nama pelanggan.
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -44,29 +45,23 @@ class TransaksiController extends Controller
             });
         }
 
-        // Filter tanggal mulai.
         if ($request->filled('tanggal_mulai')) {
             $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
         }
 
-        // Filter tanggal akhir.
         if ($request->filled('tanggal_akhir')) {
             $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
         }
 
-        // Urutkan transaksi terbaru terlebih dahulu.
         $transaksis = $query
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
             ->get();
 
-        // Data cabang untuk dropdown filter.
-        // Customer Service hanya mendapatkan data cabangnya sendiri.
         $cabangs = $user->isCustomerService()
-            ? \App\Models\Cabang::where('id', $user->cabang_id)->get()
-            : \App\Models\Cabang::orderBy('nama')->get();
+            ? Cabang::where('id', $user->cabang_id)->get()
+            : Cabang::orderBy('nama')->get();
 
-        // Pilih halaman berdasarkan role pengguna.
         if ($user->isCustomerService()) {
             return view('cs.transaksi.index', compact(
                 'transaksis',
@@ -74,241 +69,343 @@ class TransaksiController extends Controller
             ));
         }
 
-        // Admin Pusat dan Admin Cabang tetap menggunakan halaman Admin.
         return view('admin.transaksi.index', compact(
             'transaksis',
             'cabangs'
         ));
     }
 
-
+    /**
+     * Form transaksi baru.
+     */
     public function create()
     {
         $user = $this->user();
 
-        $produks = Produk::all();
-        $cabangs = Cabang::all();
-
-        // Customer Service hanya boleh memilih cabangnya sendiri.
-        if ($user->isCustomerService()) {
-            $cabangs = $cabangs
-                ->where('id', $user->cabang_id)
-                ->values();
+        if (!$user->isCustomerService()) {
+            abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
         }
 
-        // Pembuatan nomor referensi otomatis.
+        $produks = Produk::orderBy('nama_produk')->get();
+
+        $cabangs = Cabang::where('id', $user->cabang_id)->get();
+
         $today = now()->format('Ymd');
 
         $lastTransaksi = Transaksi::whereDate(
             'created_at',
-            now()->today()
+            now()->toDateString()
         )->count();
 
         $no_referensi = 'INV-' . $today . '-'
             . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
 
-        return view(
-            'admin.transaksi.create',
-            compact('produks', 'cabangs', 'no_referensi')
-        );
+        return view('admin.transaksi.create', compact(
+            'produks',
+            'cabangs',
+            'no_referensi'
+        ));
     }
 
+    /**
+     * Simpan transaksi, hitung HPP, kurangi stok, dan buat jurnal.
+     */
     
     public function store(Request $request)
     {
         $user = $this->user();
 
-        $request->validate([
-            'no_referensi' => 'required|unique:transaksis,no_referensi',
+        if (!$user->isCustomerService()) {
+            abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
+        }
+
+        $validated = $request->validate([
+            'no_referensi' => 'required|string|unique:transaksis,no_referensi',
             'tanggal' => 'required|date',
             'nama_pelanggan' => 'required|string|max:255',
             'cabang_id' => 'required|exists:cabangs,id',
+
             'produk_id' => 'required|array|min:1',
-            'produk_id.*' => 'required|exists:produks,id',
-            'jumlah' => 'required|array',
-            'jumlah.*' => 'required|numeric|min:1',
+            'produk_id.*' => 'required|integer|exists:produks,id',
+
+            'jumlah' => 'required|array|min:1',
+            'jumlah.*' => 'required|integer|min:1',
+
+            'harga_jual' => 'required|array|min:1',
+            'harga_jual.*' => 'required|numeric|min:0',
+
+            'jasa_edit' => 'required|array|min:1',
+            'jasa_edit.*' => 'required|numeric|min:0',
+
+            'tinggi' => 'required|array|min:1',
+            'tinggi.*' => 'nullable|numeric|min:0.01',
+
+            'lebar' => 'required|array|min:1',
+            'lebar.*' => 'nullable|numeric|min:0.01',
         ]);
 
-        // Customer Service hanya boleh mencatat transaksi cabangnya sendiri.
-        if (
-            $user->isCustomerService()
-            && (int) $request->cabang_id !== (int) $user->cabang_id
-        ) {
-            abort(
-                403,
-                'Anda hanya dapat mencatat transaksi untuk cabang Anda sendiri.'
-            );
+        $jumlahBaris = count($validated['produk_id']);
+
+        foreach (['jumlah', 'harga_jual', 'jasa_edit', 'tinggi', 'lebar'] as $field) {
+            if (count($validated[$field]) !== $jumlahBaris) {
+                return back()
+                    ->withErrors([
+                        $field => 'Data detail produk tidak lengkap.',
+                    ])
+                    ->withInput();
+            }
         }
 
-        DB::beginTransaction();
+        if ((int) $request->cabang_id !== (int) $user->cabang_id) {
+            abort(403, 'Anda hanya dapat mencatat transaksi untuk cabang sendiri.');
+        }
 
         try {
-            // 1. Cari akun yang diperlukan untuk jurnal otomatis.
-            $akunKas = Akun::where('nama_akun', 'Kas')
-                ->where('status', 'aktif')
-                ->first();
+            DB::transaction(function () use ($validated, $user) {
+                $akunKas = Akun::where('nama_akun', 'Kas')
+                    ->where('status', 'aktif')
+                    ->first();
 
-            $akunPendapatan = Akun::where(
-                'nama_akun',
-                'Pendapatan Penjualan'
-            )
-                ->where('status', 'aktif')
-                ->first();
+                $akunPendapatan = Akun::where('nama_akun', 'Pendapatan Penjualan')
+                    ->where('status', 'aktif')
+                    ->first();
 
-            $akunHpp = Akun::where(
-                'nama_akun',
-                'Harga Pokok Produksi'
-            )
-                ->where('status', 'aktif')
-                ->first();
+                $akunHpp = Akun::where('nama_akun', 'Harga Pokok Produksi')
+                    ->where('status', 'aktif')
+                    ->first();
 
-            $akunPersediaan = Akun::where('nama_akun', 'Persediaan')
-                ->where('status', 'aktif')
-                ->first();
+                $akunPersediaan = Akun::where('nama_akun', 'Persediaan')
+                    ->where('status', 'aktif')
+                    ->first();
 
-            if (
-                !$akunKas
-                || !$akunPendapatan
-                || !$akunHpp
-                || !$akunPersediaan
-            ) {
-                throw new \RuntimeException(
-                    'Akun Kas, Pendapatan Penjualan, Harga Pokok Produksi, '
-                    . 'atau Persediaan belum tersedia atau tidak aktif.'
-                );
-            }
+                if (!$akunKas || !$akunPendapatan || !$akunHpp || !$akunPersediaan) {
+                    throw new \RuntimeException(
+                        'Akun Kas, Pendapatan Penjualan, Harga Pokok Produksi, '
+                        . 'atau Persediaan belum tersedia atau tidak aktif.'
+                    );
+                }
 
-            // 2. Simpan transaksi induk.
-            $transaksi = Transaksi::create([
-                'no_referensi' => $request->no_referensi,
-                'tanggal' => $request->tanggal,
-                'nama_pelanggan' => $request->nama_pelanggan,
-                'cabang_id' => $request->cabang_id,
-                'user_id' => $user->id,
-                'total_transaksi' => 0,
-                'total_hpp' => 0,
-            ]);
-
-            $totalTransaksi = 0;
-            $totalHpp = 0;
-
-            // 3. Simpan detail setiap produk dan hitung total transaksi.
-            foreach ($request->produk_id as $key => $produkId) {
-                $produk = Produk::findOrFail($produkId);
-
-                $jumlah = (float) $request->jumlah[$key];
-                $luas = (float) ($request->luas[$key] ?? 0);
-
-                $harga = (float) $request->harga_satuan[$key];
-                $hpp = (float) $request->hpp_satuan[$key];
-
-                $subtotal = (float) $request->subtotal[$key];
-                $totalHppItem = (float) $request->total_hpp_item[$key];
-
-                // Tentukan quantity berdasarkan satuan produk.
-                $satuan = strtolower(trim($produk->satuan));
-
-                $quantity = (
-                    $satuan === 'm2'
-                    || $satuan === 'meter persegi'
-                    || str_contains($satuan, 'm²')
-                ) ? $luas : $jumlah;
-
-                // Simpan rincian produk ke tabel detail_transaksis.
-                DetailTransaksi::create([
-                    'transaksi_id' => $transaksi->id,
-                    'produk_id' => $produkId,
-                    'jumlah' => $jumlah,
-                    'lebar' => $request->lebar[$key] ?? null,
-                    'tinggi' => $request->tinggi[$key] ?? null,
-                    'luas' => $request->luas[$key] ?? null,
-                    'harga_satuan' => $harga,
-                    'hpp_satuan' => $hpp,
-                    'subtotal' => $subtotal,
-                    'total_hpp' => $totalHppItem,
+                $transaksi = Transaksi::create([
+                    'no_referensi' => $validated['no_referensi'],
+                    'tanggal' => $validated['tanggal'],
+                    'nama_pelanggan' => $validated['nama_pelanggan'],
+                    'cabang_id' => $user->cabang_id,
+                    'user_id' => $user->id,
+                    'total_transaksi' => 0,
+                    'total_hpp' => 0,
                 ]);
 
-                // Akumulasi total seluruh produk.
-                $totalTransaksi += $subtotal;
-                $totalHpp += $totalHppItem;
-            }
+                $totalTransaksi = 0;
+                $totalHppBahan = 0;
+                $totalUpahOperator = 0;
+                $detailRows = [];
 
-            // 4. Perbarui total transaksi induk.
-            $transaksi->update([
-                'total_transaksi' => $totalTransaksi,
-                'total_hpp' => $totalHpp,
-            ]);
+                // Upah operator dihitung Rp5.000 untuk SETIAP BARIS produk.
+                $upahPerBaris = 5000;
 
-            // 5. Buat satu header jurnal untuk satu transaksi.
-            $jurnal = Jurnal::create([
-                'no_referensi' => $transaksi->no_referensi,
-                'tanggal' => $transaksi->tanggal,
-                'keterangan' => 'Pendapatan Jasa',
-                'cabang_id' => $transaksi->cabang_id,
-                'user_id' => $user->id,
-            ]);
+                foreach ($validated['produk_id'] as $key => $produkId) {
+                    $produk = Produk::findOrFail($produkId);
 
-            // 6. Buat empat baris jurnal berdasarkan total transaksi.
+                    $jumlah = (int) $validated['jumlah'][$key];
+                    $hargaFinalBarang = (float) $validated['harga_jual'][$key];
+                    $jasaEdit = (float) $validated['jasa_edit'][$key];
 
-            // A. Debit Kas sebesar total penjualan.
-            DetailJurnal::create([
-                'jurnal_id' => $jurnal->id,
-                'akun_id' => $akunKas->id,
-                'keterangan' => 'Pendapatan Jasa',
-                'debit' => $totalTransaksi,
-                'kredit' => 0,
-            ]);
+                    $satuanProduk = strtolower(trim((string) $produk->satuan));
 
-            // B. Kredit Pendapatan Penjualan.
-            DetailJurnal::create([
-                'jurnal_id' => $jurnal->id,
-                'akun_id' => $akunPendapatan->id,
-                'keterangan' => 'Pendapatan Jasa',
-                'debit' => 0,
-                'kredit' => $totalTransaksi,
-            ]);
+                    $isM2 = in_array($satuanProduk, [
+                        'm2',
+                        'm²',
+                        'meter persegi',
+                    ], true);
 
-            // C. Debit Harga Pokok Produksi sebesar total HPP.
-            DetailJurnal::create([
-                'jurnal_id' => $jurnal->id,
-                'akun_id' => $akunHpp->id,
-                'keterangan' => 'Beban Pokok Penjualan',
-                'debit' => $totalHpp,
-                'kredit' => 0,
-            ]);
+                    $tinggi = null;
+                    $lebar = null;
+                    $luas = 0;
 
-            // D. Kredit Persediaan sebesar total HPP.
-            DetailJurnal::create([
-                'jurnal_id' => $jurnal->id,
-                'akun_id' => $akunPersediaan->id,
-                'keterangan' => 'Beban Pokok Penjualan',
-                'debit' => 0,
-                'kredit' => $totalHpp,
-            ]);
+                    if ($isM2) {
+                        $tinggi = (float) ($validated['tinggi'][$key] ?? 0);
+                        $lebar = (float) ($validated['lebar'][$key] ?? 0);
 
-            DB::commit();
+                        if ($tinggi <= 0 || $lebar <= 0) {
+                            throw new \RuntimeException(
+                                "Tinggi dan lebar {$produk->nama_produk} wajib diisi."
+                            );
+                        }
+
+                        // Luas total untuk seluruh jumlah barang.
+                        $luas = $tinggi * $lebar * $jumlah;
+                    }
+
+                    // Harga barang dan jasa edit adalah total untuk baris pesanan.
+                    $subtotal = $hargaFinalBarang + $jasaEdit;
+
+                    $komposisis = KomposisiProduk::where('produk_id', $produk->id)
+                        ->get();
+
+                    if ($komposisis->isEmpty()) {
+                        throw new \RuntimeException(
+                            "Komposisi bahan untuk {$produk->nama_produk} belum diatur."
+                        );
+                    }
+
+                    // Produk m² memakai luas total; produk lain memakai jumlah barang.
+                    $pengaliPemakaian = $isM2 ? $luas : $jumlah;
+                    $hppBahanItem = 0;
+
+                    foreach ($komposisis as $komposisi) {
+                        $bahan = BahanBaku::whereKey($komposisi->bahan_baku_id)
+                            ->lockForUpdate()
+                            ->first();
+
+                        if (!$bahan || $bahan->status !== 'aktif') {
+                            throw new \RuntimeException(
+                                "Bahan baku untuk {$produk->nama_produk} "
+                                . 'tidak ditemukan atau tidak aktif.'
+                            );
+                        }
+
+                        $jumlahPemakaian = (float) $komposisi->jumlah_pemakaian
+                            * $pengaliPemakaian;
+
+                        if ($jumlahPemakaian <= 0) {
+                            continue;
+                        }
+
+                        $stokTersedia = (float) $bahan->stok;
+
+                        if ($stokTersedia < $jumlahPemakaian) {
+                            throw new \RuntimeException(
+                                "Stok {$bahan->nama_bahan} tidak mencukupi. "
+                                . "Stok tersedia: {$stokTersedia} {$bahan->satuan}, "
+                                . "dibutuhkan: {$jumlahPemakaian} "
+                                . "{$komposisi->satuan_pemakaian}."
+                            );
+                        }
+
+                        $hargaRataRata = (float) $bahan->harga_rata_rata;
+                        $biayaBahan = $jumlahPemakaian * $hargaRataRata;
+
+                        $hppBahanItem += $biayaBahan;
+
+                        // Kurangi stok sesuai komposisi.
+                        $bahan->stok = $stokTersedia - $jumlahPemakaian;
+                        $bahan->save();
+                    }
+
+                    // Upah operator Rp5.000 untuk baris produk ini.
+                    $upahItem = $upahPerBaris;
+                    $hppItem = $hppBahanItem + $upahItem;
+
+                    $detailRows[] = [
+                        'transaksi_id' => $transaksi->id,
+                        'produk_id' => $produk->id,
+                        'jumlah' => $jumlah,
+                        'tinggi' => $tinggi,
+                        'lebar' => $lebar,
+                        'luas' => $isM2 ? $luas : null,
+
+                        // Harga final seluruh pesanan pada baris ini.
+                        'harga_satuan' => $hargaFinalBarang,
+
+                        // HPP per unit barang.
+                        'hpp_satuan' => $hppItem / max($jumlah, 1),
+
+                        // Harga barang ditambah jasa edit.
+                        'subtotal' => $subtotal,
+
+                        // HPP bahan ditambah upah untuk baris ini.
+                        'total_hpp' => $hppItem,
+                    ];
+
+                    $totalTransaksi += $subtotal;
+                    $totalHppBahan += $hppBahanItem;
+                    $totalUpahOperator += $upahItem;
+                }
+
+                $totalHpp = $totalHppBahan + $totalUpahOperator;
+
+                foreach ($detailRows as $detailRow) {
+                    DetailTransaksi::create($detailRow);
+                }
+
+                $transaksi->update([
+                    'total_transaksi' => $totalTransaksi,
+                    'total_hpp' => $totalHpp,
+                ]);
+
+                // Jurnal penjualan.
+                $jurnal = Jurnal::create([
+                    'no_referensi' => $transaksi->no_referensi,
+                    'tanggal' => $transaksi->tanggal,
+                    'keterangan' => 'Penjualan produk cetak dan jasa edit',
+                    'cabang_id' => $transaksi->cabang_id,
+                    'user_id' => $user->id,
+                ]);
+
+                // Debit Kas sebesar pembayaran pelanggan.
+                DetailJurnal::create([
+                    'jurnal_id' => $jurnal->id,
+                    'akun_id' => $akunKas->id,
+                    'keterangan' => 'Pendapatan penjualan',
+                    'debit' => $totalTransaksi,
+                    'kredit' => 0,
+                ]);
+
+                // Kredit Pendapatan: harga barang + jasa edit.
+                DetailJurnal::create([
+                    'jurnal_id' => $jurnal->id,
+                    'akun_id' => $akunPendapatan->id,
+                    'keterangan' => 'Pendapatan penjualan',
+                    'debit' => 0,
+                    'kredit' => $totalTransaksi,
+                ]);
+
+                // Debit HPP seluruh baris produk.
+                DetailJurnal::create([
+                    'jurnal_id' => $jurnal->id,
+                    'akun_id' => $akunHpp->id,
+                    'keterangan' => 'Pengakuan harga pokok produksi',
+                    'debit' => $totalHpp,
+                    'kredit' => 0,
+                ]);
+
+                // Kredit Persediaan sebesar nilai bahan yang dipakai.
+                if ($totalHppBahan > 0) {
+                    DetailJurnal::create([
+                        'jurnal_id' => $jurnal->id,
+                        'akun_id' => $akunPersediaan->id,
+                        'keterangan' => 'Pengakuan harga pokok produksi',
+                        'debit' => 0,
+                        'kredit' => $totalHppBahan,
+                    ]);
+                }
+
+                // Kredit Kas untuk total upah operator semua baris.
+                DetailJurnal::create([
+                    'jurnal_id' => $jurnal->id,
+                    'akun_id' => $akunKas->id,
+                    'keterangan' => 'Pengakuan harga pokok produksi',
+                    'debit' => 0,
+                    'kredit' => $totalUpahOperator,
+                ]);
+            });
 
             return redirect()
                 ->route('transaksi.index')
-                ->with(
-                    'success',
-                    'Transaksi dan jurnal otomatis berhasil disimpan!'
-                );
+                ->with('success', 'Transaksi, HPP, stok, dan jurnal berhasil disimpan!');
 
         } catch (\Throwable $e) {
-            DB::rollBack();
-
             report($e);
 
             return back()
-                ->with(
-                    'error',
-                    'Transaksi gagal disimpan. Periksa konfigurasi akun dan struktur database.'
-                )
+                ->with('error', 'Transaksi gagal disimpan: ' . $e->getMessage())
                 ->withInput();
         }
     }
 
+    /**
+     * Ekspor PDF.
+     */
     public function exportPdf(Request $request)
     {
         $user = $this->user();
@@ -319,14 +416,12 @@ class TransaksiController extends Controller
             'detailTransaksis.produk',
         ]);
 
-        // Batasi akses data berdasarkan role dan cabang.
         if ($user->role === 'Admin Cabang' || $user->isCustomerService()) {
             $query->where('cabang_id', $user->cabang_id);
         } elseif ($user->role === 'Admin Pusat' && $request->filled('cabang_id')) {
             $query->where('cabang_id', $request->cabang_id);
         }
 
-        // Filter pencarian.
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -336,7 +431,6 @@ class TransaksiController extends Controller
             });
         }
 
-        // Filter tanggal.
         if ($request->filled('tanggal_mulai')) {
             $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
         }
@@ -358,6 +452,9 @@ class TransaksiController extends Controller
         return $pdf->download('riwayat-transaksi.pdf');
     }
 
+    /**
+     * Ekspor Excel.
+     */
     public function exportExcel(Request $request)
     {
         return Excel::download(
@@ -365,5 +462,4 @@ class TransaksiController extends Controller
             'riwayat-transaksi.xlsx'
         );
     }
-
 }

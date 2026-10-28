@@ -19,11 +19,13 @@
                 Kelola data pengguna dan hak akses sistem informasi akuntansi CV Cemerlang.
             </p>
 
-            <a href="{{ route('user.create') }}"
-               class="btn btn-primary btn-sm mb-2">
+            <button type="button"
+                    class="btn btn-primary btn-sm mb-2"
+                    data-toggle="modal"
+                    data-target="#modalTambahUser">
                 <i class="fas fa-plus mr-1"></i>
                 Tambah User
-            </a>
+            </button>
         </div>
 
         {{-- NOTIFIKASI SUKSES --}}
@@ -47,7 +49,7 @@
             <div class="alert alert-danger alert-dismissible fade show py-2 mb-3"
                  role="alert">
                 <i class="fas fa-exclamation-circle mr-2"></i>
-                Terdapat kesalahan pada proses yang dilakukan.
+                Gagal menambahkan pengguna. Periksa kembali data pada formulir.
 
                 <button type="button"
                         class="close"
@@ -84,22 +86,18 @@
                         <tbody>
                             @forelse ($users as $user)
                                 <tr>
-                                    {{-- NOMOR URUT --}}
                                     <td class="text-center align-middle text-muted">
                                         {{ $loop->iteration }}
                                     </td>
 
-                                    {{-- NAMA --}}
                                     <td class="align-middle font-weight-bold">
                                         {{ $user->name }}
                                     </td>
 
-                                    {{-- USERNAME --}}
                                     <td class="align-middle">
                                         {{ $user->username ?? '-' }}
                                     </td>
 
-                                    {{-- ROLE --}}
                                     <td class="align-middle">
                                         @php
                                             $role = strtolower($user->role ?? '');
@@ -120,12 +118,10 @@
                                         @endif
                                     </td>
 
-                                    {{-- CABANG --}}
                                     <td class="align-middle">
                                         {{ $user->cabang->nama ?? 'Pusat/Semua Cabang' }}
                                     </td>
 
-                                    {{-- AKSI --}}
                                     <td class="text-center align-middle text-nowrap">
                                         <div class="d-flex justify-content-center">
                                             <a href="{{ route('user.edit', $user->id) }}"
@@ -134,10 +130,9 @@
                                                 <i class="fas fa-edit"></i>
                                             </a>
 
-                                            <form
-                                                action="{{ route('user.destroy', $user->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus pengguna ini?');">
+                                            <form action="{{ route('user.destroy', $user->id) }}"
+                                                  method="POST"
+                                                  onsubmit="return confirm('Yakin ingin menghapus pengguna ini?');">
                                                 @csrf
                                                 @method('DELETE')
 
@@ -167,7 +162,6 @@
                 </div>
             </div>
 
-            {{-- FOOTER TABEL --}}
             <div class="card-footer text-muted">
                 <small>
                     Total pengguna:
@@ -177,5 +171,300 @@
         </div>
 
     </div>
+
+    {{-- MODAL TAMBAH PENGGUNA --}}
+    <div class="modal fade"
+         id="modalTambahUser"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="judulModalTambahUser"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered"
+             role="document">
+
+            <div class="modal-content">
+
+                {{-- HEADER MODAL --}}
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white"
+                        id="judulModalTambahUser">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Tambah Pengguna Baru
+                    </h5>
+
+                    <button type="button"
+                            class="close text-white"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                {{-- FORM TAMBAH PENGGUNA --}}
+                <form id="formTambahUser"
+                      action="{{ route('user.store') }}"
+                      method="POST">
+
+                    @csrf
+
+                    <div class="modal-body">
+
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <strong>
+                                    <i class="fas fa-exclamation-circle mr-1"></i>
+                                    Gagal menyimpan pengguna
+                                </strong>
+
+                                <ul class="mb-0 mt-2 pl-3">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        {{-- NAMA DAN EMAIL --}}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="userName">
+                                    Nama Lengkap <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text"
+                                       id="userName"
+                                       name="name"
+                                       value="{{ old('name') }}"
+                                       class="form-control @error('name') is-invalid @enderror"
+                                       placeholder="Masukkan nama lengkap"
+                                       maxlength="255"
+                                       autocomplete="name"
+                                       required>
+
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="userEmail">
+                                    Email <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="email"
+                                       id="userEmail"
+                                       name="email"
+                                       value="{{ old('email') }}"
+                                       class="form-control @error('email') is-invalid @enderror"
+                                       placeholder="nama@email.com"
+                                       maxlength="255"
+                                       autocomplete="email"
+                                       required>
+
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- USERNAME DAN PASSWORD --}}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="userUsername">
+                                    Username <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text"
+                                       id="userUsername"
+                                       name="username"
+                                       value="{{ old('username') }}"
+                                       class="form-control @error('username') is-invalid @enderror"
+                                       placeholder="Masukkan username"
+                                       maxlength="255"
+                                       autocomplete="username"
+                                       required>
+
+                                @error('username')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="userPassword">
+                                    Password <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="password"
+                                       id="userPassword"
+                                       name="password"
+                                       class="form-control @error('password') is-invalid @enderror"
+                                       placeholder="Minimal 8 karakter"
+                                       minlength="8"
+                                       autocomplete="new-password"
+                                       required>
+
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+
+                                <small class="form-text text-muted">
+                                    Password tidak akan ditampilkan kembali jika validasi gagal.
+                                </small>
+                            </div>
+                        </div>
+
+                        {{-- ROLE DAN CABANG --}}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="userRole">
+                                    Role <span class="text-danger">*</span>
+                                </label>
+
+                                <select id="userRole"
+                                        name="role"
+                                        class="form-control @error('role') is-invalid @enderror"
+                                        required>
+                                    <option value="">-- Pilih Role --</option>
+
+                                    <option value="Admin Pusat"
+                                        {{ old('role') === 'Admin Pusat' ? 'selected' : '' }}>
+                                        Admin Pusat
+                                    </option>
+
+                                    <option value="Admin Cabang"
+                                        {{ old('role') === 'Admin Cabang' ? 'selected' : '' }}>
+                                        Admin Cabang
+                                    </option>
+
+                                    <option value="Customer Service"
+                                        {{ old('role') === 'Customer Service' ? 'selected' : '' }}>
+                                        Customer Service
+                                    </option>
+                                </select>
+
+                                @error('role')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="userCabang">
+                                    Penempatan Cabang
+                                    <span id="labelWajibCabang" class="text-danger d-none">*</span>
+                                </label>
+
+                                <select id="userCabang"
+                                        name="cabang_id"
+                                        class="form-control @error('cabang_id') is-invalid @enderror">
+                                    <option value="">
+                                        -- Pusat / Tidak ada cabang spesifik --
+                                    </option>
+
+                                    @foreach ($cabangs as $cabang)
+                                        <option value="{{ $cabang->id }}"
+                                            {{ (string) old('cabang_id') === (string) $cabang->id ? 'selected' : '' }}>
+                                            {{ $cabang->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('cabang_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+
+                                <small class="form-text text-muted">
+                                    Admin Cabang wajib memiliki penempatan cabang.
+                                </small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {{-- FOOTER MODAL --}}
+                    <div class="modal-footer bg-light">
+                        <button type="button"
+                                class="btn btn-light"
+                                data-dismiss="modal">
+                            <i class="fas fa-times mr-1"></i>
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                                id="btnSimpanUser"
+                                class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i>
+                            Simpan Pengguna
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    {{-- SCRIPT MODAL --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const modal = document.getElementById('modalTambahUser');
+                const form = document.getElementById('formTambahUser');
+                const tombolSimpan = document.getElementById('btnSimpanUser');
+                const roleSelect = document.getElementById('userRole');
+                const cabangSelect = document.getElementById('userCabang');
+                const labelWajibCabang = document.getElementById('labelWajibCabang');
+
+                if (!modal || !form) {
+                    return;
+                }
+
+                // Hindari masalah stacking context pada layout Stisla.
+                document.body.appendChild(modal);
+
+                // Cabang wajib dipilih jika role adalah Admin Cabang.
+                function aturPenempatanCabang() {
+                    if (!roleSelect || !cabangSelect) {
+                        return;
+                    }
+
+                    const adminCabang = roleSelect.value === 'Admin Cabang';
+
+                    cabangSelect.required = adminCabang;
+
+                    if (labelWajibCabang) {
+                        labelWajibCabang.classList.toggle('d-none', !adminCabang);
+                    }
+
+                    // Admin Pusat otomatis menggunakan penempatan pusat.
+                    if (roleSelect.value === 'Admin Pusat') {
+                        cabangSelect.value = '';
+                    }
+                }
+
+                if (roleSelect) {
+                    roleSelect.addEventListener('change', aturPenempatanCabang);
+                    aturPenempatanCabang();
+                }
+
+                // Cegah form terkirim berkali-kali.
+                form.addEventListener('submit', function () {
+                    if (tombolSimpan) {
+                        tombolSimpan.disabled = true;
+                        tombolSimpan.innerHTML =
+                            '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
+                    }
+                });
+
+                // Buka kembali modal jika validasi server gagal.
+                @if ($errors->any())
+                    if (window.jQuery &&
+                        typeof jQuery.fn.modal === 'function') {
+                        jQuery(modal).modal('show');
+                    }
+                @endif
+            });
+        </script>
+    @endpush
 
 </x-admin-layout-stisla>

@@ -43,25 +43,14 @@ class DatabaseSeeder extends Seeder
             'role' => 'Admin Cabang',
             'cabang_id' => $cabang->id,
         ]);
-
-        // 3. Buat Data Produk Dummy
-        Produk::create([
-            'nama_produk' => 'Spanduk Banner (Meteran)',
-            'satuan' => 'm2',
-            'harga_jual' => 25000,
-            'hpp' => 15000,
-        ]);
-        
-        Produk::create([
-            'nama_produk' => 'Brosur A4',
-            'satuan' => 'lembar',
-            'harga_jual' => 1500,
-            'hpp' => 1000,
-        ]);
     
         // Seeder Akun
         $this->call([
             AkunSeeder::class,
+            BahanBakuSeeder::class,
+            ProdukSeeder::class,
+            KomposisiProdukSeeder::class,
+            TransaksiSeeder::class,
         ]);
     
     }

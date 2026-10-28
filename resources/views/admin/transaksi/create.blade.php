@@ -1,663 +1,561 @@
 
 <x-cs-layout>
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Transaksi Baru</h1>
-        <p class="text-sm text-gray-500 mt-1">
-            Catat satu transaksi dengan satu atau beberapa produk.
-        </p>
-    </div>
+    <div class="max-w-[1600px] mx-auto space-y-6 pb-8">
 
-    @if (session('error'))
-        <div class="bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-4">
-            {{ session('error') }}
+        {{-- HEADER --}}
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                Transaksi Baru
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">
+                Input pesanan pelanggan, harga produk, dan jasa edit.
+            </p>
         </div>
-    @endif
 
-    @if ($errors->any())
-        <div class="bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-4">
-            <p class="font-semibold mb-1">Periksa kembali data transaksi:</p>
-            <ul class="list-disc pl-5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+        {{-- ALERT --}}
+        @if (session('success'))
+            <div class="p-4 rounded-xl bg-green-50 border border-green-200 text-green-800">
+                {{ session('success') }}
+            </div>
+        @endif
 
-    <form action="{{ route('transaksi.store') }}" method="POST" id="form-transaksi">
-        @csrf
+        @if (session('error'))
+            <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800">
+                {{ session('error') }}
+            </div>
+        @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        @if ($errors->any())
+            <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800">
+                <p class="font-bold mb-2">Periksa kembali input kamu:</p>
+                <ul class="list-disc pl-5 text-sm space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-            {{-- FORM DATA TRANSAKSI --}}
-            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <form action="{{ route('transaksi.store') }}"
+              method="POST"
+              id="form-transaksi">
+            @csrf
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            No Referensi
-                        </label>
-                        <input
-                            type="text"
-                            name="no_referensi"
-                            value="{{ old('no_referensi', $no_referensi) }}"
-                            class="w-full px-4 py-2 border rounded-lg bg-gray-50"
-                            readonly
-                        >
-                    </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Tanggal
-                        </label>
-                        <input
-                            type="date"
-                            name="tanggal"
-                            value="{{ old('tanggal', date('Y-m-d')) }}"
-                            class="w-full px-4 py-2 border rounded-lg"
-                            required
-                        >
-                    </div>
-                </div>
+                {{-- =========================================
+                     KOLOM KIRI: INFORMASI DAN INPUT PRODUK
+                ========================================== --}}
+                <div class="lg:col-span-2 space-y-6">
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Nama Pelanggan
-                        </label>
-                        <input
-                            type="text"
-                            name="nama_pelanggan"
-                            value="{{ old('nama_pelanggan') }}"
-                            class="w-full px-4 py-2 border rounded-lg"
-                            maxlength="255"
-                            required
-                        >
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Cabang Transaksi
-                        </label>
-                        <select
-                            name="cabang_id"
-                            class="w-full px-4 py-2 border rounded-lg"
-                            required
-                        >
-                            @foreach ($cabangs as $cabang)
-                                <option
-                                    value="{{ $cabang->id }}"
-                                    {{ (string) old('cabang_id', Auth::user()->cabang_id) === (string) $cabang->id ? 'selected' : '' }}
-                                >
-                                    {{ $cabang->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <hr class="mb-5">
-
-                {{-- JUDUL DETAIL PRODUK --}}
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-lg">Detail Produk</h3>
-                        <p class="text-xs text-gray-500 mt-1">
-                            Tambahkan semua produk dalam transaksi yang sama.
-                        </p>
-                    </div>
-
-                    <button
-                        type="button"
-                        id="btn-tambah-produk"
-                        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
-                    >
-                        <i class="fa-solid fa-plus"></i>
-                        Tambah Produk
-                    </button>
-                </div>
-
-                {{-- DAFTAR BARIS PRODUK --}}
-                <div id="item-list" class="space-y-4">
-
-                    {{-- Baris produk pertama --}}
-                    <div class="item-row rounded-xl border border-gray-200 p-4 bg-gray-50/50">
-
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="nomor-produk text-sm font-bold text-gray-700">
-                                Produk 1
-                            </span>
-
-                            <button
-                                type="button"
-                                class="btn-hapus-produk text-red-600 hover:text-red-800 text-sm font-medium"
-                                aria-label="Hapus produk"
-                            >
-                                <i class="fa-solid fa-trash mr-1"></i>
-                                Hapus
-                            </button>
+                    {{-- INFORMASI TRANSAKSI --}}
+                    <section class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-100 text-blue-700 font-bold">
+                                1
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-800">
+                                    Informasi Transaksi
+                                </h2>
+                                <p class="text-sm text-gray-500">
+                                    Informasi dasar pesanan pelanggan.
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-                            {{-- Pilih produk --}}
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs text-gray-500 mb-1">
-                                    Produk
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    No. Referensi
                                 </label>
+                                <input type="text"
+                                       name="no_referensi"
+                                       value="{{ old('no_referensi', $no_referensi) }}"
+                                       readonly
+                                       class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-100 text-gray-600">
+                            </div>
 
-                                <select
-                                    name="produk_id[]"
-                                    class="produk-select w-full px-3 py-2 border rounded-lg bg-white"
-                                    required
-                                >
-                                    <option value="">-- Pilih Produk --</option>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Tanggal <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date"
+                                       name="tanggal"
+                                       value="{{ old('tanggal', date('Y-m-d')) }}"
+                                       required
+                                       class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500">
+                            </div>
 
-                                    @foreach ($produks as $produk)
-                                        <option
-                                            value="{{ $produk->id }}"
-                                            data-harga="{{ $produk->harga_jual }}"
-                                            data-hpp="{{ $produk->hpp }}"
-                                            data-satuan="{{ strtolower(trim($produk->satuan)) }}"
-                                        >
-                                            {{ $produk->nama_produk }}
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Nama Pelanggan <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                       name="nama_pelanggan"
+                                       value="{{ old('nama_pelanggan') }}"
+                                       maxlength="255"
+                                       placeholder="Masukkan nama pelanggan"
+                                       required
+                                       class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Cabang <span class="text-red-500">*</span>
+                                </label>
+                                <select name="cabang_id"
+                                        required
+                                        class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-blue-500">
+                                    @foreach ($cabangs as $cabang)
+                                        <option value="{{ $cabang->id }}"
+                                            {{ (string) old('cabang_id', auth()->user()->cabang_id) === (string) $cabang->id ? 'selected' : '' }}>
+                                            {{ $cabang->nama }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
+                        </div>
+                    </section>
 
-                            {{-- Ukuran untuk produk meter persegi --}}
-                            <div class="dimension-container hidden sm:col-span-2">
-                                <label class="block text-xs text-gray-500 mb-1">
-                                    Ukuran (meter)
-                                </label>
+                    {{-- DETAIL PRODUK --}}
+                    <section>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 font-bold">
+                                    2
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold text-gray-800">
+                                        Detail Produk
+                                    </h2>
+                                    <p class="text-sm text-gray-500">
+                                        Tambahkan produk sesuai pesanan.
+                                    </p>
+                                </div>
+                            </div>
 
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="block text-xs text-gray-500 mb-1">
-                                            Tinggi / Panjang
-                                        </label>
-                                        <input
-                                            type="number"
-                                            name="tinggi[]"
-                                            class="tinggi-input w-full px-3 py-2 border rounded-lg"
-                                            min="1"
-                                            step="1"
-                                            placeholder="Contoh: 4"
-                                            disabled
-                                        >
-                                    </div>
+                            <button type="button"
+                                    id="tambah-produk"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-xl transition">
+                                + Tambah Produk
+                            </button>
+                        </div>
 
-                                    <div>
-                                        <label class="block text-xs text-gray-500 mb-1">
-                                            Lebar
-                                        </label>
-                                        <input
-                                            type="number"
-                                            name="lebar[]"
-                                            class="lebar-input w-full px-3 py-2 border rounded-lg"
-                                            min="1"
-                                            step="1"
-                                            placeholder="Contoh: 3"
-                                            disabled
-                                        >
-                                    </div>
+                        {{-- BARIS PRODUK DITAMBAHKAN OLEH JAVASCRIPT --}}
+                        <div id="daftar-produk" class="space-y-4"></div>
+
+                        <button type="button"
+                                id="tambah-produk-bawah"
+                                class="w-full mt-4 border-2 border-dashed border-blue-300 hover:border-blue-500 hover:bg-blue-50 text-blue-700 font-semibold rounded-xl p-4 transition">
+                            + Tambah Produk Lain
+                            <span class="block text-xs font-normal mt-1">
+                                Produk baru akan muncul di paling atas.
+                            </span>
+                        </button>
+                    </section>
+                </div>
+
+                {{-- =========================================
+                     KOLOM KANAN: RINGKASAN STICKY
+                ========================================== --}}
+                <aside class="lg:col-span-1 lg:sticky lg:top-5">
+                    <section class="bg-gray-900 text-white rounded-2xl shadow-lg overflow-hidden">
+
+                        <div class="p-5">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                                    💰
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold">
+                                        Ringkasan Transaksi
+                                    </h2>
+                                    <p class="text-xs text-gray-400">
+                                        Perhitungan langsung
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-sm text-gray-400">
+                                        Jumlah Baris Produk
+                                    </p>
+                                    <p id="jumlah-baris"
+                                       class="text-xl font-bold mt-1">1 produk</p>
                                 </div>
 
-                                <p class="text-xs text-gray-400 mt-2">
-                                    Luas dihitung otomatis dari tinggi × lebar.
-                                </p>
+                                <div class="border-t border-gray-700 pt-4">
+                                    <p class="text-sm text-gray-400">
+                                        Total Harga Barang
+                                    </p>
+                                    <p id="total-barang"
+                                       class="text-xl font-bold mt-1">Rp0</p>
+                                </div>
+
+                                <div>
+                                    <p class="text-sm text-gray-400">
+                                        Total Jasa Edit
+                                    </p>
+                                    <p id="total-edit"
+                                       class="text-xl font-bold mt-1">Rp0</p>
+                                </div>
+
+                                <div class="border-t border-gray-700 pt-4">
+                                    <p class="text-sm text-gray-400">
+                                        Total yang Dibayar Pelanggan
+                                    </p>
+                                    <p id="total-pendapatan"
+                                       class="text-3xl font-extrabold text-green-400 mt-2 break-words">
+                                        Rp0
+                                    </p>
+                                </div>
                             </div>
 
-                            {{-- Qty untuk produk selain m2 --}}
-                            <div class="qty-container">
-                                <label class="block text-xs text-gray-500 mb-1">
-                                    Kuantitas
-                                </label>
-                                <input
-                                    type="number"
-                                    name="jumlah[]"
-                                    class="jumlah-input w-full px-3 py-2 border rounded-lg"
-                                    value="1"
-                                    min="1"
-                                    step="1"
-                                    required
-                                >
-                            </div>
+                            <button type="submit"
+                                    id="tombol-proses"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-3 rounded-xl mt-5 transition">
+                                Proses Transaksi
+                            </button>
 
-                            {{-- Subtotal --}}
-                            <div>
-                                <label class="block text-xs text-gray-500 mb-1">
-                                    Subtotal Penjualan
-                                </label>
-                                <input
-                                    type="text"
-                                    class="subtotal-display w-full px-3 py-2 border rounded-lg bg-gray-100 font-semibold"
-                                    value="Rp 0"
-                                    readonly
-                                >
-                            </div>
-
-                            {{-- Nilai untuk dikirim --}}
-                            <input type="hidden" name="luas[]" class="luas-input" value="">
-
-                            <input
-                                type="hidden"
-                                name="harga_satuan[]"
-                                class="harga-satuan-input"
-                                value=""
-                            >
-
-                            <input
-                                type="hidden"
-                                name="hpp_satuan[]"
-                                class="hpp-satuan-input"
-                                value=""
-                            >
-
-                            <input
-                                type="hidden"
-                                name="subtotal[]"
-                                class="subtotal-input"
-                                value="0"
-                            >
-
-                            <input
-                                type="hidden"
-                                name="total_hpp_item[]"
-                                class="total-hpp-item-input"
-                                value="0"
-                            >
+                            <a href="{{ route('transaksi.index') }}"
+                               class="block text-center bg-white/10 hover:bg-white/20 font-semibold px-4 py-3 rounded-xl mt-3 transition">
+                                Batal
+                            </a>
                         </div>
+                    </section>
+                </aside>
 
-                        <div class="mt-3 flex justify-between gap-3 text-sm">
-                            <span class="text-gray-500">HPP produk</span>
-                            <span class="font-semibold text-gray-700 hpp-display">
-                                Rp 0
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 p-3 rounded-lg bg-blue-50 text-blue-800 text-xs">
-                    <i class="fa-solid fa-circle-info mr-1"></i>
-                    Produk bersatuan m² menggunakan perhitungan tinggi × lebar.
-                    Produk bersatuan lain menggunakan kuantitas.
-                </div>
             </div>
+        </form>
+    </div>
 
-            {{-- RINGKASAN PEMBAYARAN --}}
-            <div class="lg:col-span-1">
-                <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700 text-white lg:sticky lg:top-6">
+    {{-- =========================================
+         TEMPLATE BARIS PRODUK
+    ========================================== --}}
+    <template id="template-produk">
+        <div class="produk-row bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
 
-                    <h3 class="font-bold text-gray-300 mb-2">
-                        Total Pembayaran
-                    </h3>
-
-                    <div
-                        class="text-3xl sm:text-4xl font-bold text-green-400 mb-6 break-words"
-                        id="grand-total-display"
-                    >
-                        Rp 0
+            <div class="flex items-center justify-between gap-3 bg-gray-50 border-b border-gray-200 px-4 py-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span class="nomor-produk flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-xl bg-blue-600 text-white font-bold">
+                        1
+                    </span>
+                    <div class="min-w-0">
+                        <h3 class="judul-produk font-bold text-gray-800 truncate">
+                            Produk 1
+                        </h3>
+                        <p class="status-produk text-xs text-gray-500">
+                            Silakan pilih produk
+                        </p>
                     </div>
-
-                    <div class="border-t border-gray-600 pt-4 mb-5 space-y-3">
-                        <div class="flex justify-between gap-3 text-sm">
-                            <span class="text-gray-300">Jumlah jenis produk</span>
-                            <span id="jumlah-produk-display" class="font-semibold">1</span>
-                        </div>
-
-                        <div class="flex justify-between gap-3 text-sm">
-                            <span class="text-gray-300">Total HPP</span>
-                            <span id="grand-hpp-display" class="font-semibold">Rp 0</span>
-                        </div>
-                    </div>
-
-                    <input
-                        type="hidden"
-                        name="total_transaksi_input"
-                        id="total_transaksi_input"
-                        value="0"
-                    >
-
-                    <input
-                        type="hidden"
-                        name="total_hpp_input"
-                        id="total_hpp_input"
-                        value="0"
-                    >
-
-                    <button
-                        type="submit"
-                        class="w-full bg-blue-600 text-white px-5 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
-                    >
-                        <i class="fa-solid fa-check mr-2"></i>
-                        Proses Transaksi
-                    </button>
-
-                    <p class="text-xs text-gray-400 mt-4 text-center">
-                        Pastikan produk, ukuran, dan kuantitas sudah benar sebelum menyimpan.
-                    </p>
                 </div>
-            </div>
 
-        </div>
-    </form>
-
-    {{-- TEMPLATE BARIS PRODUK TAMBAHAN --}}
-    <template id="item-template">
-        <div class="item-row rounded-xl border border-gray-200 p-4 bg-gray-50/50">
-
-            <div class="flex items-center justify-between mb-3">
-                <span class="nomor-produk text-sm font-bold text-gray-700">
-                    Produk
-                </span>
-
-                <button
-                    type="button"
-                    class="btn-hapus-produk text-red-600 hover:text-red-800 text-sm font-medium"
-                    aria-label="Hapus produk"
-                >
-                    <i class="fa-solid fa-trash mr-1"></i>
+                <button type="button"
+                        class="hapus-produk flex-shrink-0 text-sm font-semibold text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg">
                     Hapus
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                <div class="sm:col-span-2">
-                    <label class="block text-xs text-gray-500 mb-1">Produk</label>
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Nama Produk <span class="text-red-500">*</span>
+                        </label>
 
-                    <select
-                        name="produk_id[]"
-                        class="produk-select w-full px-3 py-2 border rounded-lg bg-white"
-                        required
-                    >
-                        <option value="">-- Pilih Produk --</option>
-
-                        @foreach ($produks as $produk)
-                            <option
-                                value="{{ $produk->id }}"
-                                data-harga="{{ $produk->harga_jual }}"
-                                data-hpp="{{ $produk->hpp }}"
-                                data-satuan="{{ strtolower(trim($produk->satuan)) }}"
-                            >
-                                {{ $produk->nama_produk }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="dimension-container hidden sm:col-span-2">
-                    <label class="block text-xs text-gray-500 mb-1">Ukuran (meter)</label>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs text-gray-500 mb-1">Tinggi / Panjang</label>
-                            <input
-                                type="number"
-                                name="tinggi[]"
-                                class="tinggi-input w-full px-3 py-2 border rounded-lg"
-                                min="0.01"
-                                step="0.01"
-                                placeholder="Contoh: 4"
-                                disabled
-                            >
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-gray-500 mb-1">Lebar</label>
-                            <input
-                                type="number"
-                                name="lebar[]"
-                                class="lebar-input w-full px-3 py-2 border rounded-lg"
-                                min="0.01"
-                                step="0.01"
-                                placeholder="Contoh: 3"
-                                disabled
-                            >
-                        </div>
+                        <select name="produk_id[]"
+                                class="produk-select w-full border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-blue-500"
+                                required>
+                            <option value="">-- Pilih produk --</option>
+                            @foreach ($produks as $produk)
+                                <option value="{{ $produk->id }}"
+                                        data-satuan="{{ strtolower(trim($produk->satuan)) }}">
+                                    {{ $produk->nama_produk }} ({{ $produk->satuan }})
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
-                    <p class="text-xs text-gray-400 mt-2">
-                        Luas dihitung otomatis dari tinggi × lebar.
+                    <div class="ukuran-container hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Tinggi / Panjang (meter)
+                        </label>
+                        <input type="number"
+                               name="tinggi[]"
+                               step="0.01"
+                               min="0.01"
+                               placeholder="Contoh: 1"
+                               class="tinggi w-full border border-gray-300 rounded-xl px-4 py-3">
+                    </div>
+
+                    <div class="ukuran-container hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Lebar (meter)
+                        </label>
+                        <input type="number"
+                               name="lebar[]"
+                               step="0.01"
+                               min="0.01"
+                               placeholder="Contoh: 2"
+                               class="lebar w-full border border-gray-300 rounded-xl px-4 py-3">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Jumlah Barang <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number"
+                               name="jumlah[]"
+                               value="1"
+                               min="1"
+                               step="1"
+                               class="jumlah w-full border border-gray-300 rounded-xl px-4 py-3"
+                               required>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Banyaknya barang yang dipesan.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Harga Barang (Rp) <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number"
+                               name="harga_jual[]"
+                               min="0"
+                               step="1"
+                               placeholder="Masukkan harga barang"
+                               class="harga-jual w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                               required>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Harga total untuk baris pesanan ini.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Jasa Edit (Rp)
+                        </label>
+                        <input type="number"
+                               name="jasa_edit[]"
+                               min="0"
+                               step="1"
+                               placeholder="Masukkan biaya edit (opsional)"
+                               class="jasa-edit w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                               >
+                        <p class="text-xs text-gray-500 mt-1">
+                            Kosongkan jika tidak ada jasa edit.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- RINGKASAN PER PRODUK --}}
+                <div class="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <p class="text-xs uppercase tracking-wide text-gray-500 font-bold mb-3">
+                        Ringkasan Produk Ini
                     </p>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs text-gray-500">Luas Total</p>
+                            <p class="luas-display font-bold text-gray-800 mt-1">-</p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-gray-500">Harga Barang</p>
+                            <p class="harga-display font-semibold text-gray-800 mt-1">Rp0</p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-gray-500">Jasa Edit</p>
+                            <p class="edit-display font-semibold text-gray-800 mt-1">Rp0</p>
+                        </div>
+
+                        <div class="border-l border-gray-200 pl-3">
+                            <p class="text-xs text-gray-500">Subtotal</p>
+                            <p class="subtotal-total font-bold text-blue-700 text-lg mt-1">Rp0</p>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="qty-container">
-                    <label class="block text-xs text-gray-500 mb-1">Kuantitas</label>
-                    <input
-                        type="number"
-                        name="jumlah[]"
-                        class="jumlah-input w-full px-3 py-2 border rounded-lg"
-                        value="1"
-                        min="1"
-                        step="1"
-                        required
-                    >
-                </div>
-
-                <div>
-                    <label class="block text-xs text-gray-500 mb-1">Subtotal Penjualan</label>
-                    <input
-                        type="text"
-                        class="subtotal-display w-full px-3 py-2 border rounded-lg bg-gray-100 font-semibold"
-                        value="Rp 0"
-                        readonly
-                    >
-                </div>
-
-                <input type="hidden" name="luas[]" class="luas-input" value="">
-                <input type="hidden" name="harga_satuan[]" class="harga-satuan-input" value="">
-                <input type="hidden" name="hpp_satuan[]" class="hpp-satuan-input" value="">
-                <input type="hidden" name="subtotal[]" class="subtotal-input" value="0">
-                <input type="hidden" name="total_hpp_item[]" class="total-hpp-item-input" value="0">
-            </div>
-
-            <div class="mt-3 flex justify-between gap-3 text-sm">
-                <span class="text-gray-500">HPP produk</span>
-                <span class="font-semibold text-gray-700 hpp-display">Rp 0</span>
             </div>
         </div>
     </template>
 
     <script>
         (() => {
-            const itemList = document.getElementById('item-list');
-            const template = document.getElementById('item-template');
-            const btnTambah = document.getElementById('btn-tambah-produk');
+            const list = document.getElementById('daftar-produk');
+            const template = document.getElementById('template-produk');
             const form = document.getElementById('form-transaksi');
+            const tombolProses = document.getElementById('tombol-proses');
 
-            const rupiah = (nilai) => {
-                return 'Rp ' + Number(nilai || 0).toLocaleString('id-ID', {
-                    maximumFractionDigits: 2
+            const angka = input => Number.parseFloat(input?.value) || 0;
+
+            const rupiah = nilai => 'Rp' +
+                Number(nilai || 0).toLocaleString('id-ID', {
+                    maximumFractionDigits: 0
                 });
-            };
 
-            const angka = (nilai) => {
-                return Number.parseFloat(nilai) || 0;
-            };
-
-            function isMeterPersegi(satuan) {
-                const s = (satuan || '').toLowerCase().trim();
-
-                return s === 'm2'
-                    || s === 'm²'
-                    || s === 'meter persegi'
-                    || s.includes('m²');
+            function isM2(satuan) {
+                return ['m2', 'm²', 'meter persegi'].includes(
+                    (satuan || '').toLowerCase().trim()
+                );
             }
 
             function hitungBaris(row) {
                 const select = row.querySelector('.produk-select');
                 const option = select.options[select.selectedIndex];
+                const satuan = option?.dataset.satuan || '';
+                const dipilih = Boolean(select.value);
+                const berbasisLuas = dipilih && isM2(satuan);
 
-                const qtyInput = row.querySelector('.jumlah-input');
-                const tinggiInput = row.querySelector('.tinggi-input');
-                const lebarInput = row.querySelector('.lebar-input');
-                const luasInput = row.querySelector('.luas-input');
+                row.querySelectorAll('.ukuran-container').forEach(el => {
+                    el.classList.toggle('hidden', !berbasisLuas);
+                });
 
-                const dimensionContainer = row.querySelector('.dimension-container');
-                const qtyContainer = row.querySelector('.qty-container');
+                const tinggi = row.querySelector('.tinggi');
+                const lebar = row.querySelector('.lebar');
 
-                const hargaInput = row.querySelector('.harga-satuan-input');
-                const hppInput = row.querySelector('.hpp-satuan-input');
-                const subtotalInput = row.querySelector('.subtotal-input');
-                const totalHppInput = row.querySelector('.total-hpp-item-input');
+                tinggi.required = berbasisLuas;
+                lebar.required = berbasisLuas;
 
-                const subtotalDisplay = row.querySelector('.subtotal-display');
-                const hppDisplay = row.querySelector('.hpp-display');
-
-                if (!option || !option.value) {
-                    dimensionContainer.classList.add('hidden');
-                    qtyContainer.classList.remove('hidden');
-
-                    tinggiInput.disabled = true;
-                    lebarInput.disabled = true;
-                    tinggiInput.required = false;
-                    lebarInput.required = false;
-
-                    luasInput.value = '';
-                    hargaInput.value = '';
-                    hppInput.value = '';
-                    subtotalInput.value = '0';
-                    totalHppInput.value = '0';
-
-                    subtotalDisplay.value = rupiah(0);
-                    hppDisplay.textContent = rupiah(0);
-
-                    hitungTotal();
-                    return;
+                if (!berbasisLuas) {
+                    tinggi.value = '';
+                    lebar.value = '';
                 }
 
-                const harga = angka(option.dataset.harga);
-                const hpp = angka(option.dataset.hpp);
-                const satuan = option.dataset.satuan || '';
+                const jumlah = Math.max(1, angka(row.querySelector('.jumlah')));
+                const luas = berbasisLuas
+                    ? angka(tinggi) * angka(lebar) * jumlah
+                    : 0;
 
-                let multiplier = 0;
+                const harga = angka(row.querySelector('.harga-jual'));
+                const edit = angka(row.querySelector('.jasa-edit'));
 
-                if (isMeterPersegi(satuan)) {
-                    dimensionContainer.classList.remove('hidden');
-                    qtyContainer.classList.add('hidden');
+                row.querySelector('.judul-produk').textContent =
+                    dipilih ? option.textContent.trim() : 'Produk';
 
-                    tinggiInput.disabled = false;
-                    lebarInput.disabled = false;
-                    tinggiInput.required = true;
-                    lebarInput.required = true;
+                row.querySelector('.status-produk').textContent =
+                    !dipilih
+                        ? 'Silakan pilih produk'
+                        : (berbasisLuas
+                            ? 'Perhitungan berdasarkan luas m²'
+                            : 'Perhitungan berdasarkan jumlah barang');
 
-                    const tinggi = angka(tinggiInput.value);
-                    const lebar = angka(lebarInput.value);
-                    const luas = tinggi * lebar;
+                row.querySelector('.luas-display').textContent =
+                    berbasisLuas
+                        ? luas.toLocaleString('id-ID', {
+                            maximumFractionDigits: 2
+                        }) + ' m²'
+                        : '-';
 
-                    luasInput.value = luas > 0 ? luas.toFixed(2) : '';
-                    qtyInput.value = '1';
-
-                    multiplier = luas;
-                } else {
-                    dimensionContainer.classList.add('hidden');
-                    qtyContainer.classList.remove('hidden');
-
-                    tinggiInput.disabled = true;
-                    lebarInput.disabled = true;
-                    tinggiInput.required = false;
-                    lebarInput.required = false;
-
-                    tinggiInput.value = '';
-                    lebarInput.value = '';
-                    luasInput.value = '';
-
-                    multiplier = Math.max(0, angka(qtyInput.value));
-                }
-
-                const subtotal = Math.round((harga * multiplier + Number.EPSILON) * 100) / 100;
-                const totalHpp = Math.round((hpp * multiplier + Number.EPSILON) * 100) / 100;
-
-                hargaInput.value = harga;
-                hppInput.value = hpp;
-                subtotalInput.value = subtotal;
-                totalHppInput.value = totalHpp;
-
-                subtotalDisplay.value = rupiah(subtotal);
-                hppDisplay.textContent = rupiah(totalHpp);
+                row.querySelector('.harga-display').textContent = rupiah(harga);
+                row.querySelector('.edit-display').textContent = rupiah(edit);
+                row.querySelector('.subtotal-total').textContent =
+                    rupiah(harga + edit);
 
                 hitungTotal();
             }
 
             function hitungTotal() {
-                let totalPenjualan = 0;
-                let totalHpp = 0;
+                let totalBarang = 0;
+                let totalEdit = 0;
+                let jumlahBaris = 0;
 
-                const rows = itemList.querySelectorAll('.item-row');
+                list.querySelectorAll('.produk-row').forEach(row => {
+                    if (!row.querySelector('.produk-select').value) return;
 
-                rows.forEach((row) => {
-                    totalPenjualan += angka(row.querySelector('.subtotal-input').value);
-                    totalHpp += angka(row.querySelector('.total-hpp-item-input').value);
+                    jumlahBaris++;
+                    totalBarang += angka(row.querySelector('.harga-jual'));
+                    totalEdit += angka(row.querySelector('.jasa-edit'));
                 });
 
-                document.getElementById('total_transaksi_input').value = totalPenjualan.toFixed(2);
-                document.getElementById('total_hpp_input').value = totalHpp.toFixed(2);
+                document.getElementById('jumlah-baris').textContent =
+                    jumlahBaris + (jumlahBaris === 1 ? ' produk' : ' produk');
 
-                document.getElementById('grand-total-display').textContent = rupiah(totalPenjualan);
-                document.getElementById('grand-hpp-display').textContent = rupiah(totalHpp);
-                document.getElementById('jumlah-produk-display').textContent = rows.length;
+                document.getElementById('total-barang').textContent =
+                    rupiah(totalBarang);
+
+                document.getElementById('total-edit').textContent =
+                    rupiah(totalEdit);
+
+                document.getElementById('total-pendapatan').textContent =
+                    rupiah(totalBarang + totalEdit);
             }
 
-            function perbaruiNomorProduk() {
-                itemList.querySelectorAll('.item-row').forEach((row, index) => {
-                    row.querySelector('.nomor-produk').textContent = 'Produk ' + (index + 1);
+            function perbaruiNomor() {
+                const rows = list.querySelectorAll('.produk-row');
 
-                    const btnHapus = row.querySelector('.btn-hapus-produk');
-                    btnHapus.disabled = itemList.querySelectorAll('.item-row').length === 1;
-                    btnHapus.classList.toggle(
+                rows.forEach((row, index) => {
+                    row.querySelector('.nomor-produk').textContent = index + 1;
+
+                    const tombolHapus = row.querySelector('.hapus-produk');
+                    tombolHapus.disabled = rows.length === 1;
+                    tombolHapus.classList.toggle(
                         'opacity-40',
-                        btnHapus.disabled
+                        tombolHapus.disabled
                     );
-                    btnHapus.classList.toggle(
+                    tombolHapus.classList.toggle(
                         'cursor-not-allowed',
-                        btnHapus.disabled
+                        tombolHapus.disabled
                     );
                 });
             }
 
             function tambahProduk() {
                 const fragment = template.content.cloneNode(true);
-                const row = fragment.querySelector('.item-row');
+                const rowBaru = fragment.querySelector('.produk-row');
 
-                itemList.appendChild(fragment);
+                // Produk terbaru selalu muncul di atas.
+                list.prepend(fragment);
 
-                perbaruiNomorProduk();
-                hitungBaris(row);
+                perbaruiNomor();
+                hitungBaris(rowBaru);
+
+                rowBaru.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                setTimeout(() => {
+                    rowBaru.querySelector('.produk-select').focus();
+                }, 250);
             }
 
-            btnTambah.addEventListener('click', tambahProduk);
+            document.getElementById('tambah-produk')
+                .addEventListener('click', tambahProduk);
 
-            itemList.addEventListener('change', (event) => {
-                if (event.target.matches('.produk-select')) {
-                    hitungBaris(event.target.closest('.item-row'));
+            document.getElementById('tambah-produk-bawah')
+                .addEventListener('click', tambahProduk);
+
+            list.addEventListener('change', event => {
+                const row = event.target.closest('.produk-row');
+                if (row) hitungBaris(row);
+            });
+
+            list.addEventListener('input', event => {
+                if (event.target.matches(
+                    '.jumlah, .tinggi, .lebar, .harga-jual, .jasa-edit'
+                )) {
+                    hitungBaris(event.target.closest('.produk-row'));
                 }
             });
 
-            itemList.addEventListener('input', (event) => {
-                if (event.target.matches('.jumlah-input, .tinggi-input, .lebar-input')) {
-                    hitungBaris(event.target.closest('.item-row'));
-                }
-            });
+            list.addEventListener('click', event => {
+                const tombol = event.target.closest('.hapus-produk');
 
-            itemList.addEventListener('click', (event) => {
-                const btnHapus = event.target.closest('.btn-hapus-produk');
+                if (!tombol || tombol.disabled) return;
 
-                if (!btnHapus || btnHapus.disabled) {
-                    return;
-                }
+                tombol.closest('.produk-row').remove();
 
-                const row = btnHapus.closest('.item-row');
-                row.remove();
-
-                perbaruiNomorProduk();
+                perbaruiNomor();
                 hitungTotal();
             });
 
-            form.addEventListener('submit', (event) => {
-                const rows = itemList.querySelectorAll('.item-row');
+            form.addEventListener('submit', event => {
+                const rows = list.querySelectorAll('.produk-row');
 
                 if (rows.length === 0) {
                     event.preventDefault();
@@ -670,32 +568,42 @@
 
                     if (!select.value) {
                         event.preventDefault();
-                        alert('Pilih produk pada semua baris sebelum memproses transaksi.');
+                        alert('Pilih produk pada semua baris.');
                         select.focus();
                         return;
                     }
 
-                    const satuan = select.options[select.selectedIndex].dataset.satuan || '';
+                    const option = select.options[select.selectedIndex];
 
-                    if (isMeterPersegi(satuan)) {
-                        const tinggi = angka(row.querySelector('.tinggi-input').value);
-                        const lebar = angka(row.querySelector('.lebar-input').value);
-
-                        if (tinggi <= 0 || lebar <= 0) {
+                    if (isM2(option.dataset.satuan)) {
+                        if (
+                            angka(row.querySelector('.tinggi')) <= 0 ||
+                            angka(row.querySelector('.lebar')) <= 0
+                        ) {
                             event.preventDefault();
-                            alert('Isi tinggi/panjang dan lebar dengan nilai lebih dari 0.');
+                            alert('Isi tinggi dan lebar produk m² dengan nilai lebih dari 0.');
+                            row.querySelector('.tinggi').focus();
                             return;
                         }
-                    } else if (angka(row.querySelector('.jumlah-input').value) < 1) {
-                        event.preventDefault();
-                        alert('Kuantitas produk minimal 1.');
-                        return;
                     }
                 }
+
+                // Input harga boleh kosong saat mengetik.
+                // Sebelum dikirim, kosongkan menjadi 0 agar validasi Laravel lolos.
+                list.querySelectorAll('.harga-jual, .jasa-edit').forEach(input => {
+                    if (input.value.trim() === '') {
+                        input.value = '0';
+                    }
+                });
+
+                tombolProses.disabled = true;
+                tombolProses.textContent = 'Memproses transaksi...';
+                tombolProses.classList.add('opacity-70', 'cursor-wait');
             });
 
-            perbaruiNomorProduk();
-            hitungTotal();
+            // Buat satu baris produk awal.
+            tambahProduk();
+
         })();
     </script>
 </x-cs-layout>

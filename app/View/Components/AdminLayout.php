@@ -45,10 +45,10 @@ class AdminLayout extends Component
     /**
      * Logika untuk menghasilkan struktur array menu dinamis.
      */
+    
     private function generateMenuSections(): array
     {
-        // Berkat PHPDoc di atas, IDE Intelephense sekarang tahu bahwa isAdmin() dan homeRoute() itu valid
-        $isAdmin      = $this->user->isAdmin();
+        $isAdmin = $this->user->isAdmin();
         $isAdminPusat = $this->user->role === 'Admin Pusat';
 
         return [
@@ -63,24 +63,82 @@ class AdminLayout extends Component
                         'route'  => $this->user->homeRoute(),
                         'active' => request()->is('admin', 'admin/*', 'cs', 'cs/*'),
                     ],
-                    ['label' => 'Transaksi',   'icon' => 'fa-exchange-alt', 'route' => 'transaksi.index'],
-                    ['label' => 'Pengeluaran', 'icon' => 'fa-wallet',       'route' => 'pengeluaran.index'],
-                    
-                    // Modul spesifik Admin
-                    ['label' => 'Produk',            'icon' => 'fa-box',        'route' => 'produk.index',            'visible' => $isAdmin],
-                    ['label' => 'Jurnal Umum',       'icon' => 'fa-book',       'route' => 'jurnal.index',            'visible' => $isAdmin],
-                    ['label' => 'Buku Besar',        'icon' => 'fa-book-open',  'route' => 'buku_besar.index',        'visible' => $isAdmin],
-                    ['label' => 'Laporan Laba Rugi', 'icon' => 'fa-chart-line', 'route' => 'laporan_laba_rugi.index', 'visible' => $isAdmin],
+                    [
+                        'label' => 'Transaksi',
+                        'icon'  => 'fa-exchange-alt',
+                        'route' => 'transaksi.index',
+                    ],
+                    [
+                        'label' => 'Pengeluaran',
+                        'icon'  => 'fa-wallet',
+                        'route' => 'pengeluaran.index',
+                    ],
+                    [
+                        'label'   => 'Produk',
+                        'icon'    => 'fa-box',
+                        'route'   => 'produk.index',
+                        'visible' => $isAdmin,
+                    ],
+                    [
+                        'label'   => 'Jurnal Umum',
+                        'icon'    => 'fa-book',
+                        'route'   => 'jurnal.index',
+                        'visible' => $isAdmin,
+                    ],
+                    [
+                        'label'   => 'Buku Besar',
+                        'icon'    => 'fa-book-open',
+                        'route'   => 'buku_besar.index',
+                        'visible' => $isAdmin,
+                    ],
+                    [
+                        'label'   => 'Laporan Laba Rugi',
+                        'icon'    => 'fa-chart-line',
+                        'route'   => 'laporan_laba_rugi.index',
+                        'visible' => $isAdmin,
+                    ],
                 ],
             ],
+
+            // KATEGORI PERSEDIAAN
+            [
+                'title'   => 'Persediaan',
+                'dot'     => 'bg-amber-400',
+                'visible' => $isAdmin,
+                'items'   => [
+                    [
+                        'label' => 'Bahan Baku',
+                        'icon'  => 'fa-boxes',
+                        'route' => 'bahan-baku.index',
+                    ],
+                    [
+                        'label' => 'Persediaan',
+                        'icon'  => 'fa-warehouse',
+                        'route' => 'persediaan.index',
+                    ],
+                ],
+            ],
+
             [
                 'title'   => 'Master Data',
                 'dot'     => 'bg-emerald-400',
                 'visible' => $isAdminPusat,
                 'items'   => [
-                    ['label' => 'Cabang', 'icon' => 'fa-store',   'route' => 'cabang.index'],
-                    ['label' => 'User',   'icon' => 'fa-users',   'route' => 'user.index'],
-                    ['label' => 'Akun',   'icon' => 'fa-list-ul', 'route' => 'akun.index'],
+                    [
+                        'label' => 'Cabang',
+                        'icon'  => 'fa-store',
+                        'route' => 'cabang.index',
+                    ],
+                    [
+                        'label' => 'User',
+                        'icon'  => 'fa-users',
+                        'route' => 'user.index',
+                    ],
+                    [
+                        'label' => 'Akun',
+                        'icon'  => 'fa-list-ul',
+                        'route' => 'akun.index',
+                    ],
                 ],
             ],
         ];

@@ -120,29 +120,7 @@ class PengeluaranController extends Controller
             ? Cabang::where('status', 'aktif')->orderBy('nama')->get()
             : collect();
 
-        return view('admin.pengeluaran.index', compact(
-            'pengeluarans',
-            'cabangs',
-            'startDate',
-            'endDate'
-        ));
-    }
-
-    /**
-     * Form tambah pengeluaran.
-     */
-    public function create()
-    {
-        $this->authorizePengeluaran();
-
-        $user = Auth::user();
-
-        // Admin Pusat dapat memilih semua cabang aktif.
-        // Admin Cabang hanya mendapatkan cabangnya sendiri.
-        $cabangs = $this->cabangAktifQuery()
-            ->orderBy('nama')
-            ->get();
-
+        // Dropdown akun beban untuk modal tambah pengeluaran.
         $akuns = Akun::where('status', 'aktif')
             ->where('tipe_akun', 'Beban/Biaya')
             ->where('kelompok_akun', 'Beban Operasional')
@@ -157,10 +135,13 @@ class PengeluaranController extends Controller
             ->orderBy('kode_akun')
             ->get();
 
-        return view(
-            'admin.pengeluaran.create',
-            compact('cabangs', 'akuns')
-        );
+        return view('admin.pengeluaran.index', compact(
+            'pengeluarans',
+            'cabangs',
+            'startDate',
+            'endDate',
+            'akuns'
+        ));
     }
 
     /**

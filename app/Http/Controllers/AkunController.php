@@ -4,10 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Akun;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AkunController extends Controller
 {
-    private function tipeKode($tipe)
+    /**
+     * Prefix tipe akun.
+     */
+    private function tipeKode(string $tipe): ?string
     {
         return [
             'Aset'        => '1',
@@ -18,18 +23,86 @@ class AkunController extends Controller
         ][$tipe] ?? null;
     }
 
-    private function kelompokKode($kelompok)
+    /**
+     * Kode awal kelompok akun.
+     */
+    private function kelompokKode(string $kelompok): ?int
     {
         return [
             'Aset'              => 1100,
             'Kewajiban'         => 1100,
             'Ekuitas'           => 1100,
             'Pendapatan Usaha'  => 1100,
-
             'HPP'               => 1100,
             'Beban Operasional' => 2100,
             'Biaya Lain-lain'   => 3100,
         ][$kelompok] ?? null;
+    }
+
+    /**
+     * Aturan kelompok yang sah untuk setiap tipe akun.
+     */
+    private function kelompokValid(string $tipe, string $kelompok): bool
+    {
+        $kelompokData = [
+            'Aset' => ['Aset'],
+            'Kewajiban' => ['Kewajiban'],
+            'Ekuitas' => ['Ekuitas'],
+            'Pendapatan' => ['Pendapatan Usaha'],
+            'Beban/Biaya' => [
+                'HPP',
+                'Beban Operasional',
+                'Biaya Lain-lain',
+            ],
+        ];
+
+        return in_array(
+            $kelompok,
+            $kelompokData[$tipe] ?? [],
+            true
+        );
+    }
+
+    /**
+     * Membuat kode akun berikutnya untuk tipe dan kelompok tertentu.
+     */
+    private function kodeBerikutnya(
+        string $tipe,
+        string $kelompok,
+        ?int $kecualiId = null
+    ): ?string {
+        $tipeKode = $this->tipeKode($tipe);
+        $kelompokKode = $this->kelompokKode($kelompok);
+
+        if (
+            !$tipeKode ||
+            $kelompokKode === null ||
+            !$this->kelompokValid($tipe, $kelompok)
+        ) {
+            return null;
+        }
+
+        $query = Akun::where('tipe_akun', $tipe)
+            ->where('kelompok_akun', $kelompok);
+
+        if ($kecualiId !== null) {
+            $query->where('id', '!=', $kecualiId);
+        }
+
+        $kodeTerakhir = $query
+            ->pluck('kode_akun')
+            ->map(function ($kode) {
+                // Format kode akun: angka tipe + tanda "-" + angka kelompok.
+                return (int) substr($kode, 2);
+            })
+            ->filter()
+            ->max();
+
+        $nomor = $kodeTerakhir
+            ? $kodeTerakhir + 100
+            : $kelompokKode;
+
+        return $tipeKode . '-' . $nomor;
     }
 
     public function index()
@@ -39,239 +112,165 @@ class AkunController extends Controller
         return view('admin.akun.index', compact('akuns'));
     }
 
-    public function create()
-    {
-        return view('admin.akun.create');
-    }
-
     public function previewKode(Request $request)
     {
         $validated = $request->validate([
-            'tipe_akun' => 'required|string',
-            'kelompok_akun' => 'required|string',
+            'tipe_akun' => [
+                'required',
+                Rule::in([
+                    'Aset',
+                    'Kewajiban',
+                    'Ekuitas',
+                    'Pendapatan',
+                    'Beban/Biaya',
+                ]),
+            ],
+            'kelompok_akun' => ['required', 'string'],
+            'id' => ['nullable', 'integer', 'exists:akuns,id'],
         ]);
 
-        $tipeKode = $this->tipeKode($validated['tipe_akun']);
-
-        $kelompokKode = $this->kelompokKode($validated['kelompok_akun']);
-
-        if (!$tipeKode || !$kelompokKode) {
-            return response()->json([
-                'kode' => null
-            ]);
-        }
-
-        $query = Akun::where(
-            'tipe_akun',
-            $validated['tipe_akun']
-        )
-        ->where(
-            'kelompok_akun',
-            $validated['kelompok_akun']
+        $kode = $this->kodeBerikutnya(
+            $validated['tipe_akun'],
+            $validated['kelompok_akun'],
+            isset($validated['id']) ? (int) $validated['id'] : null
         );
 
-        // Kalau sedang edit, jangan hitung akun yang sedang diedit
-        if ($request->filled('id')) {
-            $query->where('id', '!=', $request->id);
-        }
-
-        $akunTerakhir = $query
-            ->orderBy('kode_akun', 'desc')
-            ->first();
-
-        if (!$akunTerakhir) {
-
-            $nomorKode = $kelompokKode;
-
-        } else {
-
-            $nomorTerakhir = (int) substr(
-                $akunTerakhir->kode_akun,
-                2
-            );
-
-            $nomorKode = $nomorTerakhir + 100;
-        }
-
-        $kodeAkun = $tipeKode . '-' . $nomorKode;
-
-        return response()->json([
-            'kode' => $kodeAkun
-        ]);
+        return response()->json(['kode' => $kode]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_akun'     => 'required|string|max:255',
-            'tipe_akun'     => 'required|string',
-            'kelompok_akun' => 'required|string',
+            'nama_akun' => ['required', 'string', 'max:255'],
+            'tipe_akun' => [
+                'required',
+                Rule::in([
+                    'Aset',
+                    'Kewajiban',
+                    'Ekuitas',
+                    'Pendapatan',
+                    'Beban/Biaya',
+                ]),
+            ],
+            'kelompok_akun' => ['required', 'string'],
+        ], [
+            'nama_akun.required' => 'Nama akun wajib diisi.',
+            'tipe_akun.required' => 'Tipe akun wajib dipilih.',
+            'kelompok_akun.required' => 'Kelompok akun wajib dipilih.',
         ]);
 
-        $tipeKode = $this->tipeKode(
-            $validated['tipe_akun']
-        );
-
-        $kelompokKode = $this->kelompokKode(
+        if (!$this->kelompokValid(
+            $validated['tipe_akun'],
             $validated['kelompok_akun']
-        );
-
-        if (!$tipeKode || !$kelompokKode) {
+        )) {
             return back()
                 ->withInput()
                 ->withErrors([
-                    'kelompok_akun' => 'Tipe atau kelompok akun tidak valid.'
+                    'kelompok_akun' => 'Kelompok akun tidak sesuai dengan tipe akun yang dipilih.',
                 ]);
         }
 
-        $akunDalamKelompok = Akun::where(
-            'tipe_akun',
-            $validated['tipe_akun']
-        )
-        ->where(
-            'kelompok_akun',
-            $validated['kelompok_akun']
-        )
-        ->get();
+        DB::transaction(function () use ($validated) {
+            // Hitung ulang kode di server sebelum menyimpan.
+            $kode = $this->kodeBerikutnya(
+                $validated['tipe_akun'],
+                $validated['kelompok_akun']
+            );
 
-        if ($akunDalamKelompok->isEmpty()) {
+            if (!$kode) {
+                throw new \RuntimeException('Kode akun tidak dapat dibuat.');
+            }
 
-            // Akun pertama
-            $nomorKode = $kelompokKode;
-
-        } else {
-
-            $nomorTerakhir = $akunDalamKelompok->max(function ($akun) {
-
-                return (int) substr(
-                    $akun->kode_akun,
-                    2
-                );
-            });
-
-            $nomorKode = $nomorTerakhir + 100;
-        }
-
-        $kodeAkun =
-            $tipeKode . '-' . $nomorKode;
-
-        Akun::create([
-            'kode_akun'     => $kodeAkun,
-            'nama_akun'     => $validated['nama_akun'],
-            'tipe_akun'     => $validated['tipe_akun'],
-            'kelompok_akun' => $validated['kelompok_akun'],
-            'status'        => 'aktif',
-        ]);
-
+            Akun::create([
+                'kode_akun' => $kode,
+                'nama_akun' => $validated['nama_akun'],
+                'tipe_akun' => $validated['tipe_akun'],
+                'kelompok_akun' => $validated['kelompok_akun'],
+                'status' => 'aktif',
+            ]);
+        });
 
         return redirect()
             ->route('akun.index')
-            ->with(
-                'success',
-                'Akun berhasil ditambahkan!'
-            );
+            ->with('success', 'Akun berhasil ditambahkan!');
     }
 
     public function edit($id)
     {
         $akun = Akun::findOrFail($id);
 
-        return view(
-            'admin.akun.edit',
-            compact('akun')
-        );
+        return view('admin.akun.edit', compact('akun'));
     }
 
     public function update(Request $request, $id)
     {
         $akun = Akun::findOrFail($id);
 
-
         $validated = $request->validate([
-            'nama_akun'     => 'required|string|max:255',
-            'tipe_akun'     => 'required|string',
-            'kelompok_akun' => 'required|string',
-            'status'        => 'required|in:aktif,nonaktif',
+            'nama_akun' => ['required', 'string', 'max:255'],
+            'tipe_akun' => [
+                'required',
+                Rule::in([
+                    'Aset',
+                    'Kewajiban',
+                    'Ekuitas',
+                    'Pendapatan',
+                    'Beban/Biaya',
+                ]),
+            ],
+            'kelompok_akun' => ['required', 'string'],
+            'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
+        ], [
+            'nama_akun.required' => 'Nama akun wajib diisi.',
+            'tipe_akun.required' => 'Tipe akun wajib dipilih.',
+            'kelompok_akun.required' => 'Kelompok akun wajib dipilih.',
+            'status.required' => 'Status akun wajib dipilih.',
         ]);
 
+        if (!$this->kelompokValid(
+            $validated['tipe_akun'],
+            $validated['kelompok_akun']
+        )) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'kelompok_akun' => 'Kelompok akun tidak sesuai dengan tipe akun yang dipilih.',
+                ]);
+        }
+
+        $data = [
+            'nama_akun' => $validated['nama_akun'],
+            'tipe_akun' => $validated['tipe_akun'],
+            'kelompok_akun' => $validated['kelompok_akun'],
+            'status' => $validated['status'],
+        ];
+
+        // Pertahankan kode jika tipe dan kelompok tidak berubah.
         if (
             $akun->tipe_akun !== $validated['tipe_akun'] ||
             $akun->kelompok_akun !== $validated['kelompok_akun']
         ) {
-
-            $tipeKode = $this->tipeKode(
-                $validated['tipe_akun']
+            $kode = $this->kodeBerikutnya(
+                $validated['tipe_akun'],
+                $validated['kelompok_akun'],
+                (int) $akun->id
             );
 
-            $kelompokKode = $this->kelompokKode(
-                $validated['kelompok_akun']
-            );
-
-
-            if (!$tipeKode || !$kelompokKode) {
-
+            if (!$kode) {
                 return back()
                     ->withInput()
                     ->withErrors([
-                        'kelompok_akun' =>
-                            'Tipe atau kelompok akun tidak valid.'
+                        'kelompok_akun' => 'Kode akun tidak dapat dibuat.',
                     ]);
             }
 
-
-            $prefix =
-                $tipeKode . '-' . $kelompokKode;
-
-
-            $akunTerakhir = Akun::where(
-                'kode_akun',
-                'like',
-                $prefix . '%'
-            )
-            ->where('id', '!=', $akun->id)
-            ->orderBy('kode_akun', 'desc')
-            ->first();
-
-
-            if ($akunTerakhir) {
-
-                $nomorTerakhir = (int) substr(
-                    $akunTerakhir->kode_akun,
-                    -4
-                );
-
-                $nomorBaru = $nomorTerakhir + 100;
-
-            } else {
-
-                $nomorBaru = 100;
-            }
-
-
-            $validated['kode_akun'] =
-                $prefix .
-                str_pad(
-                    $nomorBaru,
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                );
-
-        } else {
-
-            $validated['kode_akun'] =
-                $akun->kode_akun;
+            $data['kode_akun'] = $kode;
         }
 
-
-        $akun->update($validated);
-
+        $akun->update($data);
 
         return redirect()
             ->route('akun.index')
-            ->with(
-                'success',
-                'Akun berhasil diperbarui!'
-            );
+            ->with('success', 'Akun berhasil diperbarui!');
     }
 }
