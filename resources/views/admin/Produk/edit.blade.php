@@ -26,8 +26,21 @@
                 </div>
             </div>
             <div class="flex gap-3">
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium">Perbarui Produk</button>
-                <a href="{{ route('produk.index') }}" class="bg-gray-100 text-gray-600 px-6 py-2 rounded-lg font-medium">Batal</a>
+                <button
+                    type="submit"
+                    class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+                >
+                    <i class="fa-solid fa-floppy-disk mr-2"></i>
+                    Perbarui Produk
+                </button>
+
+                <a
+                    href="{{ route('produk.index') }}"
+                    class="bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition"
+                >
+                    <i class="fa-solid fa-xmark mr-2"></i>
+                    Batal
+                </a>
             </div>
         </form>
     </div>

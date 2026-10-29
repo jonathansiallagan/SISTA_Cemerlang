@@ -80,13 +80,15 @@
                     type="submit"
                     class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
                 >
+                    <i class="fa-solid fa-floppy-disk mr-2"></i>
                     Simpan Perubahan
                 </button>
 
                 <a
                     href="{{ route('cabang.index') }}"
-                    class="bg-gray-100 text-gray-600 px-6 py-2 rounded-lg hover:bg-gray-200 transition font-medium"
+                    class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition font-medium"
                 >
+                    <i class="fa-solid fa-xmark mr-2"></i>
                     Batal
                 </a>
             </div>

@@ -136,10 +136,11 @@
                             </div>
 
                             <button type="button"
-                                    id="tambah-produk"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-xl transition">
-                                + Tambah Produk
-                            </button>
+                                id="tambah-produk"
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-xl transition">
+                            <i class="fa-solid fa-plus mr-1"></i>
+                            Tambah Produk
+                        </button>
                         </div>
 
                         {{-- BARIS PRODUK DITAMBAHKAN OLEH JAVASCRIPT --}}
@@ -148,7 +149,8 @@
                         <button type="button"
                                 id="tambah-produk-bawah"
                                 class="w-full mt-4 border-2 border-dashed border-blue-300 hover:border-blue-500 hover:bg-blue-50 text-blue-700 font-semibold rounded-xl p-4 transition">
-                            + Tambah Produk Lain
+                            <i class="fa-solid fa-plus mr-1"></i>
+                            Tambah Produk Lain
                             <span class="block text-xs font-normal mt-1">
                                 Produk baru akan muncul di paling atas.
                             </span>
@@ -216,6 +218,7 @@
                             <button type="submit"
                                     id="tombol-proses"
                                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-3 rounded-xl mt-5 transition">
+                                <i class="fa-solid fa-cash-register mr-2"></i>
                                 Proses Transaksi
                             </button>
 
@@ -254,6 +257,7 @@
 
                 <button type="button"
                         class="hapus-produk flex-shrink-0 text-sm font-semibold text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg">
+                    <i class="fa-solid fa-trash mr-1"></i>
                     Hapus
                 </button>
             </div>
