@@ -122,11 +122,17 @@
                                     </td>
 
                                     <td class="text-center align-middle text-nowrap">
-                                        <a href="{{ route('bahan-baku.edit', $bahan->id) }}"
-                                           class="btn btn-primary btn-sm"
-                                           title="Edit Bahan Baku">
+                                        <button type="button"
+                                                class="btn btn-primary btn-sm btn-edit-bahan"
+                                                data-id="{{ $bahan->id }}"
+                                                data-url="{{ route('bahan-baku.update', $bahan->id) }}"
+                                                data-kode="{{ $bahan->kode_bahan }}"
+                                                data-nama="{{ $bahan->nama_bahan }}"
+                                                data-spesifikasi="{{ $bahan->spesifikasi }}"
+                                                data-satuan="{{ $bahan->satuan }}"
+                                                data-status="{{ $bahan->status }}">
                                             <i class="fas fa-edit"></i>
-                                        </a>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -196,7 +202,7 @@
 
                     <div class="modal-body">
 
-                        @if ($errors->any())
+                        @if ($errors->any() && !old('edit_bahan_id'))
                             <div class="alert alert-danger">
                                 <strong>
                                     <i class="fas fa-exclamation-circle mr-1"></i>
@@ -356,6 +362,141 @@
         </div>
     </div>
 
+    {{-- MODAL EDIT BAHAN BAKU --}}
+    <div class="modal fade"
+        id="modalEditBahan"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="judulModalEditBahan"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered"
+            role="document">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white"
+                        id="judulModalEditBahan">
+                        <i class="fas fa-edit mr-2"></i>
+                        Edit Bahan Baku
+                    </h5>
+
+                    <button type="button"
+                            class="close text-white"
+                            data-dismiss="modal"
+                            aria-label="Tutup">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form id="formEditBahan" method="POST" action="#">
+                    @csrf
+                    @method('PUT')
+
+                    <input type="hidden"
+                        name="edit_bahan_id"
+                        id="editBahanId">
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label for="editKodeBahan">Kode Bahan</label>
+                            <input type="text"
+                                name="kode_bahan"
+                                id="editKodeBahan"
+                                class="form-control bg-light"
+                                readonly
+                                required>
+                            <small class="text-muted">
+                                Kode bahan dibuat otomatis oleh sistem.
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editNamaBahan">
+                                Nama Bahan <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                name="nama_bahan"
+                                id="editNamaBahan"
+                                class="form-control"
+                                maxlength="255"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editSpesifikasiBahan">Spesifikasi</label>
+                            <input type="text"
+                                name="spesifikasi"
+                                id="editSpesifikasiBahan"
+                                class="form-control"
+                                maxlength="255">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editSatuanBahan">
+                                Satuan <span class="text-danger">*</span>
+                            </label>
+                            <select name="satuan"
+                                    id="editSatuanBahan"
+                                    class="form-control"
+                                    required>
+                                <option value="">-- Pilih Satuan --</option>
+                                @foreach ([
+                                    'lembar',
+                                    'rim',
+                                    'pcs',
+                                    'roll',
+                                    'meter',
+                                    'm2',
+                                    'kg',
+                                    'liter',
+                                    'botol',
+                                    'pak'
+                                ] as $satuan)
+                                    <option value="{{ $satuan }}">
+                                        {{ ucfirst($satuan) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-0">
+                            <label for="editStatusBahan">
+                                Status <span class="text-danger">*</span>
+                            </label>
+                            <select name="status"
+                                    id="editStatusBahan"
+                                    class="form-control"
+                                    required>
+                                <option value="aktif">Aktif</option>
+                                <option value="nonaktif">Nonaktif</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-dismiss="modal">
+                            <i class="fas fa-times mr-1"></i>
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                                id="btnUpdateBahan"
+                                class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
     {{-- SCRIPT MODAL --}}
     @push('scripts')
         <script>
@@ -382,7 +523,7 @@
                 });
 
                 // Tampilkan kembali modal jika validasi gagal.
-                @if ($errors->any())
+                @if ($errors->any() && !old('edit_bahan_id'))
                     if (window.jQuery &&
                         typeof jQuery.fn.modal === 'function') {
                         jQuery(modal).modal('show');
@@ -390,6 +531,89 @@
                 @endif
             });
         </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const modal = document.getElementById('modalEditBahan');
+                const form = document.getElementById('formEditBahan');
+                const tombolUpdate = document.getElementById('btnUpdateBahan');
+
+                if (!modal || !form) {
+                    return;
+                }
+
+                // Memindahkan modal ke body agar tampil dengan benar.
+                document.body.appendChild(modal);
+
+                const idInput = document.getElementById('editBahanId');
+                const kodeInput = document.getElementById('editKodeBahan');
+                const namaInput = document.getElementById('editNamaBahan');
+                const spesifikasiInput = document.getElementById('editSpesifikasiBahan');
+                const satuanInput = document.getElementById('editSatuanBahan');
+                const statusInput = document.getElementById('editStatusBahan');
+
+                document.querySelectorAll('.btn-edit-bahan').forEach(function (tombol) {
+                    tombol.addEventListener('click', function () {
+                        idInput.value = this.dataset.id || '';
+                        kodeInput.value = this.dataset.kode || '';
+                        namaInput.value = this.dataset.nama || '';
+                        spesifikasiInput.value = this.dataset.spesifikasi || '';
+                        satuanInput.value = this.dataset.satuan || '';
+                        statusInput.value = this.dataset.status || 'aktif';
+
+                        form.action = this.dataset.url || '';
+
+                        tombolUpdate.disabled = false;
+                        tombolUpdate.innerHTML =
+                            '<i class="fas fa-save mr-1"></i> Simpan Perubahan';
+
+                        if (window.jQuery && typeof jQuery.fn.modal === 'function') {
+                            jQuery(modal).modal('show');
+                        } else {
+                            console.error('Bootstrap Modal tidak tersedia.');
+                        }
+                    });
+                });
+
+                // Mencegah form dikirim jika URL update belum tersedia.
+                form.addEventListener('submit', function (event) {
+                    if (!form.action || form.action.endsWith('#')) {
+                        event.preventDefault();
+                        alert('URL update bahan baku belum tersedia.');
+                        return;
+                    }
+
+                    tombolUpdate.disabled = true;
+                    tombolUpdate.innerHTML =
+                        '<i class="fas fa-spinner fa-spin mr-1"></i> Memperbarui...';
+                });
+
+                // Buka kembali modal Edit jika validasi update gagal.
+                const oldEditId = @json(old('edit_bahan_id'));
+
+                if (oldEditId) {
+                    const tombolLama = Array.from(
+                        document.querySelectorAll('.btn-edit-bahan')
+                    ).find(function (tombol) {
+                        return String(tombol.dataset.id) === String(oldEditId);
+                    });
+
+                    if (tombolLama) {
+                        idInput.value = oldEditId;
+                        kodeInput.value = @json(old('kode_bahan', ''));
+                        namaInput.value = @json(old('nama_bahan', ''));
+                        spesifikasiInput.value = @json(old('spesifikasi', ''));
+                        satuanInput.value = @json(old('satuan', ''));
+                        statusInput.value = @json(old('status', 'aktif'));
+                        form.action = tombolLama.dataset.url || '';
+
+                        if (window.jQuery && typeof jQuery.fn.modal === 'function') {
+                            jQuery(modal).modal('show');
+                        }
+                    }
+                }
+            });
+            </script>
     @endpush
 
 </x-admin-layout-stisla>
