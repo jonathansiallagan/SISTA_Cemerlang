@@ -16,7 +16,6 @@ class UserController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Cabang aktif untuk pilihan penempatan di modal tambah pengguna.
         $cabangs = Cabang::where('status', 'aktif')
             ->orderBy('nama')
             ->get();
@@ -26,7 +25,6 @@ class UserController extends Controller
 
     public function create()
     {
-        // Tetap dipertahankan untuk kompatibilitas dengan route lama.
         $cabangs = Cabang::where('status', 'aktif')
             ->orderBy('nama')
             ->get();
@@ -40,16 +38,15 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
-                'string',
                 'email',
                 'max:255',
-                'unique:users,email',
+                Rule::unique('users', 'email'),
             ],
             'username' => [
                 'required',
                 'string',
                 'max:255',
-                'unique:users,username',
+                Rule::unique('users', 'username'),
             ],
             'password' => ['required', 'string', 'min:8'],
             'role' => [
@@ -70,18 +67,18 @@ class UserController extends Controller
             'name.max' => 'Nama lengkap maksimal 255 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
-            'email.unique' => 'Email sudah digunakan oleh pengguna lain.',
+            'email.unique' => 'Email sudah digunakan pengguna lain.',
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username sudah digunakan.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
             'role.required' => 'Role wajib dipilih.',
             'role.in' => 'Role yang dipilih tidak valid.',
-            'cabang_id.required_if' => 'Admin Cabang wajib memiliki penempatan cabang.',
+            'cabang_id.required_if' =>
+                'Admin Cabang wajib memiliki penempatan cabang.',
             'cabang_id.exists' => 'Cabang yang dipilih tidak valid.',
         ]);
 
-        // Admin Pusat tidak ditempatkan pada cabang tertentu.
         if ($validated['role'] === 'Admin Pusat') {
             $validated['cabang_id'] = null;
         }
@@ -100,17 +97,6 @@ class UserController extends Controller
             ->with('success', 'Pengguna baru berhasil ditambahkan!');
     }
 
-    public function edit($id)
-    {
-        $user = User::findOrFail($id);
-
-        $cabangs = Cabang::where('status', 'aktif')
-            ->orderBy('nama')
-            ->get();
-
-        return view('admin.user.edit', compact('user', 'cabangs'));
-    }
-
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -119,7 +105,6 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
-                'string',
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->ignore($user->id),
@@ -146,6 +131,7 @@ class UserController extends Controller
             ],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
+            'name.max' => 'Nama lengkap maksimal 255 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan pengguna lain.',
@@ -154,7 +140,8 @@ class UserController extends Controller
             'password.min' => 'Password minimal 8 karakter.',
             'role.required' => 'Role wajib dipilih.',
             'role.in' => 'Role yang dipilih tidak valid.',
-            'cabang_id.required_if' => 'Admin Cabang wajib memiliki penempatan cabang.',
+            'cabang_id.required_if' =>
+                'Admin Cabang wajib memiliki penempatan cabang.',
             'cabang_id.exists' => 'Cabang yang dipilih tidak valid.',
         ]);
 
@@ -170,6 +157,7 @@ class UserController extends Controller
             'cabang_id' => $validated['cabang_id'] ?? null,
         ];
 
+        // Password hanya diperbarui jika pengguna mengisinya.
         if (!empty($validated['password'])) {
             $data['password'] = Hash::make($validated['password']);
         }

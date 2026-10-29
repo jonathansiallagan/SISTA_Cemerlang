@@ -194,83 +194,31 @@ class AkunController extends Controller
             ->route('akun.index')
             ->with('success', 'Akun berhasil ditambahkan!');
     }
-
-    public function edit($id)
-    {
-        $akun = Akun::findOrFail($id);
-
-        return view('admin.akun.edit', compact('akun'));
-    }
-
+    
     public function update(Request $request, $id)
     {
         $akun = Akun::findOrFail($id);
 
         $validated = $request->validate([
             'nama_akun' => ['required', 'string', 'max:255'],
-            'tipe_akun' => [
-                'required',
-                Rule::in([
-                    'Aset',
-                    'Kewajiban',
-                    'Ekuitas',
-                    'Pendapatan',
-                    'Beban/Biaya',
-                ]),
-            ],
-            'kelompok_akun' => ['required', 'string'],
             'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
         ], [
             'nama_akun.required' => 'Nama akun wajib diisi.',
-            'tipe_akun.required' => 'Tipe akun wajib dipilih.',
-            'kelompok_akun.required' => 'Kelompok akun wajib dipilih.',
+            'nama_akun.max' => 'Nama akun maksimal 255 karakter.',
             'status.required' => 'Status akun wajib dipilih.',
+            'status.in' => 'Status akun tidak valid.',
         ]);
 
-        if (!$this->kelompokValid(
-            $validated['tipe_akun'],
-            $validated['kelompok_akun']
-        )) {
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'kelompok_akun' => 'Kelompok akun tidak sesuai dengan tipe akun yang dipilih.',
-                ]);
-        }
-
-        $data = [
+        // Hanya nama dan status yang boleh diperbarui.
+        // Kode, tipe, dan kelompok akun tetap seperti semula.
+        $akun->update([
             'nama_akun' => $validated['nama_akun'],
-            'tipe_akun' => $validated['tipe_akun'],
-            'kelompok_akun' => $validated['kelompok_akun'],
             'status' => $validated['status'],
-        ];
-
-        // Pertahankan kode jika tipe dan kelompok tidak berubah.
-        if (
-            $akun->tipe_akun !== $validated['tipe_akun'] ||
-            $akun->kelompok_akun !== $validated['kelompok_akun']
-        ) {
-            $kode = $this->kodeBerikutnya(
-                $validated['tipe_akun'],
-                $validated['kelompok_akun'],
-                (int) $akun->id
-            );
-
-            if (!$kode) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'kelompok_akun' => 'Kode akun tidak dapat dibuat.',
-                    ]);
-            }
-
-            $data['kode_akun'] = $kode;
-        }
-
-        $akun->update($data);
+        ]);
 
         return redirect()
             ->route('akun.index')
             ->with('success', 'Akun berhasil diperbarui!');
     }
+
 }

@@ -113,11 +113,20 @@
                                     </td>
 
                                     <td class="text-center align-middle text-nowrap">
-                                        <a href="{{ route('akun.edit', $akun->id) }}"
-                                           class="btn btn-primary btn-sm"
-                                           title="Edit Akun">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
+                                        <button type="button"
+                                            class="btn btn-primary btn-sm btn-edit-akun"
+                                            title="Edit Akun"
+                                            data-toggle="modal"
+                                            data-target="#modalEditAkun"
+                                            data-id="{{ $akun->id }}"
+                                            data-url="{{ route('akun.update', $akun->id) }}"
+                                            data-kode="{{ $akun->kode_akun }}"
+                                            data-nama="{{ $akun->nama_akun }}"
+                                            data-tipe="{{ $akun->tipe_akun }}"
+                                            data-kelompok="{{ $akun->kelompok_akun }}"
+                                            data-status="{{ $akun->status }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                     </td>
                                 </tr>
                             @empty
@@ -463,5 +472,237 @@
             });
         </script>
     @endpush
+
+    
+{{-- MODAL EDIT AKUN --}}
+<div class="modal fade"
+     id="modalEditAkun"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="judulModalEditAkun"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered"
+         role="document"
+         style="max-width: 650px; width: calc(100% - 30px);">
+
+        <div class="modal-content"
+             style="border-radius: 10px; overflow: hidden;">
+
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white"
+                    id="judulModalEditAkun">
+                    <i class="fas fa-edit mr-2"></i>
+                    Edit Akun
+                </h5>
+
+                <button type="button"
+                        class="close text-white"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form id="formEditAkun" method="POST" action="#">
+                @csrf
+                @method('PUT')
+
+                <input type="hidden"
+                       name="akun_id"
+                       id="edit_akun_id">
+
+                <div class="modal-body">
+
+                    @if ($errors->any() && old('akun_id'))
+                        <div class="alert alert-danger">
+                            <strong>Gagal memperbarui akun.</strong>
+                            <ul class="mb-0 mt-2 pl-3">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- KODE AKUN --}}
+                    <div class="form-group">
+                        <label for="edit_kode_akun">Kode Akun</label>
+                        <input type="text"
+                               id="edit_kode_akun"
+                               class="form-control bg-light"
+                               readonly>
+                        <small class="form-text text-muted">
+                            Kode akun tidak dapat diubah.
+                        </small>
+                    </div>
+
+                    {{-- NAMA AKUN --}}
+                    <div class="form-group">
+                        <label for="edit_nama_akun">
+                            Nama Akun <span class="text-danger">*</span>
+                        </label>
+
+                        <input type="text"
+                               name="nama_akun"
+                               id="edit_nama_akun"
+                               class="form-control @error('nama_akun') is-invalid @enderror"
+                               value="{{ old('nama_akun') }}"
+                               maxlength="255"
+                               required>
+
+                        @error('nama_akun')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+
+                    {{-- TIPE AKUN --}}
+                    <div class="form-group">
+                        <label for="edit_tipe_akun">Tipe Akun</label>
+                        <input type="text"
+                               id="edit_tipe_akun"
+                               class="form-control bg-light"
+                               readonly>
+                        <small class="form-text text-muted">
+                            Tipe akun tidak dapat diubah.
+                        </small>
+                    </div>
+
+                    {{-- KELOMPOK AKUN --}}
+                    <div class="form-group">
+                        <label for="edit_kelompok_akun">Kelompok Akun</label>
+                        <input type="text"
+                               id="edit_kelompok_akun"
+                               class="form-control bg-light"
+                               readonly>
+                        <small class="form-text text-muted">
+                            Kelompok akun tidak dapat diubah.
+                        </small>
+                    </div>
+
+                    {{-- STATUS --}}
+                    <div class="form-group mb-0">
+                        <label for="edit_status">
+                            Status <span class="text-danger">*</span>
+                        </label>
+
+                        <select name="status"
+                                id="edit_status"
+                                class="form-control @error('status') is-invalid @enderror"
+                                required>
+                            <option value="aktif">Aktif</option>
+                            <option value="nonaktif">Nonaktif</option>
+                        </select>
+
+                        @error('status')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+
+                        <small class="form-text text-muted">
+                            Pastikan akun yang dinonaktifkan tidak lagi
+                            diperlukan untuk transaksi baru.
+                        </small>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i>
+                        Batal
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary"
+                            id="btnUpdateAkun">
+                        <i class="fas fa-save mr-1"></i>
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('modalEditAkun');
+    const form = document.getElementById('formEditAkun');
+
+    if (!modal || !form) return;
+
+    // Hindari masalah posisi modal pada layout Stisla.
+    document.body.appendChild(modal);
+
+    const field = {
+        id: document.getElementById('edit_akun_id'),
+        kode: document.getElementById('edit_kode_akun'),
+        nama: document.getElementById('edit_nama_akun'),
+        tipe: document.getElementById('edit_tipe_akun'),
+        kelompok: document.getElementById('edit_kelompok_akun'),
+        status: document.getElementById('edit_status')
+    };
+
+    function isiModal(tombol) {
+        field.id.value = tombol.dataset.id;
+        field.kode.value = tombol.dataset.kode;
+        field.nama.value = tombol.dataset.nama;
+        field.tipe.value = tombol.dataset.tipe;
+        field.kelompok.value = tombol.dataset.kelompok;
+        field.status.value = tombol.dataset.status;
+
+        form.action = tombol.dataset.url;
+    }
+
+    document.querySelectorAll('.btn-edit-akun').forEach(function (tombol) {
+        tombol.addEventListener('click', function () {
+            isiModal(this);
+        });
+    });
+
+    // Cegah pengiriman formulir berkali-kali.
+    form.addEventListener('submit', function () {
+        const tombol = document.getElementById('btnUpdateAkun');
+
+        tombol.disabled = true;
+        tombol.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
+    });
+
+    // Buka kembali modal jika validasi gagal.
+    const oldId = @json(old('akun_id'));
+
+    if (oldId) {
+        const tombolLama = Array.from(
+            document.querySelectorAll('.btn-edit-akun')
+        ).find(function (tombol) {
+            return tombol.dataset.id === String(oldId);
+        });
+
+        if (tombolLama) {
+            isiModal(tombolLama);
+
+            // Pulihkan input yang dikirim sebelum validasi gagal.
+            field.nama.value = @json(old('nama_akun', ''));
+            field.status.value = @json(old('status', 'aktif'));
+
+            if (window.jQuery && typeof jQuery.fn.modal === 'function') {
+                jQuery(modal).modal('show');
+            }
+        }
+    }
+});
+</script>
+@endpush
+
 
 </x-admin-layout-stisla>

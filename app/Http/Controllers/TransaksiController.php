@@ -162,26 +162,32 @@ class TransaksiController extends Controller
 
         try {
             DB::transaction(function () use ($validated, $user) {
-                $akunKas = Akun::where('nama_akun', 'Kas')
+                $akunKas = Akun::where('kode_akun', '1-1100')
                     ->where('status', 'aktif')
                     ->first();
 
-                $akunPendapatan = Akun::where('nama_akun', 'Pendapatan Penjualan')
+                $akunPendapatan = Akun::where('kode_akun', '4-1100')
                     ->where('status', 'aktif')
                     ->first();
 
-                $akunHpp = Akun::where('nama_akun', 'Harga Pokok Produksi')
+                $akunHpp = Akun::where('kode_akun', '5-1100')
                     ->where('status', 'aktif')
                     ->first();
 
-                $akunPersediaan = Akun::where('nama_akun', 'Persediaan')
+                $akunPersediaan = Akun::where('kode_akun', '1-1300')
                     ->where('status', 'aktif')
                     ->first();
 
-                if (!$akunKas || !$akunPendapatan || !$akunHpp || !$akunPersediaan) {
+                if (
+                    !$akunKas ||
+                    !$akunPendapatan ||
+                    !$akunHpp ||
+                    !$akunPersediaan
+                ) {
                     throw new \RuntimeException(
-                        'Akun Kas, Pendapatan Penjualan, Harga Pokok Produksi, '
-                        . 'atau Persediaan belum tersedia atau tidak aktif.'
+                        'Akun Kas, Pendapatan Penjualan, HPP, atau Persediaan '
+                        . 'belum tersedia atau tidak aktif. '
+                        . 'Periksa kode akun pada menu Akun.'
                     );
                 }
 

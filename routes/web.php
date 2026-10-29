@@ -135,14 +135,12 @@ Route::middleware(['auth'])->group(function () {
         // === ROUTE MASTER DATA USER ===
         Route::get('/user', [UserController::class, 'index'])->name('user.index');
         Route::post('/user', [UserController::class, 'store'])->name('user.store');
-        Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
         Route::put('/user/{id}', [UserController::class, 'update'])->name('user.update');
         Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('user.destroy');
 
         // === ROUTE MASTER DATA AKUN ===
         Route::get('/akun', [AkunController::class, 'index'])->name('akun.index');
         Route::post('/akun', [AkunController::class, 'store'])->name('akun.store');
-        Route::get('/akun/{id}/edit', [AkunController::class, 'edit'])->name('akun.edit');
         Route::put('/akun/{id}', [AkunController::class, 'update'])->name('akun.update');
         Route::get('/akun/preview-kode', [AkunController::class, 'previewKode'])->name('akun.preview-kode');
     });
