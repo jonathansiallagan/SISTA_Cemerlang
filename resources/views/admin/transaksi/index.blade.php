@@ -1,34 +1,36 @@
 <x-admin-layout-stisla>
     {{-- HEADER HALAMAN --}}
-    <div class="section-header">
-        <h1>Riwayat Transaksi</h1>
+    <div
+        class="mb-[30px] flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[3px] bg-white px-[30px] py-5 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+        <h1 class="text-2xl font-bold text-[#34395e]">Riwayat Transaksi</h1>
 
-        <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item">
-                <a href="{{ route('transaksi.index') }}">Transaksi</a>
-            </div>
-            <div class="breadcrumb-item active">Riwayat Transaksi</div>
-        </div>
+        <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
+            <li>
+                <a href="{{ route('transaksi.index') }}" class="hover:text-[#6777ef]">Transaksi</a>
+            </li>
+            <li
+                class="font-semibold text-[#6777ef] before:px-2 before:font-normal before:text-[#6c757d] before:content-['/']">
+                Riwayat Transaksi
+            </li>
+        </ol>
     </div>
 
-    <div class="section-body">
+    <div>
 
         {{-- DESKRIPSI DAN EXPORT --}}
-        <div class="row align-items-center mb-2">
-            <div class="col-md-6">
-                <p class="text-muted mb-0">
-                    Riwayat transaksi dan rincian produk.
-                </p>
-            </div>
+        <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <p class="text-[#6c757d]">
+                Riwayat transaksi dan rincian produk.
+            </p>
 
-            <div class="col-md-6 text-md-right mt-1 mt-md-0">
+            <div class="flex flex-wrap gap-1">
                 <a href="{{ route('transaksi.export.pdf', request()->query()) }}"
-                   class="btn btn-danger btn-sm">
+                    class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#fb160a]">
                     <i class="fas fa-file-pdf mr-1"></i> Export PDF
                 </a>
 
                 <a href="{{ route('transaksi.export.excel', request()->query()) }}"
-                   class="btn btn-success btn-sm">
+                    class="inline-flex items-center rounded-[3px] bg-[#54ca68] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#3fb556]">
                     <i class="fas fa-file-excel mr-1"></i> Export Excel
                 </a>
             </div>
@@ -36,242 +38,233 @@
 
         {{-- NOTIFIKASI --}}
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show py-2 mb-3">
-                {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
+            <div role="alert"
+                class="mb-4 flex items-center rounded-[3px] border-l-[3px] border-black/20 bg-[#54ca68] px-5 py-2 text-white">
+                <span class="min-w-0">{{ session('success') }}</span>
+                <button type="button" aria-label="Tutup" onclick="this.closest('[role=alert]').remove()"
+                    class="ml-auto pl-4 text-2xl leading-none text-white/80 hover:text-white">&times;</button>
             </div>
         @endif
 
         @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3">
-                {{ session('error') }}
-                <button type="button" class="close" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
+            <div role="alert"
+                class="mb-4 flex items-center rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2 text-white">
+                <span class="min-w-0">{{ session('error') }}</span>
+                <button type="button" aria-label="Tutup" onclick="this.closest('[role=alert]').remove()"
+                    class="ml-auto pl-4 text-2xl leading-none text-white/80 hover:text-white">&times;</button>
             </div>
         @endif
 
         {{-- FILTER TRANSAKSI: RINGKAS --}}
-        <div class="card mb-2">
-            <div class="card-body py-3 px-4">
-                <form action="{{ route('transaksi.index') }}" method="GET">
-                    <div class="form-row align-items-end">
+        <div class="mb-2 rounded-[3px] bg-white px-6 py-4 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+            <form action="{{ route('transaksi.index') }}" method="GET"
+                class="grid grid-cols-1 items-end gap-x-2.5 gap-y-2 md:grid-cols-2 lg:grid-cols-4">
 
-                        {{-- TANGGAL MULAI --}}
-                        <div class="form-group col-lg-3 col-md-6 mb-2">
-                            <label for="tanggal_mulai" class="mb-1">
-                                Tanggal Mulai
-                            </label>
-                            <input type="date"
-                                   id="tanggal_mulai"
-                                   name="tanggal_mulai"
-                                   value="{{ request('tanggal_mulai') }}"
-                                   class="form-control form-control-sm">
-                        </div>
+                {{-- TANGGAL MULAI --}}
+                <div>
+                    <label for="tanggal_mulai"
+                        class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Tanggal Mulai
+                    </label>
+                    <input type="date" id="tanggal_mulai" name="tanggal_mulai"
+                        value="{{ request('tanggal_mulai') }}"
+                        class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                </div>
 
-                        {{-- TANGGAL AKHIR --}}
-                        <div class="form-group col-lg-3 col-md-6 mb-2">
-                            <label for="tanggal_akhir" class="mb-1">
-                                Tanggal Akhir
-                            </label>
-                            <input type="date"
-                                   id="tanggal_akhir"
-                                   name="tanggal_akhir"
-                                   value="{{ request('tanggal_akhir') }}"
-                                   class="form-control form-control-sm">
-                        </div>
+                {{-- TANGGAL AKHIR --}}
+                <div>
+                    <label for="tanggal_akhir"
+                        class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Tanggal Akhir
+                    </label>
+                    <input type="date" id="tanggal_akhir" name="tanggal_akhir"
+                        value="{{ request('tanggal_akhir') }}"
+                        class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                </div>
 
-                        {{-- CABANG --}}
-                        @if (auth()->user()->role === 'Admin Pusat')
-                            <div class="form-group col-lg-3 col-md-6 mb-2">
-                                <label for="cabang_id" class="mb-1">
-                                    Cabang
-                                </label>
-                                <select id="cabang_id"
-                                        name="cabang_id"
-                                        class="form-control form-control-sm">
-                                    <option value="">Semua Cabang</option>
+                {{-- CABANG --}}
+                @if (auth()->user()->role === 'Admin Pusat')
+                    <div>
+                        <label for="cabang_id"
+                            class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                            Cabang
+                        </label>
+                        <select id="cabang_id" name="cabang_id"
+                            class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                            <option value="">Semua Cabang</option>
 
-                                    @foreach ($cabangs as $cabang)
-                                        <option value="{{ $cabang->id }}"
-                                            @selected((string) request('cabang_id') === (string) $cabang->id)>
-                                            {{ $cabang->nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endif
-
-                        {{-- TOMBOL --}}
-                        <div class="form-group col-lg-3 col-md-6 mb-3">
-                            <div class="d-flex align-items-center">
-                                <button type="submit"
-                                        class="btn btn-primary btn-sm mr-2">
-                                    <i class="fas fa-filter mr-1"></i> Filter
-                                </button>
-
-                                <a href="{{ route('transaksi.index') }}"
-                                   class="btn btn-light btn-sm">
-                                    <i class="fas fa-redo mr-1"></i> Reset
-                                </a>
-                            </div>
-                        </div>
-
+                            @foreach ($cabangs as $cabang)
+                                <option value="{{ $cabang->id }}" @selected((string) request('cabang_id') === (string) $cabang->id)>
+                                    {{ $cabang->nama }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                </form>
-            </div>
+                @endif
+
+                {{-- TOMBOL --}}
+                <div class="flex items-center gap-2">
+                    <button type="submit"
+                        class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                        <i class="fas fa-filter mr-1"></i> Filter
+                    </button>
+
+                    <a href="{{ route('transaksi.index') }}"
+                        class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                        <i class="fas fa-redo mr-1"></i> Reset
+                    </a>
+                </div>
+            </form>
         </div>
 
         {{-- TABEL RIWAYAT TRANSAKSI --}}
-        <div class="card">
-            <div class="card-header bg-primary py-2">
-                <h4 class="text-white mb-0">
+        <div class="overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+            <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
+                <h4 class="text-base font-semibold leading-7 text-white">
                     <i class="fas fa-table mr-2"></i>
                     Data Riwayat Transaksi
                 </h4>
             </div>
 
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sista">
-                        <thead>
-                            <tr>
-                                <th class="text-center text-nowrap">#</th>
-                                <th class="text-nowrap">No Referensi</th>
-                                <th class="text-nowrap">Tanggal</th>
-                                <th>Pelanggan</th>
-                                <th>Cabang</th>
-                                <th>Nama Produk</th>
-                                <th class="text-right">Qty</th>
-                                <th>Satuan</th>
-                                <th class="text-right text-nowrap">Total Transaksi</th>
-                            </tr>
-                        </thead>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-[13px]">
+                    <thead>
+                        <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
+                            <th class="h-[45px] whitespace-nowrap bg-black/[0.04] px-[15px] text-center">#</th>
+                            <th class="h-[45px] whitespace-nowrap bg-black/[0.04] px-[15px] text-left">No Referensi</th>
+                            <th class="h-[45px] whitespace-nowrap bg-black/[0.04] px-[15px] text-left">Tanggal</th>
+                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Pelanggan</th>
+                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Cabang</th>
+                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Nama Produk</th>
+                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-right">Qty</th>
+                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Satuan</th>
+                            <th class="h-[45px] whitespace-nowrap bg-black/[0.04] px-[15px] text-right">Total Transaksi
+                            </th>
+                        </tr>
+                    </thead>
 
-                        <tbody>
-                            @forelse ($transaksis as $trx)
-                                @php
-                                    $details = $trx->detailTransaksis;
-                                    $jumlahBaris = $details->count();
-                                @endphp
+                    <tbody>
+                        @forelse ($transaksis as $trx)
+                            @php
+                                $details = $trx->detailTransaksis;
+                                $jumlahBaris = $details->count();
+                            @endphp
 
-                                @forelse ($details as $detail)
-                                    <tr>
-                                        @if ($loop->first)
-                                            {{-- NOMOR URUT --}}
-                                            <td rowspan="{{ $jumlahBaris }}"
-                                                class="text-center align-middle text-muted">
-                                                {{ $loop->parent->iteration }}
-                                            </td>
-
-                                            {{-- NO REFERENSI --}}
-                                            <td rowspan="{{ $jumlahBaris }}"
-                                                class="align-middle font-weight-bold text-primary text-nowrap">
-                                                {{ $trx->no_referensi }}
-                                            </td>
-
-                                            {{-- TANGGAL --}}
-                                            <td rowspan="{{ $jumlahBaris }}"
-                                                class="align-middle text-nowrap">
-                                                {{ \Carbon\Carbon::parse($trx->tanggal)->format('d M Y') }}
-                                            </td>
-
-                                            {{-- PELANGGAN --}}
-                                            <td rowspan="{{ $jumlahBaris }}"
-                                                class="align-middle">
-                                                {{ $trx->nama_pelanggan }}
-                                            </td>
-
-                                            {{-- CABANG --}}
-                                            <td rowspan="{{ $jumlahBaris }}"
-                                                class="align-middle">
-                                                {{ $trx->cabang->nama ?? '-' }}
-                                            </td>
-                                        @endif
-
-                                        {{-- NAMA PRODUK --}}
-                                        <td class="align-middle">
-                                            {{ $detail->produk->nama_produk ?? 'Produk tidak ditemukan' }}
-                                        </td>
-
-                                        {{-- QUANTITY --}}
-                                        <td class="text-right align-middle text-nowrap">
-                                            @php
-                                                $satuanProduk = strtolower(
-                                                    trim($detail->produk->satuan ?? '')
-                                                );
-
-                                                $meteran = $satuanProduk === 'm2'
-                                                    || $satuanProduk === 'meter persegi'
-                                                    || str_contains($satuanProduk, 'm²');
-
-                                                $qty = $meteran && (float) $detail->luas > 0
-                                                    ? (float) $detail->luas
-                                                    : (float) $detail->jumlah;
-                                            @endphp
-
-                                            {{ rtrim(rtrim(number_format($qty, 2, ',', '.'), '0'), ',') }}
-                                        </td>
-
-                                        {{-- SATUAN --}}
-                                        <td class="align-middle text-nowrap">
-                                            {{ $detail->produk->satuan ?? '-' }}
-                                        </td>
-
-                                        {{-- TOTAL TRANSAKSI --}}
-                                        @if ($loop->first)
-                                            <td rowspan="{{ $jumlahBaris }}"
-                                                class="text-right align-middle font-weight-bold text-nowrap">
-                                                Rp {{ number_format((float) $trx->total_transaksi, 0, ',', '.') }}
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td class="text-center align-middle text-muted">
+                            @forelse ($details as $detail)
+                                <tr
+                                    class="border-b {{ $loop->last ? 'border-[#e3eaef]' : 'border-[#f2f2f2]' }}">
+                                    @if ($loop->first)
+                                        {{-- NOMOR URUT --}}
+                                        <td rowspan="{{ $jumlahBaris }}"
+                                            class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
                                             {{ $loop->parent->iteration }}
                                         </td>
 
-                                        <td class="align-middle font-weight-bold text-primary text-nowrap">
+                                        {{-- NO REFERENSI --}}
+                                        <td rowspan="{{ $jumlahBaris }}"
+                                            class="whitespace-nowrap px-[15px] py-3 align-middle font-bold text-[#6777ef]">
                                             {{ $trx->no_referensi }}
                                         </td>
 
-                                        <td class="align-middle text-nowrap">
+                                        {{-- TANGGAL --}}
+                                        <td rowspan="{{ $jumlahBaris }}"
+                                            class="whitespace-nowrap px-[15px] py-3 align-middle">
                                             {{ \Carbon\Carbon::parse($trx->tanggal)->format('d M Y') }}
                                         </td>
 
-                                        <td class="align-middle">
+                                        {{-- PELANGGAN --}}
+                                        <td rowspan="{{ $jumlahBaris }}" class="px-[15px] py-3 align-middle">
                                             {{ $trx->nama_pelanggan }}
                                         </td>
 
-                                        <td class="align-middle">
+                                        {{-- CABANG --}}
+                                        <td rowspan="{{ $jumlahBaris }}" class="px-[15px] py-3 align-middle">
                                             {{ $trx->cabang->nama ?? '-' }}
                                         </td>
+                                    @endif
 
-                                        <td colspan="3" class="align-middle text-muted">
-                                            Belum ada detail produk.
-                                        </td>
+                                    {{-- NAMA PRODUK --}}
+                                    <td class="px-[15px] py-3 align-middle">
+                                        {{ $detail->produk->nama_produk ?? 'Produk tidak ditemukan' }}
+                                    </td>
 
-                                        <td class="text-right align-middle font-weight-bold text-nowrap">
+                                    {{-- QUANTITY --}}
+                                    <td class="whitespace-nowrap px-[15px] py-3 text-right align-middle">
+                                        @php
+                                            $satuanProduk = strtolower(trim($detail->produk->satuan ?? ''));
+
+                                            $meteran =
+                                                $satuanProduk === 'm2' ||
+                                                $satuanProduk === 'meter persegi' ||
+                                                str_contains($satuanProduk, 'm²');
+
+                                            $qty =
+                                                $meteran && (float) $detail->luas > 0
+                                                    ? (float) $detail->luas
+                                                    : (float) $detail->jumlah;
+                                        @endphp
+
+                                        {{ rtrim(rtrim(number_format($qty, 2, ',', '.'), '0'), ',') }}
+                                    </td>
+
+                                    {{-- SATUAN --}}
+                                    <td class="whitespace-nowrap px-[15px] py-3 align-middle">
+                                        {{ $detail->produk->satuan ?? '-' }}
+                                    </td>
+
+                                    {{-- TOTAL TRANSAKSI --}}
+                                    @if ($loop->first)
+                                        <td rowspan="{{ $jumlahBaris }}"
+                                            class="whitespace-nowrap px-[15px] py-3 text-right align-middle font-bold">
                                             Rp {{ number_format((float) $trx->total_transaksi, 0, ',', '.') }}
                                         </td>
-                                    </tr>
-                                @endforelse
+                                    @endif
+                                </tr>
                             @empty
-                                <tr>
-                                    <td colspan="9" class="text-center text-muted py-4">
-                                        <i class="fas fa-receipt fa-2x mb-2"></i>
-                                        <p class="mb-0">
-                                            Belum ada transaksi untuk filter yang dipilih.
-                                        </p>
+                                <tr class="border-b border-[#e3eaef]">
+                                    <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
+                                        {{ $loop->parent->iteration }}
+                                    </td>
+
+                                    <td
+                                        class="whitespace-nowrap px-[15px] py-3 align-middle font-bold text-[#6777ef]">
+                                        {{ $trx->no_referensi }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-[15px] py-3 align-middle">
+                                        {{ \Carbon\Carbon::parse($trx->tanggal)->format('d M Y') }}
+                                    </td>
+
+                                    <td class="px-[15px] py-3 align-middle">
+                                        {{ $trx->nama_pelanggan }}
+                                    </td>
+
+                                    <td class="px-[15px] py-3 align-middle">
+                                        {{ $trx->cabang->nama ?? '-' }}
+                                    </td>
+
+                                    <td colspan="3" class="px-[15px] py-3 align-middle text-[#6c757d]">
+                                        Belum ada detail produk.
+                                    </td>
+
+                                    <td
+                                        class="whitespace-nowrap px-[15px] py-3 text-right align-middle font-bold">
+                                        Rp {{ number_format((float) $trx->total_transaksi, 0, ',', '.') }}
                                     </td>
                                 </tr>
                             @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="px-[15px] py-6 text-center text-[#6c757d]">
+                                    <i class="fas fa-receipt text-[2em]"></i>
+                                    <p>
+                                        Belum ada transaksi untuk filter yang dipilih.
+                                    </p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
 
