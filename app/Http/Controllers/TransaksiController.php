@@ -110,7 +110,6 @@ class TransaksiController extends Controller
     /**
      * Simpan transaksi, hitung HPP, kurangi stok, dan buat jurnal.
      */
-    
     public function store(Request $request)
     {
         $user = $this->user();
@@ -206,9 +205,6 @@ class TransaksiController extends Controller
                 $totalUpahOperator = 0;
                 $detailRows = [];
 
-                // Upah operator dihitung Rp5.000 untuk SETIAP BARIS produk.
-                $upahPerBaris = 5000;
-
                 foreach ($validated['produk_id'] as $key => $produkId) {
                     $produk = Produk::findOrFail($produkId);
 
@@ -254,8 +250,13 @@ class TransaksiController extends Controller
                         );
                     }
 
-                    // Produk m² memakai luas total; produk lain memakai jumlah barang.
+                    /*
+                     * Dasar perhitungan pemakaian:
+                     * - Produk m²: gunakan total luas pesanan.
+                     * - Produk lainnya: gunakan jumlah barang.
+                     */
                     $pengaliPemakaian = $isM2 ? $luas : $jumlah;
+
                     $hppBahanItem = 0;
 
                     foreach ($komposisis as $komposisi) {
@@ -298,8 +299,21 @@ class TransaksiController extends Controller
                         $bahan->save();
                     }
 
-                    // Upah operator Rp5.000 untuk baris produk ini.
-                    $upahItem = $upahPerBaris;
+                    /*
+                     * UPAH OPERATOR:
+                     * Tarif disimpan pada master produk sebagai upah per satuan.
+                     *
+                     * Produk m²:
+                     * upah per m² x total luas pesanan.
+                     *
+                     * Produk lainnya:
+                     * upah per satuan x jumlah barang.
+                     */
+                    $upahPerSatuan = (float) ($produk->upah_operator ?? 0);
+
+                    $upahItem = $upahPerSatuan * $pengaliPemakaian;
+
+                    // HPP produk = biaya bahan baku + total upah operator.
                     $hppItem = $hppBahanItem + $upahItem;
 
                     $detailRows[] = [
@@ -313,13 +327,13 @@ class TransaksiController extends Controller
                         // Harga final seluruh pesanan pada baris ini.
                         'harga_satuan' => $hargaFinalBarang,
 
-                        // HPP per unit barang.
+                        // HPP rata-rata per barang.
                         'hpp_satuan' => $hppItem / max($jumlah, 1),
 
                         // Harga barang ditambah jasa edit.
                         'subtotal' => $subtotal,
 
-                        // HPP bahan ditambah upah untuk baris ini.
+                        // Total HPP bahan dan upah operator pada baris ini.
                         'total_hpp' => $hppItem,
                     ];
 
@@ -339,7 +353,7 @@ class TransaksiController extends Controller
                     'total_hpp' => $totalHpp,
                 ]);
 
-                // Jurnal penjualan.
+                // Buat jurnal penjualan.
                 $jurnal = Jurnal::create([
                     'no_referensi' => $transaksi->no_referensi,
                     'tanggal' => $transaksi->tanggal,
@@ -386,14 +400,19 @@ class TransaksiController extends Controller
                     ]);
                 }
 
-                // Kredit Kas untuk total upah operator semua baris.
-                DetailJurnal::create([
-                    'jurnal_id' => $jurnal->id,
-                    'akun_id' => $akunKas->id,
-                    'keterangan' => 'Pengakuan harga pokok produksi',
-                    'debit' => 0,
-                    'kredit' => $totalUpahOperator,
-                ]);
+                /*
+                 * Kredit Kas untuk upah operator.
+                 * Asumsi: upah operator dibayarkan langsung saat transaksi.
+                 */
+                if ($totalUpahOperator > 0) {
+                    DetailJurnal::create([
+                        'jurnal_id' => $jurnal->id,
+                        'akun_id' => $akunKas->id,
+                        'keterangan' => 'Pembayaran upah operator produksi',
+                        'debit' => 0,
+                        'kredit' => $totalUpahOperator,
+                    ]);
+                }
             });
 
             return redirect()

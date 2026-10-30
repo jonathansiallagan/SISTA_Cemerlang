@@ -126,16 +126,6 @@ class BahanBakuController extends Controller
             );
     }
 
-    public function edit($id)
-    {
-        $bahanBaku = BahanBaku::findOrFail($id);
-
-        return view(
-            'admin.bahan_baku.edit',
-            compact('bahanBaku')
-        );
-    }
-
     public function update(Request $request, $id)
     {
         $bahanBaku = BahanBaku::findOrFail($id);
