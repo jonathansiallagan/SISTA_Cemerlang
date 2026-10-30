@@ -62,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
     Route::get('/transaksi/export/pdf', [TransaksiController::class, 'exportPdf',])->name('transaksi.export.pdf');
     Route::get('/transaksi/export/excel', [TransaksiController::class,'exportExcel',])->name('transaksi.export.excel');
+    Route::get('/transaksi/form-modal', [TransaksiController::class,'formModal'])->name('transaksi.form-modal');
 
 //====================================================================================================//
     // === ROUTE yang bisa diakses ADMIN PUSAT & ADMIN CABANG ===
