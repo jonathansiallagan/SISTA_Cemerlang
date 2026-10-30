@@ -1,309 +1,200 @@
+
 <x-cs-layout :fullwidth="true">
 
-    {{-- LATAR BELAKANG: FOTO PERCETAKAN + PANEL TRANSAKSI TERBARU --}}
-    <div class="cs-hero">
+    {{-- LATAR BELAKANG: FOTO PERCETAKAN --}}
+    <div class="flex min-h-[calc(100vh-134px)] items-center justify-center px-5 py-10"
+         style="background-image: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('{{ asset('images/percetakan.jpg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;">
 
-        <div class="cs-box">
+        {{-- PANEL TRANSAKSI TERBARU --}}
+        <div class="w-full max-w-[1060px] overflow-hidden rounded-[20px] border border-white/50 bg-white/95 shadow-2xl backdrop-blur-xl">
 
-            {{-- HEADER PANEL --}}
-            <div class="cs-box-header">
-                <div class="cs-box-heading">
-                    <span class="cs-box-icon">
+            {{-- ================= HEADER PANEL ================= --}}
+            <div class="flex items-center justify-between gap-3 bg-gradient-to-r from-[#6777ef] to-[#8191f7] px-8 py-6">
+
+                <div class="flex min-w-0 items-center gap-4">
+
+                    {{-- ICON --}}
+                    <div class="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl bg-white/20 text-lg text-white">
                         <i class="fas fa-receipt"></i>
-                    </span>
+                    </div>
 
+                    {{-- JUDUL --}}
                     <div>
-                        <h5 class="cs-box-title">Transaksi Terbaru</h5>
+                        <h5 class="m-0 text-lg font-bold leading-tight text-white">
+                            Transaksi Terbaru
+                        </h5>
 
                         @if ($namaCabang !== 'Belum ditentukan')
-                            <span class="cs-box-subtitle">{{ $namaCabang }}</span>
+                            <span class="mt-1 block text-xs text-white/80">
+                                {{ $namaCabang }}
+                            </span>
                         @endif
                     </div>
+
                 </div>
 
-                <span class="cs-box-date">
-                    <i class="far fa-calendar-alt"></i>
+                {{-- TANGGAL --}}
+                <div class="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-4 py-2 text-xs font-bold text-white">
+
+                    <i class="far fa-calendar-alt mr-1"></i>
+
                     {{ \Carbon\Carbon::parse($tanggal)->format('d/m/Y') }}
-                </span>
+
+                </div>
+
             </div>
 
-            {{-- ISI PANEL --}}
-            <div class="cs-box-body">
-                <div class="table-responsive">
-                    <table class="table table-md cs-table mb-0">
+
+            {{-- ================= ISI PANEL ================= --}}
+            <div class="w-full px-5 pb-3 pt-2 sm:px-8">
+
+                {{-- TABEL TRANSAKSI --}}
+                <div class="w-full overflow-x-auto">
+
+                    <table class="w-full min-w-full table-auto border-collapse text-sm">
+
+                        {{-- HEADER TABEL --}}
                         <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>No. Referensi</th>
-                                <th>Pelanggan</th>
-                                <th>Diinput Oleh</th>
-                                <th class="text-right" style="text-align:right">Total</th>
+
+                            <tr class="text-left">
+
+                                <th class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-[#98a6ad]">
+                                    #
+                                </th>
+
+                                <th class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-[#98a6ad]">
+                                    No. Referensi
+                                </th>
+
+                                <th class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-[#98a6ad]">
+                                    Pelanggan
+                                </th>
+
+                                <th class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-[#98a6ad]">
+                                    Diinput Oleh
+                                </th>
+
+                                <th class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-right text-[11px] font-bold uppercase tracking-wider text-[#98a6ad]">
+                                    Total
+                                </th>
+
                             </tr>
+
                         </thead>
+
+
+                        {{-- DATA TRANSAKSI --}}
                         <tbody>
+
                             @forelse ($transaksiTerbaru as $index => $t)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $t->no_referensi ?? '-' }}</td>
-                                    <td>{{ $t->nama_pelanggan ?? '-' }}</td>
-                                    <td>{{ optional($t->user)->name ?? '-' }}</td>
-                                    <td class="text-right">
-                                        <strong>
-                                            Rp {{ number_format((float) $t->total_transaksi, 0, ',', '.') }}
-                                        </strong>
+
+                                <tr class="transition-colors duration-200 hover:bg-[#f6f7ff]">
+
+                                    <td class="whitespace-nowrap border-b border-gray-100 px-3 py-5 text-center align-middle text-[#34395e]">
+                                        {{ $index + 1 }}
                                     </td>
+
+                                    <td class="whitespace-nowrap border-b border-gray-100 px-3 py-5 align-middle text-[#34395e]">
+                                        {{ $t->no_referensi ?? '-' }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap border-b border-gray-100 px-3 py-5 align-middle text-[#34395e]">
+                                        {{ $t->nama_pelanggan ?? '-' }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap border-b border-gray-100 px-3 py-5 align-middle text-[#34395e]">
+                                        {{ optional($t->user)->name ?? '-' }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap border-b border-gray-100 px-3 py-5 text-right align-middle font-bold text-[#34395e]">
+
+                                        Rp {{ number_format((float) $t->total_transaksi, 0, ',', '.') }}
+
+                                    </td>
+
                                 </tr>
+
                             @empty
-                                <tr class="cs-empty-row">
-                                    <td colspan="5">
-                                        <div class="cs-empty">
-                                            <i class="fas fa-inbox"></i>
-                                            <strong>Belum ada transaksi</strong>
-                                            <span>Transaksi yang dibuat pada tanggal ini akan tampil di sini.</span>
+
+                                {{-- JIKA BELUM ADA TRANSAKSI --}}
+                                <tr>
+
+                                    <td colspan="5" class="px-3 py-10 text-center">
+
+                                        <div class="flex flex-col items-center gap-2">
+
+                                            <i class="fas fa-inbox text-4xl text-gray-400"></i>
+
+                                            <strong class="text-[15px] font-semibold text-[#34395e]">
+                                                Belum ada transaksi
+                                            </strong>
+
+                                            <span class="text-xs text-[#98a6ad]">
+                                                Transaksi yang dibuat pada tanggal ini akan tampil di sini.
+                                            </span>
+
                                         </div>
+
                                     </td>
+
                                 </tr>
+
                             @endforelse
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </div>
 
-            {{-- FOOTER PANEL --}}
-            <div class="cs-box-footer">
-                <span class="cs-box-note">
+
+            {{-- ================= FOOTER PANEL ================= --}}
+            <div class="flex items-center justify-between gap-3 border-t border-[#eceff7] bg-[#f6f7fb]/90 px-8 py-4">
+
+                {{-- JUMLAH TRANSAKSI --}}
+                <span class="text-xs text-[#98a6ad]">
+
                     Menampilkan {{ $transaksiTerbaru->count() }} transaksi terakhir
+
                 </span>
 
-                <div class="cs-box-actions">
-                    <a href="{{ route('transaksi.index') }}" class="cs-btn cs-btn-ghost">
-                        <i class="fas fa-history"></i> Riwayat Transaksi
+
+                {{-- TOMBOL AKSI --}}
+                <div class="flex items-center gap-3">
+
+                    {{-- RIWAYAT TRANSAKSI --}}
+                    <a href="{{ route('transaksi.index') }}"
+                       class="inline-flex items-center justify-center gap-2 rounded-full border border-[#d9deef] bg-white px-5 py-2.5 text-[13px] font-bold text-[#34395e] no-underline transition duration-200 hover:-translate-y-0.5 hover:border-[#6777ef] hover:text-[#6777ef]">
+
+                        <i class="fas fa-history"></i>
+
+                        Riwayat Transaksi
+
                     </a>
 
-                    <a href="{{ route('transaksi.create') }}" class="cs-btn cs-btn-primary">
-                        <i class="fas fa-plus"></i> Transaksi Baru
+
+                    {{-- TRANSAKSI BARU --}}
+                    <a href="{{ route('transaksi.create') }}"
+                       class="inline-flex items-center justify-center gap-2 rounded-full bg-[#6777ef] px-5 py-2.5 text-[13px] font-bold text-white no-underline shadow-lg shadow-indigo-200 transition duration-200 hover:-translate-y-0.5 hover:bg-[#5565e0]">
+
+                        <i class="fas fa-plus"></i>
+
+                        Transaksi Baru
+
                     </a>
+
                 </div>
+
             </div>
 
         </div>
+
     </div>
 
-    <style>
-        /* Latar belakang foto percetakan.
-           Simpan gambar di: public/images/bg-percetakan.jpg
-           Tingkat gelap foto: ubah angka .45 (0 = terang, 1 = gelap). */
-        .cs-hero {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: calc(100vh - 76px - 58px);
-            padding: 40px 20px;
-            background:
-                linear-gradient(rgba(15, 23, 42, .45), rgba(15, 23, 42, .45)),
-                url('{{ asset('images/percetakan.jpg') }}') center / cover no-repeat,
-                #4b5563;
-            box-sizing: border-box;
-        }
 
-        /* Panel kaca: foto di belakang masih sedikit terlihat */
-        .cs-box {
-            width: 100%;
-            max-width: 920px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, .45);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, .94);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
-        }
+    {{-- ================= RESPONSIVE MOBILE ================= --}}
+    <div class="hidden"></div>
 
-        /* Header */
-        .cs-box-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 20px 28px;
-            background: linear-gradient(135deg, #6777ef 0%, #8191f7 100%);
-        }
-
-        .cs-box-heading {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            min-width: 0;
-        }
-
-        .cs-box-icon {
-            display: grid;
-            place-items: center;
-            width: 42px;
-            height: 42px;
-            flex-shrink: 0;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, .2);
-            color: #fff;
-            font-size: 17px;
-        }
-
-        .cs-box-title {
-            margin: 0;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1.3;
-        }
-
-        .cs-box-subtitle {
-            display: block;
-            margin-top: 2px;
-            color: rgba(255, 255, 255, .8);
-            font-size: 12px;
-            line-height: 1.3;
-        }
-
-        .cs-box-date {
-            flex-shrink: 0;
-            padding: 6px 14px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, .2);
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .cs-box-date i { margin-right: 6px; }
-
-        /* Isi */
-        .cs-box-body {
-            padding: 8px 28px 12px;
-        }
-
-        .cs-table {
-            margin: 0;
-            background: transparent;
-        }
-
-        .cs-box .cs-table thead th {
-            padding: 14px 10px;
-            border: 0;
-            border-bottom: 1px solid #e8ebf3;
-            background: transparent !important;
-            color: #98a6ad;
-            text-align: left;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: .6px;
-            text-transform: uppercase;
-        }
-
-        .cs-box .cs-table tbody td {
-            padding: 14px 10px;
-            border: 0;
-            border-bottom: 1px solid #f0f2f8;
-            background: transparent !important;
-            color: #34395e;
-            vertical-align: middle;
-        }
-
-        .cs-box .cs-table tbody tr:last-child td { border-bottom: 0; }
-        .cs-box .cs-table tbody tr:hover td { background: #f6f7ff !important; }
-        .cs-box .cs-table .cs-empty-row:hover td { background: transparent !important; }
-
-        /* Tampilan saat belum ada transaksi */
-        .cs-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            padding: 36px 10px 30px;
-            text-align: center;
-        }
-
-        .cs-empty i {
-            margin-bottom: 6px;
-            color: #0a0a0c;
-            font-size: 38px;
-        }
-
-        .cs-empty strong {
-            color: #34395e;
-            font-size: 15px;
-        }
-
-        .cs-empty span {
-            color: #98a6ad;
-            font-size: 13px;
-        }
-
-        /* Footer */
-        .cs-box-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 16px 28px;
-            border-top: 1px solid #eceff7;
-            background: rgba(246, 247, 251, .9);
-        }
-
-        .cs-box-note {
-            color: #98a6ad;
-            font-size: 12px;
-        }
-
-        .cs-box-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .cs-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 20px;
-            border: 1px solid transparent;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 700;
-            line-height: 1.2;
-            text-decoration: none;
-            transition: all .2s ease;
-        }
-
-        .cs-btn:hover { text-decoration: none; transform: translateY(-1px); }
-
-        .cs-btn-ghost {
-            border-color: #d9deef;
-            background: #fff;
-            color: #34395e;
-        }
-
-        .cs-btn-ghost:hover { border-color: #6777ef; color: #6777ef; }
-
-        .cs-btn-primary {
-            background: #6777ef;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(103, 119, 239, .35);
-        }
-
-        .cs-btn-primary:hover { background: #5565e0; color: #fff; }
-
-        /* HP */
-        @media (max-width: 575px) {
-            .cs-hero { padding: 20px 12px; align-items: flex-start; }
-            .cs-box { border-radius: 16px; }
-            .cs-box-header,
-            .cs-box-body,
-            .cs-box-footer { padding-left: 16px; padding-right: 16px; }
-            .cs-box-header { flex-wrap: wrap; }
-            .cs-box-footer { flex-direction: column; align-items: stretch; }
-            .cs-box-note { text-align: center; }
-            .cs-box-actions { justify-content: center; flex-wrap: wrap; }
-        }
-    </style>
 </x-cs-layout>

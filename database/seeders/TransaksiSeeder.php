@@ -47,6 +47,19 @@ class TransaksiSeeder extends Seeder
             'Rina Amelia',
         ];
 
+        $nomorHp = [
+            '081234567801',
+            '081234567802',
+            '081234567803',
+            '081234567804',
+            '081234567805',
+            '081234567806',
+            '081234567807',
+            '081234567808',
+            '081234567809',
+            '081234567810',
+        ];
+
         $jumlahDibuat = 0;
 
         for ($i = 1; $i <= 10; $i++) {
@@ -70,6 +83,7 @@ class TransaksiSeeder extends Seeder
                 'no_referensi' => $noReferensi,
                 'tanggal' => $waktu->toDateString(),
                 'nama_pelanggan' => $pelanggan[$i - 1],
+                'nomor_hp' => $nomorHp[$i - 1],
                 'cabang_id' => $cabangIds[
                     ($i - 1) % count($cabangIds)
                 ],

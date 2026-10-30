@@ -78,34 +78,36 @@ class TransaksiController extends Controller
     /**
      * Form transaksi baru.
      */
-    public function create()
-    {
-        $user = $this->user();
+    
+public function create()
+{
+    $user = $this->user();
 
-        if (!$user->isCustomerService()) {
-            abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
-        }
-
-        $produks = Produk::orderBy('nama_produk')->get();
-
-        $cabangs = Cabang::where('id', $user->cabang_id)->get();
-
-        $today = now()->format('Ymd');
-
-        $lastTransaksi = Transaksi::whereDate(
-            'created_at',
-            now()->toDateString()
-        )->count();
-
-        $no_referensi = 'INV-' . $today . '-'
-            . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
-
-        return view('admin.transaksi.create', compact(
-            'produks',
-            'cabangs',
-            'no_referensi'
-        ));
+    if (!$user->isCustomerService()) {
+        abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
     }
+
+    $produks = Produk::orderBy('nama_produk')->get();
+
+    $cabangs = Cabang::where('id', $user->cabang_id)->get();
+
+    $today = now()->format('Ymd');
+
+    $lastTransaksi = Transaksi::whereDate(
+        'created_at',
+        now()->toDateString()
+    )->count();
+
+    $no_referensi = 'INV-' . $today . '-'
+        . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
+
+    return view('admin.transaksi.modal-page', compact(
+        'produks',
+        'cabangs',
+        'no_referensi'
+    ));
+}
+
 
     /**
      * Simpan transaksi, hitung HPP, kurangi stok, dan buat jurnal.
@@ -122,7 +124,7 @@ class TransaksiController extends Controller
             'no_referensi' => 'required|string|unique:transaksis,no_referensi',
             'tanggal' => 'required|date',
             'nama_pelanggan' => 'required|string|max:255',
-            'cabang_id' => 'required|exists:cabangs,id',
+            'nomor_hp' => 'nullable|string|max:20',
 
             'produk_id' => 'required|array|min:1',
             'produk_id.*' => 'required|integer|exists:produks,id',
@@ -133,8 +135,8 @@ class TransaksiController extends Controller
             'harga_jual' => 'required|array|min:1',
             'harga_jual.*' => 'required|numeric|min:0',
 
-            'jasa_edit' => 'required|array|min:1',
-            'jasa_edit.*' => 'required|numeric|min:0',
+            'jasa_edit' => 'nullable|array',
+            'jasa_edit.*' => 'nullable|numeric|min:0',
 
             'tinggi' => 'required|array|min:1',
             'tinggi.*' => 'nullable|numeric|min:0.01',
@@ -153,10 +155,6 @@ class TransaksiController extends Controller
                     ])
                     ->withInput();
             }
-        }
-
-        if ((int) $request->cabang_id !== (int) $user->cabang_id) {
-            abort(403, 'Anda hanya dapat mencatat transaksi untuk cabang sendiri.');
         }
 
         try {
@@ -195,6 +193,7 @@ class TransaksiController extends Controller
                     'tanggal' => $validated['tanggal'],
                     'nama_pelanggan' => $validated['nama_pelanggan'],
                     'cabang_id' => $user->cabang_id,
+                    'nomor_hp' => $validated['nomor_hp'] ?? null,
                     'user_id' => $user->id,
                     'total_transaksi' => 0,
                     'total_hpp' => 0,
@@ -210,7 +209,7 @@ class TransaksiController extends Controller
 
                     $jumlah = (int) $validated['jumlah'][$key];
                     $hargaFinalBarang = (float) $validated['harga_jual'][$key];
-                    $jasaEdit = (float) $validated['jasa_edit'][$key];
+                    $jasaEdit = (float) ($validated['jasa_edit'][$key] ?? 0);
 
                     $satuanProduk = strtolower(trim((string) $produk->satuan));
 
@@ -408,7 +407,7 @@ class TransaksiController extends Controller
                     DetailJurnal::create([
                         'jurnal_id' => $jurnal->id,
                         'akun_id' => $akunKas->id,
-                        'keterangan' => 'Pembayaran upah operator produksi',
+                        'keterangan' => 'Pengakuan harga pokok produksi',
                         'debit' => 0,
                         'kredit' => $totalUpahOperator,
                     ]);
@@ -475,6 +474,34 @@ class TransaksiController extends Controller
         )->setPaper('a4', 'landscape');
 
         return $pdf->download('riwayat-transaksi.pdf');
+    }
+
+    public function formModal()
+    {
+        $user = $this->user();
+
+        if (!$user->isCustomerService()) {
+            abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
+        }
+
+        $produks = Produk::orderBy('nama_produk')->get();
+
+        $cabangs = Cabang::where('id', $user->cabang_id)->get();
+
+        $today = now()->format('Ymd');
+
+        $lastTransaksi = Transaksi::whereDate(
+            'created_at',
+            now()->toDateString()
+        )->count();
+
+        $no_referensi = 'INV-' . $today . '-'
+            . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
+
+        return view(
+            'admin.transaksi.partials.form',
+            compact('produks', 'cabangs', 'no_referensi')
+        );
     }
 
     /**
