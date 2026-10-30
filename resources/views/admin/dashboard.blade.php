@@ -207,6 +207,13 @@
                                 </li>
                             @endforelse
                         </ul>
+                        
+                        <a href="{{ route('produk.index') }}"
+                           class="mt-3 flex w-full items-center justify-center rounded-[3px] border border-[#6777ef] px-4 py-2 text-[13px] font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
+                           <i class="fas fa-box-open mr-2"></i>
+                           Lihat Katalog Produk
+                        </a>
+                    
                     </div>
 
                     <a href="{{ route('produk.index') }}"

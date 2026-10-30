@@ -319,7 +319,6 @@
                         </small>
                     </div>
                 </div>
-
             </div>
 
             {{-- FOOTER MODAL --}}
