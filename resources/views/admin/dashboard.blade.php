@@ -218,8 +218,9 @@
                         </ul>
 
                         <a href="{{ route('produk.index') }}"
-                        class="btn btn-outline-primary btn-block mt-3">
-                            Lihat Katalog Produk
+                           class="btn btn-outline-primary btn-block mt-3">
+                           <i class="fas fa-box-open mr-1"></i>
+                           Lihat Katalog Produk
                         </a>
                     </div>
                 </div>
@@ -233,7 +234,8 @@
                 <h4>Transaksi Terbaru</h4>
                 <div class="card-header-action">
                     <a href="{{ route('transaksi.index') }}" class="btn btn-primary">
-                        {{ number_format($jumlahTransaksi) }} Transaksi
+                       <i class="fas fa-receipt mr-1"></i>
+                       {{ number_format($jumlahTransaksi) }} Transaksi
                     </a>
                 </div>
             </div>
@@ -344,7 +346,8 @@
 
                     <div class="card-footer text-right">
                         <a href="{{ route('jurnal.index') }}" class="btn btn-outline-primary">
-                            Lihat Jurnal Umum
+                           <i class="fas fa-book-open mr-1"></i>
+                           Lihat Jurnal Umum
                         </a>
                     </div>
                 </div>
@@ -367,7 +370,8 @@
                         </div>
 
                         <a href="{{ route('buku_besar.index') }}" class="btn btn-outline-primary btn-block">
-                            Lihat Buku Besar
+                           <i class="fas fa-book mr-1"></i>
+                           Lihat Buku Besar
                         </a>
                     </div>
                 </div>
