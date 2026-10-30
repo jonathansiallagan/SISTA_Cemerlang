@@ -142,6 +142,7 @@
                                 <th class="text-nowrap">No Referensi</th>
                                 <th class="text-nowrap">Tanggal</th>
                                 <th>Pelanggan</th>
+                                <th>Nomor HP</th>
                                 <th>Cabang</th>
                                 <th>Nama Produk</th>
                                 <th class="text-right">Qty</th>
@@ -182,6 +183,12 @@
                                             <td rowspan="{{ $jumlahBaris }}"
                                                 class="align-middle">
                                                 {{ $trx->nama_pelanggan }}
+                                            </td>
+
+                                            {{-- NOMOR HP --}}
+                                            <td rowspan="{{ $jumlahBaris }}"
+                                                class="align-middle">
+                                                {{ $trx->nomor_hp }}
                                             </td>
 
                                             {{-- CABANG --}}
