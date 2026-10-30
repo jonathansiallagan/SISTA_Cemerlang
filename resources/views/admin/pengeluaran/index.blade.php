@@ -16,7 +16,6 @@
     </div>
 
     <div>
-
         {{-- DESKRIPSI DAN TOMBOL TAMBAH --}}
         <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
             <p class="text-[#6c757d]">
@@ -122,86 +121,71 @@
         </div>
 
         {{-- TABEL RIWAYAT PENGELUARAN --}}
-        <div class="overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
-                <h4 class="text-base font-semibold leading-7 text-white">
-                    <i class="fas fa-receipt mr-2"></i>
-                    Data Riwayat Pengeluaran
-                </h4>
-            </div>
+        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[13px]">
-                    <thead>
-                        <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-center">#</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">No Referensi</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Tanggal</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Cabang</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Keterangan</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-right">Total Pengeluaran</th>
-                        </tr>
-                    </thead>
+            {{-- HEADER TABEL --}}
+            <x-slot:head>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">#</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">No Referensi</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Tanggal</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Cabang</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Keterangan</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-right">Total Pengeluaran</th>
+            </x-slot:head>
 
-                    <tbody>
-                        @forelse ($pengeluarans as $pengeluaran)
-                            <tr class="border-b border-[#f2f2f2]">
-                                <td class="px-[15px] py-3 text-center text-[#6c757d]">
-                                    {{ $loop->iteration }}
-                                </td>
+            {{-- ISI TABEL --}}
+            @forelse ($pengeluarans as $pengeluaran)
+                <tr class="border-b border-[#f2f2f2]">
+                    <td class="px-[15px] py-3 text-center text-[#6c757d]">
+                        {{ $loop->iteration }}
+                    </td>
 
-                                <td class="px-[15px] py-3 font-bold text-[#6777ef]">
-                                    {{ $pengeluaran->no_referensi }}
-                                </td>
+                    <td class="px-[15px] py-3 font-bold text-[#6777ef]">
+                        {{ $pengeluaran->no_referensi }}
+                    </td>
 
-                                <td class="whitespace-nowrap px-[15px] py-3">
-                                    {{ $pengeluaran->tanggal->format('d M Y') }}
-                                </td>
+                    <td class="whitespace-nowrap px-[15px] py-3">
+                        {{ $pengeluaran->tanggal->format('d M Y') }}
+                    </td>
 
-                                <td class="px-[15px] py-3">
-                                    {{ $pengeluaran->cabang?->nama ?? '-' }}
-                                </td>
+                    <td class="px-[15px] py-3">
+                        {{ $pengeluaran->cabang?->nama ?? '-' }}
+                    </td>
 
-                                <td class="px-[15px] py-3">
-                                    {{ $pengeluaran->keterangan ?: '-' }}
-                                </td>
+                    <td class="px-[15px] py-3">
+                        {{ $pengeluaran->keterangan ?: '-' }}
+                    </td>
 
-                                <td class="whitespace-nowrap px-[15px] py-3 text-right font-bold">
-                                    Rp {{ number_format((float) $pengeluaran->total_pengeluaran, 0, ',', '.') }}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
-                                    <i class="fas fa-receipt text-[2em]"></i>
+                    <td class="whitespace-nowrap px-[15px] py-3 text-right font-bold">
+                        Rp {{ number_format((float) $pengeluaran->total_pengeluaran, 0, ',', '.') }}
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
+                        <i class="fas fa-receipt text-[2em]"></i>
 
-                                    <p class="mb-1 font-bold">
-                                        Belum ada data pengeluaran
-                                    </p>
+                        <p class="mb-1 font-bold">
+                            Belum ada data pengeluaran
+                        </p>
 
-                                    <p>
-                                        Klik tombol Tambah Pengeluaran
-                                        untuk mencatat pengeluaran baru.
-                                    </p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                        <p>
+                            Klik tombol Tambah Pengeluaran
+                            untuk mencatat pengeluaran baru.
+                        </p>
+                    </td>
+                </tr>
+            @endforelse
+        </x-card-table>
 
+        {{-- PAGINASI --}}
         <p class="mt-4 text-xs text-[#6c757d]">
             Menampilkan {{ $pengeluarans->count() }} data pengeluaran.
         </p>
-
     </div>
 
     {{-- =====================================================
-         MODAL TAMBAH PENGELUARAN
-         Memakai elemen <dialog> bawaan browser (tanpa Bootstrap/jQuery).
-         Dibuka dengan tombol [data-modal-open], ditutup dengan
-         [data-modal-close], klik latar gelap, atau tombol Esc.
+        MODAL TAMBAH PENGELUARAN
     ====================================================== --}}
     <dialog id="modalTambahPengeluaran" aria-labelledby="judulModalPengeluaran"
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-hidden rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop:bg-black/50 open:flex open:flex-col">

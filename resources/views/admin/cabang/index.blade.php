@@ -52,83 +52,70 @@
         @endif
 
         {{-- TABEL DATA CABANG --}}
-        <div class="overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
-                <h4 class="text-base font-semibold leading-7 text-white">
-                    <i class="fas fa-store mr-2"></i>
-                    Daftar Cabang
-                </h4>
-            </div>
+        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[13px]">
-                    <thead>
-                        <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-center">#</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Nama Cabang</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Alamat</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">No. HP</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-center">Status Cabang</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-center">Aksi</th>
-                        </tr>
-                    </thead>
+            {{-- HEADER TABEL --}}
+            <x-slot:head>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">#</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Nama Cabang</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Alamat</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">No. HP</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">Status Cabang</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">Aksi</th>
+            </x-slot:head>
 
-                    <tbody>
-                        @forelse ($cabangs as $cabang)
-                            <tr class="odd:bg-black/[0.025]">
-                                <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
-                                    {{ $loop->iteration }}
-                                </td>
+            {{-- ISI TABEL --}}
+            @forelse ($cabangs as $cabang)
+                <tr class="odd:bg-black/[0.025]">
+                    <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
+                        {{ $loop->iteration }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle font-bold">
-                                    {{ $cabang->nama }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle font-bold">
+                        {{ $cabang->nama }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    {{ $cabang->alamat ?: '-' }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $cabang->alamat ?: '-' }}
+                    </td>
 
-                                <td class="whitespace-nowrap px-[15px] py-3 align-middle">
-                                    {{ $cabang->no_hp ?: '-' }}
-                                </td>
+                    <td class="whitespace-nowrap px-[15px] py-3 align-middle">
+                        {{ $cabang->no_hp ?: '-' }}
+                    </td>
 
-                                <td class="px-[15px] py-3 text-center align-middle">
-                                    @if (strtolower($cabang->status) === 'aktif')
-                                        <span
-                                            class="rounded-full bg-[#54ca68] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                            {{ ucfirst($cabang->status) }}
-                                        </span>
-                                    @else
-                                        <span
-                                            class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                            {{ ucfirst($cabang->status) }}
-                                        </span>
-                                    @endif
-                                </td>
+                    <td class="px-[15px] py-3 text-center align-middle">
+                        @if (strtolower($cabang->status) === 'aktif')
+                            <span
+                                class="rounded-full bg-[#54ca68] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                {{ ucfirst($cabang->status) }}
+                            </span>
+                        @else
+                            <span
+                                class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                {{ ucfirst($cabang->status) }}
+                            </span>
+                        @endif
+                    </td>
 
-                                <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
-                                    <a href="{{ route('cabang.edit', $cabang->id) }}" title="Edit Cabang"
-                                        class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
-                                    <i class="fas fa-store mb-2 text-[2em]"></i>
-                                    <p>
-                                        Belum ada data cabang.
-                                        Silakan tambah cabang baru.
-                                    </p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+                    <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
+                        <a href="{{ route('cabang.edit', $cabang->id) }}" title="Edit Cabang"
+                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
+                        <i class="fas fa-store mb-2 text-[2em]"></i>
+                        <p>
+                            Belum ada data cabang.
+                            Silakan tambah cabang baru.
+                        </p>
+                    </td>
+                </tr>
+            @endforelse
+        </x-card-table>
     </div>
 
     {{-- MODAL TAMBAH CABANG --}}
@@ -192,8 +179,8 @@
                         Alamat Lengkap <span class="text-[#fc544b]">*</span>
                     </label>
 
-                    <textarea id="alamatCabang" name="alamat" rows="3" maxlength="1000"
-                        placeholder="Masukkan alamat lengkap cabang" required
+                    <textarea id="alamatCabang" name="alamat" rows="3" maxlength="1000" placeholder="Masukkan alamat lengkap cabang"
+                        required
                         class="w-full rounded-[3px] border bg-[#fdfdff] px-[15px] py-2.5 text-sm text-[#495057] focus:outline-none @error('alamat') border-[#fc544b] @else border-[#e4e6fc] focus:border-[#95a0f4] @enderror">{{ old('alamat') }}</textarea>
 
                     @error('alamat')
@@ -203,7 +190,8 @@
 
                 {{-- STATUS CABANG --}}
                 <div>
-                    <label for="statusCabang" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                    <label for="statusCabang"
+                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                         Status Cabang <span class="text-[#fc544b]">*</span>
                     </label>
 

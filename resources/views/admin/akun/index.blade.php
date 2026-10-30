@@ -53,93 +53,79 @@
         @endif
 
         {{-- TABEL BAGAN AKUN --}}
-        <div class="overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
-                <h4 class="text-base font-semibold leading-7 text-white">
-                    <i class="fas fa-book mr-2"></i>
-                    Daftar Akun Perkiraan
-                </h4>
-            </div>
+        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[13px]">
-                    <thead>
-                        <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
-                            <th class="h-[45px] w-[5%] bg-black/[0.04] px-[15px] text-center">#</th>
-                            <th class="h-[45px] w-[17%] bg-black/[0.04] px-[15px] text-left">Kode Akun</th>
-                            <th class="h-[45px] w-[30%] bg-black/[0.04] px-[15px] text-left">Nama Akun</th>
-                            <th class="h-[45px] w-[20%] bg-black/[0.04] px-[15px] text-left">Tipe Akun</th>
-                            <th class="h-[45px] w-[15%] bg-black/[0.04] px-[15px] text-center">Status</th>
-                            <th class="h-[45px] w-[13%] bg-black/[0.04] px-[15px] text-center">Aksi</th>
-                        </tr>
-                    </thead>
+            {{-- HEADER TABEL --}}
+            <x-slot:head>
+                <th class="h-[45px] w-[5%] bg-[#fdfdff] px-[15px] text-center">#</th>
+                <th class="h-[45px] w-[17%] bg-[#fdfdff] px-[15px] text-left">Kode Akun</th>
+                <th class="h-[45px] w-[30%] bg-[#fdfdff] px-[15px] text-left">Nama Akun</th>
+                <th class="h-[45px] w-[20%] bg-[#fdfdff] px-[15px] text-left">Tipe Akun</th>
+                <th class="h-[45px] w-[15%] bg-[#fdfdff] px-[15px] text-center">Status</th>
+                <th class="h-[45px] w-[13%] bg-[#fdfdff] px-[15px] text-center">Aksi</th>
+            </x-slot:head>
 
-                    <tbody>
-                        @forelse ($akuns as $akun)
-                            <tr class="odd:bg-black/[0.025]">
-                                <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
-                                    {{ $loop->iteration }}
-                                </td>
+            {{-- ISI TABEL --}}
+            @forelse ($akuns as $akun)
+                <tr class="odd:bg-black/[0.025]">
+                    <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
+                        {{ $loop->iteration }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    <strong class="font-bold text-[#6777ef]">
-                                        {{ $akun->kode_akun }}
-                                    </strong>
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        <strong class="font-bold text-[#6777ef]">
+                            {{ $akun->kode_akun }}
+                        </strong>
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle font-bold">
-                                    {{ $akun->nama_akun }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle font-bold">
+                        {{ $akun->nama_akun }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    {{ $akun->tipe_akun }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $akun->tipe_akun }}
+                    </td>
 
-                                <td class="px-[15px] py-3 text-center align-middle">
-                                    @if (strtolower($akun->status) === 'aktif')
-                                        <span
-                                            class="rounded-full bg-[#54ca68] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">Aktif</span>
-                                    @else
-                                        <span
-                                            class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">Nonaktif</span>
-                                    @endif
-                                </td>
+                    <td class="px-[15px] py-3 text-center align-middle">
+                        @if (strtolower($akun->status) === 'aktif')
+                            <span
+                                class="rounded-full bg-[#54ca68] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">Aktif</span>
+                        @else
+                            <span
+                                class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">Nonaktif</span>
+                        @endif
+                    </td>
 
-                                <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
-                                    <button type="button" title="Edit Akun" data-modal-open="modalEditAkun"
-                                        class="btn-edit-akun inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
-                                        data-id="{{ $akun->id }}" data-url="{{ route('akun.update', $akun->id) }}"
-                                        data-kode="{{ $akun->kode_akun }}" data-nama="{{ $akun->nama_akun }}"
-                                        data-tipe="{{ $akun->tipe_akun }}"
-                                        data-kelompok="{{ $akun->kelompok_akun }}"
-                                        data-status="{{ $akun->status }}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
-                                    <i class="fas fa-book mb-2 text-[2em]"></i>
-                                    <p>
-                                        Belum ada data akun perkiraan.
-                                        Silakan tambah akun baru.
-                                    </p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
+                        <button type="button" title="Edit Akun" data-modal-open="modalEditAkun"
+                            class="btn-edit-akun inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
+                            data-id="{{ $akun->id }}" data-url="{{ route('akun.update', $akun->id) }}"
+                            data-kode="{{ $akun->kode_akun }}" data-nama="{{ $akun->nama_akun }}"
+                            data-tipe="{{ $akun->tipe_akun }}" data-kelompok="{{ $akun->kelompok_akun }}"
+                            data-status="{{ $akun->status }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
+                        <i class="fas fa-book mb-2 text-[2em]"></i>
+                        <p>
+                            Belum ada data akun perkiraan.
+                            Silakan tambah akun baru.
+                        </p>
+                    </td>
+                </tr>
+            @endforelse
+        </x-card-table>
+    </div>
 
-            <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
-                <small class="text-xs">
-                    Total akun:
-                    <strong class="font-bold">{{ $akuns->count() }}</strong>
-                </small>
-            </div>
-        </div>
-
+    <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
+        <small class="text-xs">
+            Total akun:
+            <strong class="font-bold">{{ $akuns->count() }}</strong>
+        </small>
     </div>
 
     {{-- MODAL TAMBAH AKUN --}}
@@ -162,8 +148,7 @@
             <div class="p-[25px]">
 
                 @if ($errors->any())
-                    <div
-                        class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
+                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
                         <strong class="font-bold">Gagal menyimpan akun.</strong>
                         <ul class="mb-0 mt-2 list-disc pl-4">
                             @foreach ($errors->all() as $error)
@@ -211,8 +196,7 @@
 
                 {{-- KELOMPOK AKUN --}}
                 <div class="mb-[25px]">
-                    <label for="kelompok_akun"
-                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                    <label for="kelompok_akun" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                         Kelompok Akun <span class="text-[#fc544b]">*</span>
                     </label>
 
@@ -469,8 +453,7 @@
             <div class="p-[25px]">
 
                 @if ($errors->any() && old('akun_id'))
-                    <div
-                        class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
+                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
                         <strong class="font-bold">Gagal memperbarui akun.</strong>
                         <ul class="mb-0 mt-2 list-disc pl-4">
                             @foreach ($errors->all() as $error)

@@ -52,93 +52,76 @@
         @endif
 
         {{-- TABEL PRODUK --}}
-        <div class="overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
-                <h4 class="text-base font-semibold leading-7 text-white">
-                    <i class="fas fa-box mr-2"></i>
-                    Daftar Produk &amp; Layanan
-                </h4>
-            </div>
+        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[13px]">
-                    <thead>
-                        <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
-                            <th class="h-[45px] w-[7%] bg-black/[0.04] px-[15px] text-center">#</th>
-                            <th class="h-[45px] bg-black/[0.04] px-[15px] text-left">Nama Produk/Layanan</th>
-                            <th class="h-[45px] w-[20%] bg-black/[0.04] px-[15px] text-left">Satuan</th>
-                            <th class="h-[45px] w-[15%] bg-black/[0.04] px-[15px] text-center">Aksi</th>
-                        </tr>
-                    </thead>
+            {{-- HEADER TABEL --}}
+            <x-slot:head>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">#</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Nama Produk/Layanan</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Satuan</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">Aksi</th>
+            </x-slot:head>
 
-                    <tbody>
-                        @forelse ($produks as $produk)
-                            <tr class="border-b border-[#f2f2f2]">
-                                {{-- NOMOR URUT --}}
-                                <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
-                                    {{ $loop->iteration }}
-                                </td>
+            {{-- ISI TABEL --}}
+            @forelse ($produks as $produk)
+                <tr class="border-b border-[#f2f2f2]">
+                    {{-- NOMOR URUT --}}
+                    <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
+                        {{ $loop->iteration }}
+                    </td>
 
-                                {{-- NAMA PRODUK --}}
-                                <td class="px-[15px] py-3 align-middle font-bold">
-                                    {{ $produk->nama_produk }}
-                                </td>
+                    {{-- NAMA PRODUK --}}
+                    <td class="px-[15px] py-3 align-middle font-bold">
+                        {{ $produk->nama_produk }}
+                    </td>
 
-                                {{-- SATUAN --}}
-                                <td class="px-[15px] py-3 align-middle">
-                                    {{ $produk->satuan }}
-                                </td>
+                    {{-- SATUAN --}}
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $produk->satuan }}
+                    </td>
 
-                                {{-- AKSI --}}
-                                <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
-                                    <a href="{{ route('produk.edit', $produk->id) }}" title="Edit Produk"
-                                        class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                    {{-- AKSI --}}
+                    <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
+                        <a href="{{ route('produk.edit', $produk->id) }}" title="Edit Produk"
+                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
+                            <i class="fas fa-edit"></i>
+                        </a>
 
-                                    <form action="{{ route('produk.destroy', $produk->id) }}" method="POST"
-                                        class="inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
-                                        @csrf
-                                        @method('DELETE')
+                        <form action="{{ route('produk.destroy', $produk->id) }}" method="POST" class="inline"
+                            onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
+                            @csrf
+                            @method('DELETE')
 
-                                        <button type="submit" title="Hapus Produk"
-                                            class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-[15px] py-6 text-center text-[#6c757d]">
-                                    <i class="fas fa-box-open text-[2em]"></i>
-                                    <p>
-                                        Belum ada data produk.
-                                    </p>
-                                    <small>Silakan tambahkan produk atau layanan terlebih dahulu.</small>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                            <button type="submit" title="Hapus Produk"
+                                class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="4" class="px-[15px] py-6 text-center text-[#6c757d]">
+                        <i class="fas fa-box-open text-[2em]"></i>
+                        <p>
+                            Belum ada data produk.
+                        </p>
+                        <small>Silakan tambahkan produk atau layanan terlebih dahulu.</small>
+                    </td>
+                </tr>
+            @endforelse
+        </x-card-table>
+    </div>
 
-            <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
-                <small>
-                    Total produk dan layanan:
-                    <strong>{{ $produks->count() }}</strong>
-                </small>
-            </div>
-        </div>
-
+    <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
+        <small>
+            Total produk dan layanan:
+            <strong>{{ $produks->count() }}</strong>
+        </small>
     </div>
 
 
-    {{-- MODAL TAMBAH PRODUK
-         Memakai elemen <dialog> bawaan browser (tanpa Bootstrap/jQuery).
-         Dibuka dengan tombol [data-modal-open], ditutup dengan
-         [data-modal-close], klik latar gelap, atau tombol Esc. --}}
+    {{-- MODAL TAMBAH PRODUK --}}
     <dialog id="modalTambahProduk" aria-labelledby="judulModalTambahProduk"
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-hidden rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop:bg-black/50 open:flex open:flex-col">
 
@@ -172,9 +155,8 @@
                         class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                         Nama Produk / Layanan <span class="text-[#fc544b]">*</span>
                     </label>
-                    <input type="text" id="modal_nama_produk" name="nama_produk"
-                        value="{{ old('nama_produk') }}" maxlength="255" placeholder="Contoh: Spanduk Flexi"
-                        required autofocus
+                    <input type="text" id="modal_nama_produk" name="nama_produk" value="{{ old('nama_produk') }}"
+                        maxlength="255" placeholder="Contoh: Spanduk Flexi" required autofocus
                         class="h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none @error('nama_produk') border-[#fc544b] @else border-[#e4e6fc] @enderror">
                     @error('nama_produk')
                         <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
@@ -246,8 +228,7 @@
                             </div>
 
                             <div class="mb-4">
-                                <label
-                                    class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                                <label class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                                     Nama Bahan Baku
                                 </label>
                                 <select name="bahan_baku_id[]" required
@@ -269,8 +250,7 @@
                                         Jumlah Pemakaian
                                     </label>
                                     <input type="number" name="jumlah_pemakaian[]" min="0.0001" step="0.0001"
-                                        value="{{ $oldJumlah[$i] ?? '' }}" placeholder="Contoh: 1 atau 0.03"
-                                        required
+                                        value="{{ $oldJumlah[$i] ?? '' }}" placeholder="Contoh: 1 atau 0.03" required
                                         class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
                                 </div>
 
@@ -289,8 +269,7 @@
                 </div>
 
                 @if ($errors->has('bahan_baku_id') || $errors->has('jumlah_pemakaian') || $errors->has('satuan_pemakaian'))
-                    <div
-                        class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-4 text-white">
+                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-4 text-white">
                         Periksa kembali data komposisi bahan baku.
                         @foreach ($errors->all() as $error)
                             <div>{{ $error }}</div>

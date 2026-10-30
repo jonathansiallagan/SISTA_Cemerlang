@@ -53,118 +53,104 @@
         @endif
 
         {{-- TABEL DATA PENGGUNA --}}
-        <div class="overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
-                <h4 class="text-base font-semibold leading-7 text-white">
-                    <i class="fas fa-users mr-2"></i>
-                    Daftar Pengguna
-                </h4>
-            </div>
+        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[13px]">
-                    <thead>
-                        <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
-                            <th class="h-[45px] w-[5%] bg-black/[0.04] px-[15px] text-center">#</th>
-                            <th class="h-[45px] w-[22%] bg-black/[0.04] px-[15px] text-left">Nama</th>
-                            <th class="h-[45px] w-[18%] bg-black/[0.04] px-[15px] text-left">Username</th>
-                            <th class="h-[45px] w-[15%] bg-black/[0.04] px-[15px] text-left">Role</th>
-                            <th class="h-[45px] w-[25%] bg-black/[0.04] px-[15px] text-left">Cabang</th>
-                            <th class="h-[45px] w-[15%] bg-black/[0.04] px-[15px] text-center">Aksi</th>
-                        </tr>
-                    </thead>
+            {{-- HEADER TABEL --}}
+            <x-slot:head>
+                <th class="h-[45px] w-[5%] bg-[#fdfdff] px-[15px] text-center">#</th>
+                <th class="h-[45px] w-[22%] bg-[#fdfdff] px-[15px] text-left">Nama</th>
+                <th class="h-[45px] w-[18%] bg-[#fdfdff] px-[15px] text-left">Username</th>
+                <th class="h-[45px] w-[15%] bg-[#fdfdff] px-[15px] text-left">Role</th>
+                <th class="h-[45px] w-[25%] bg-[#fdfdff] px-[15px] text-left">Cabang</th>
+                <th class="h-[45px] w-[15%] bg-[#fdfdff] px-[15px] text-center">Aksi</th>
+            </x-slot:head>
 
-                    <tbody>
-                        @forelse ($users as $user)
-                            <tr class="odd:bg-black/[0.025]">
-                                <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
-                                    {{ $loop->iteration }}
-                                </td>
+            {{-- ISI TABEL --}}
+            @forelse ($users as $user)
+                <tr class="odd:bg-black/[0.025]">
+                    <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
+                        {{ $loop->iteration }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle font-bold">
-                                    {{ $user->name }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle font-bold">
+                        {{ $user->name }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    {{ $user->username ?? '-' }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $user->username ?? '-' }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    @php
-                                        $role = strtolower($user->role ?? '');
-                                    @endphp
+                    <td class="px-[15px] py-3 align-middle">
+                        @php
+                            $role = strtolower($user->role ?? '');
+                        @endphp
 
-                                    @if ($role === 'admin pusat')
-                                        <span
-                                            class="rounded-full bg-[#6777ef] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                            {{ $user->role }}
-                                        </span>
-                                    @elseif ($role === 'admin cabang')
-                                        <span
-                                            class="rounded-full bg-[#3abaf4] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                            {{ $user->role }}
-                                        </span>
-                                    @else
-                                        <span
-                                            class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                            {{ $user->role ?? '-' }}
-                                        </span>
-                                    @endif
-                                </td>
+                        @if ($role === 'admin pusat')
+                            <span
+                                class="rounded-full bg-[#6777ef] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                {{ $user->role }}
+                            </span>
+                        @elseif ($role === 'admin cabang')
+                            <span
+                                class="rounded-full bg-[#3abaf4] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                {{ $user->role }}
+                            </span>
+                        @else
+                            <span
+                                class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                {{ $user->role ?? '-' }}
+                            </span>
+                        @endif
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    {{ $user->cabang->nama ?? 'Pusat/Semua Cabang' }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $user->cabang->nama ?? 'Pusat/Semua Cabang' }}
+                    </td>
 
-                                <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
-                                    <div class="flex justify-center">
+                    <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
+                        <div class="flex justify-center">
 
-                                        <button type="button" title="Edit Pengguna"
-                                            class="btn-edit-user mr-1 inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
-                                            data-id="{{ $user->id }}"
-                                            data-url="{{ route('user.update', $user->id) }}"
-                                            data-name="{{ $user->name }}" data-email="{{ $user->email }}"
-                                            data-username="{{ $user->username }}" data-role="{{ $user->role }}"
-                                            data-cabang="{{ $user->cabang_id }}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                            <button type="button" title="Edit Pengguna"
+                                class="btn-edit-user mr-1 inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
+                                data-id="{{ $user->id }}" data-url="{{ route('user.update', $user->id) }}"
+                                data-name="{{ $user->name }}" data-email="{{ $user->email }}"
+                                data-username="{{ $user->username }}" data-role="{{ $user->role }}"
+                                data-cabang="{{ $user->cabang_id }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
 
-                                        <form action="{{ route('user.destroy', $user->id) }}" method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus pengguna ini?');">
-                                            @csrf
-                                            @method('DELETE')
+                            <form action="{{ route('user.destroy', $user->id) }}" method="POST"
+                                onsubmit="return confirm('Yakin ingin menghapus pengguna ini?');">
+                                @csrf
+                                @method('DELETE')
 
-                                            <button type="submit" title="Hapus Pengguna"
-                                                class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
-                                    <i class="fas fa-users mb-2 text-[2em]"></i>
-                                    <p>
-                                        Belum ada data pengguna.
-                                        Silakan tambah pengguna baru.
-                                    </p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                <button type="submit" title="Hapus Pengguna"
+                                    class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
+                        <i class="fas fa-users mb-2 text-[2em]"></i>
+                        <p>
+                            Belum ada data pengguna.
+                            Silakan tambah pengguna baru.
+                        </p>
+                    </td>
+                </tr>
+            @endforelse
+        </x-card-table>
+    </div>
 
-            <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
-                <small class="text-xs">
-                    Total pengguna:
-                    <strong class="font-bold">{{ $users->count() }}</strong>
-                </small>
-            </div>
-        </div>
-
+    <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
+        <small class="text-xs">
+            Total pengguna:
+            <strong class="font-bold">{{ $users->count() }}</strong>
+        </small>
     </div>
 
     {{-- MODAL TAMBAH PENGGUNA --}}
@@ -189,8 +175,7 @@
             <div class="p-[25px]">
 
                 @if ($errors->any())
-                    <div
-                        class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
+                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
                         <strong class="font-bold">
                             <i class="fas fa-exclamation-circle mr-1"></i>
                             Gagal menyimpan pengguna
@@ -221,7 +206,8 @@
                     </div>
 
                     <div class="mb-[25px]">
-                        <label for="userEmail" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        <label for="userEmail"
+                            class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                             Email <span class="text-[#fc544b]">*</span>
                         </label>
 
@@ -275,7 +261,8 @@
                 {{-- ROLE DAN CABANG --}}
                 <div class="grid grid-cols-1 gap-x-2.5 md:grid-cols-2">
                     <div>
-                        <label for="userRole" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        <label for="userRole"
+                            class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                             Role <span class="text-[#fc544b]">*</span>
                         </label>
 
@@ -603,8 +590,7 @@
             <div class="p-[25px]">
 
                 @if ($errors->any() && old('edit_user_id'))
-                    <div
-                        class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
+                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
                         <strong class="font-bold">Gagal memperbarui pengguna.</strong>
                         <ul class="mb-0 mt-2 list-disc pl-4">
                             @foreach ($errors->all() as $error)

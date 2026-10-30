@@ -53,101 +53,88 @@
         @endif
 
         {{-- TABEL BAHAN BAKU --}}
-        <div class="overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
-                <h4 class="text-base font-semibold leading-7 text-white">
-                    <i class="fas fa-boxes mr-2"></i>
-                    Daftar Bahan Baku
-                </h4>
-            </div>
+        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[13px]">
-                    <thead>
-                        <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
-                            <th class="h-[45px] w-[5%] bg-black/[0.04] px-[15px] text-center">#</th>
-                            <th class="h-[45px] w-[15%] bg-black/[0.04] px-[15px] text-left">Kode Bahan</th>
-                            <th class="h-[45px] w-[25%] bg-black/[0.04] px-[15px] text-left">Nama Bahan</th>
-                            <th class="h-[45px] w-[20%] bg-black/[0.04] px-[15px] text-left">Spesifikasi</th>
-                            <th class="h-[45px] w-[10%] bg-black/[0.04] px-[15px] text-left">Satuan</th>
-                            <th class="h-[45px] w-[12%] bg-black/[0.04] px-[15px] text-center">Status</th>
-                            <th class="h-[45px] w-[13%] bg-black/[0.04] px-[15px] text-center">Aksi</th>
-                        </tr>
-                    </thead>
+            {{-- HEADER TABEL --}}
+            <x-slot:head>
+                <th class="h-[45px] w-[5%] bg-[#fdfdff] px-[15px] text-center">#</th>
+                <th class="h-[45px] w-[15%] bg-[#fdfdff] px-[15px] text-left">Kode Bahan</th>
+                <th class="h-[45px] w-[25%] bg-[#fdfdff] px-[15px] text-left">Nama Bahan</th>
+                <th class="h-[45px] w-[20%] bg-[#fdfdff] px-[15px] text-left">Spesifikasi</th>
+                <th class="h-[45px] w-[10%] bg-[#fdfdff] px-[15px] text-left">Satuan</th>
+                <th class="h-[45px] w-[12%] bg-[#fdfdff] px-[15px] text-center">Status</th>
+                <th class="h-[45px] w-[13%] bg-[#fdfdff] px-[15px] text-center">Aksi</th>
+            </x-slot:head>
 
-                    <tbody>
-                        @forelse ($bahanBakus as $bahan)
-                            <tr class="odd:bg-black/[0.025]">
-                                <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
-                                    {{ $loop->iteration }}
-                                </td>
+            {{-- ISI TABEL --}}
+            @forelse ($bahanBakus as $bahan)
+                <tr class="odd:bg-black/[0.025]">
+                    <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
+                        {{ $loop->iteration }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    <strong class="font-bold text-[#6777ef]">
-                                        {{ $bahan->kode_bahan }}
-                                    </strong>
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        <strong class="font-bold text-[#6777ef]">
+                            {{ $bahan->kode_bahan }}
+                        </strong>
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle font-bold">
-                                    {{ $bahan->nama_bahan }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle font-bold">
+                        {{ $bahan->nama_bahan }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    {{ $bahan->spesifikasi ?: '-' }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $bahan->spesifikasi ?: '-' }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    {{ $bahan->satuan }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $bahan->satuan }}
+                    </td>
 
-                                <td class="px-[15px] py-3 text-center align-middle">
-                                    @if (strtolower($bahan->status) === 'aktif')
-                                        <span
-                                            class="rounded-full bg-[#54ca68] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                            Aktif
-                                        </span>
-                                    @else
-                                        <span
-                                            class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                            Nonaktif
-                                        </span>
-                                    @endif
-                                </td>
+                    <td class="px-[15px] py-3 text-center align-middle">
+                        @if (strtolower($bahan->status) === 'aktif')
+                            <span
+                                class="rounded-full bg-[#54ca68] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                Aktif
+                            </span>
+                        @else
+                            <span
+                                class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                Nonaktif
+                            </span>
+                        @endif
+                    </td>
 
-                                <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
-                                    <a href="{{ route('bahan-baku.edit', $bahan->id) }}" title="Edit Bahan Baku"
-                                        class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="px-[15px] py-6 text-center text-[#6c757d]">
-                                    <i class="fas fa-box-open mb-2 text-[2em]"></i>
-                                    <p>
-                                        Belum ada data bahan baku.
-                                    </p>
-                                    <small class="text-xs">
-                                        Silakan tambahkan bahan baku terlebih dahulu.
-                                    </small>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
-                <small class="text-xs">
-                    Total bahan baku:
-                    <strong class="font-bold">{{ $bahanBakus->count() }}</strong>
-                </small>
-            </div>
-        </div>
-
+                    <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
+                        <a href="{{ route('bahan-baku.edit', $bahan->id) }}" title="Edit Bahan Baku"
+                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7" class="px-[15px] py-6 text-center text-[#6c757d]">
+                        <i class="fas fa-box-open mb-2 text-[2em]"></i>
+                        <p>
+                            Belum ada data bahan baku.
+                        </p>
+                        <small class="text-xs">
+                            Silakan tambahkan bahan baku terlebih dahulu.
+                        </small>
+                    </td>
+                </tr>
+            @endforelse
+        </x-card-table>
     </div>
 
+    <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
+        <small class="text-xs">
+            Total bahan baku:
+            <strong class="font-bold">{{ $bahanBakus->count() }}</strong>
+        </small>
+    </div>
+    
     {{-- MODAL TAMBAH BAHAN BAKU --}}
     <dialog id="modalTambahBahan" aria-labelledby="judulModalTambahBahan"
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40">
@@ -170,8 +157,7 @@
             <div class="p-[25px]">
 
                 @if ($errors->any())
-                    <div
-                        class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
+                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2.5 text-white">
                         <strong class="font-bold">
                             <i class="fas fa-exclamation-circle mr-1"></i>
                             Periksa kembali data berikut:
@@ -222,7 +208,8 @@
 
                 {{-- SPESIFIKASI --}}
                 <div class="mb-[25px]">
-                    <label for="spesifikasiBahan" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                    <label for="spesifikasiBahan"
+                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                         Spesifikasi
                     </label>
 

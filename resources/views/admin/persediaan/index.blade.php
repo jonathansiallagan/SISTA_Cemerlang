@@ -59,7 +59,8 @@
                     <i class="fas fa-boxes"></i>
                 </div>
                 <div class="min-w-0 flex-1 py-2.5 pr-5">
-                    <h4 class="text-[13px] font-semibold uppercase tracking-[0.5px] text-[#98a6ad]">Jenis Bahan Baku</h4>
+                    <h4 class="text-[13px] font-semibold uppercase tracking-[0.5px] text-[#98a6ad]">Jenis Bahan Baku
+                    </h4>
                     <div class="text-xl font-bold text-[#34395e]">
                         {{ number_format($totalJenisBahan, 0, ',', '.') }}
                     </div>
@@ -87,7 +88,8 @@
                     <i class="fas fa-money-bill-wave"></i>
                 </div>
                 <div class="min-w-0 flex-1 py-2.5 pr-5">
-                    <h4 class="text-[13px] font-semibold uppercase tracking-[0.5px] text-[#98a6ad]">Nilai Persediaan</h4>
+                    <h4 class="text-[13px] font-semibold uppercase tracking-[0.5px] text-[#98a6ad]">Nilai Persediaan
+                    </h4>
                     <div class="text-[19px] font-bold text-[#34395e]">
                         Rp {{ number_format($totalNilaiPersediaan, 0, ',', '.') }}
                     </div>
@@ -96,103 +98,91 @@
         </div>
 
         {{-- TABEL PERSEDIAAN --}}
-        <div class="overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
-                <h4 class="text-base font-semibold leading-7 text-white">
-                    <i class="fas fa-warehouse mr-2"></i>
-                    Daftar Stok Bahan Baku
-                </h4>
-            </div>
+        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-[13px]">
-                    <thead>
-                        <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
-                            <th class="h-[45px] w-[5%] bg-black/[0.04] px-[15px] text-center">#</th>
-                            <th class="h-[45px] w-[13%] bg-black/[0.04] px-[15px] text-left">Kode Bahan</th>
-                            <th class="h-[45px] w-[22%] bg-black/[0.04] px-[15px] text-left">Nama Bahan</th>
-                            <th class="h-[45px] w-[10%] bg-black/[0.04] px-[15px] text-left">Satuan</th>
-                            <th class="h-[45px] w-[13%] bg-black/[0.04] px-[15px] text-right">Stok</th>
-                            <th class="h-[45px] w-[17%] bg-black/[0.04] px-[15px] text-right">Harga Rata-rata</th>
-                            <th class="h-[45px] w-[20%] bg-black/[0.04] px-[15px] text-right">Nilai Persediaan</th>
-                        </tr>
-                    </thead>
+            {{-- HEADER TABEL --}}
+            <x-slot:head>
+                <th class="h-[45px] w-[5%] bg-[#fdfdff] px-[15px] text-center">#</th>
+                <th class="h-[45px] w-[13%] bg-[#fdfdff] px-[15px] text-left">Kode Bahan</th>
+                <th class="h-[45px] w-[22%] bg-[#fdfdff] px-[15px] text-left">Nama Bahan</th>
+                <th class="h-[45px] w-[10%] bg-[#fdfdff] px-[15px] text-left">Satuan</th>
+                <th class="h-[45px] w-[13%] bg-[#fdfdff] px-[15px] text-right">Stok</th>
+                <th class="h-[45px] w-[17%] bg-[#fdfdff] px-[15px] text-right">Harga Rata-rata</th>
+                <th class="h-[45px] w-[20%] bg-[#fdfdff] px-[15px] text-right">Nilai Persediaan</th>
+            </x-slot:head>
 
-                    <tbody>
-                        @forelse ($bahanBakus as $bahan)
-                            @php
-                                $stok = (float) $bahan->stok;
-                                $hargaRataRata = (float) $bahan->harga_rata_rata;
-                                $nilaiPersediaan = $stok * $hargaRataRata;
-                            @endphp
+            {{-- ISI TABEL --}}
+            @forelse ($bahanBakus as $bahan)
+                @php
+                    $stok = (float) $bahan->stok;
+                    $hargaRataRata = (float) $bahan->harga_rata_rata;
+                    $nilaiPersediaan = $stok * $hargaRataRata;
+                @endphp
 
-                            <tr class="odd:bg-black/[0.025]">
-                                <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
-                                    {{ $loop->iteration }}
-                                </td>
+                <tr class="odd:bg-black/[0.025]">
+                    <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
+                        {{ $loop->iteration }}
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    <strong class="font-bold text-[#6777ef]">
-                                        {{ $bahan->kode_bahan }}
-                                    </strong>
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        <strong class="font-bold text-[#6777ef]">
+                            {{ $bahan->kode_bahan }}
+                        </strong>
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle font-bold">
-                                    {{ $bahan->nama_bahan }}
+                    <td class="px-[15px] py-3 align-middle font-bold">
+                        {{ $bahan->nama_bahan }}
 
-                                    @if (strtolower($bahan->status) !== 'aktif')
-                                        <span
-                                            class="ml-1 rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                            Nonaktif
-                                        </span>
-                                    @endif
-                                </td>
+                        @if (strtolower($bahan->status) !== 'aktif')
+                            <span
+                                class="ml-1 rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                Nonaktif
+                            </span>
+                        @endif
+                    </td>
 
-                                <td class="px-[15px] py-3 align-middle">
-                                    {{ $bahan->satuan }}
-                                </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $bahan->satuan }}
+                    </td>
 
-                                <td class="px-[15px] py-3 text-right align-middle">
-                                    {{ number_format($stok, fmod($stok, 1) == 0 ? 0 : 3, ',', '.') }}
-                                </td>
+                    <td class="px-[15px] py-3 text-right align-middle">
+                        {{ number_format($stok, fmod($stok, 1) == 0 ? 0 : 3, ',', '.') }}
+                    </td>
 
-                                <td class="px-[15px] py-3 text-right align-middle">
-                                    Rp {{ number_format($hargaRataRata, 0, ',', '.') }}
-                                </td>
+                    <td class="px-[15px] py-3 text-right align-middle">
+                        Rp {{ number_format($hargaRataRata, 0, ',', '.') }}
+                    </td>
 
-                                <td class="px-[15px] py-3 text-right align-middle font-bold">
-                                    Rp {{ number_format($nilaiPersediaan, 0, ',', '.') }}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="px-[15px] py-12 text-center text-[#6c757d]">
-                                    <i class="fas fa-box-open mb-2 text-[2em]"></i>
-                                    <p class="mb-1">Belum ada data persediaan.</p>
-                                    <small class="text-xs">
-                                        Daftarkan bahan baku terlebih dahulu melalui menu Bahan Baku.
-                                    </small>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    <td class="px-[15px] py-3 text-right align-middle font-bold">
+                        Rp {{ number_format($nilaiPersediaan, 0, ',', '.') }}
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7" class="px-[15px] py-12 text-center text-[#6c757d]">
+                        <i class="fas fa-box-open mb-2 text-[2em]"></i>
+                        <p class="mb-1">Belum ada data persediaan.</p>
+                        <small class="text-xs">
+                            Daftarkan bahan baku terlebih dahulu melalui menu Bahan Baku.
+                        </small>
+                    </td>
+                </tr>
+            @endforelse
+        </x-card-table>
+    </div>
 
-            <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
-                <small class="text-xs">
-                    Total jenis bahan:
-                    <strong class="font-bold">{{ number_format($totalJenisBahan, 0, ',', '.') }}</strong>
+    <div class="border-t border-black/5 px-[25px] py-4 text-[#6c757d]">
+        <small class="text-xs">
+            Total jenis bahan:
+            <strong class="font-bold">{{ number_format($totalJenisBahan, 0, ',', '.') }}</strong>
 
-                    <span class="mx-2">|</span>
+            <span class="mx-2">|</span>
 
-                    Total nilai persediaan:
-                    <strong class="font-bold">
-                        Rp {{ number_format($totalNilaiPersediaan, 2, ',', '.') }}
-                    </strong>
-                </small>
-            </div>
-        </div>
+            Total nilai persediaan:
+            <strong class="font-bold">
+                Rp {{ number_format($totalNilaiPersediaan, 2, ',', '.') }}
+            </strong>
+        </small>
     </div>
 
     {{-- ===================================================== --}}
@@ -328,23 +318,23 @@
 
                                 <thead>
                                     <tr class="text-[10px] font-bold uppercase tracking-[1.3px] text-[#666]">
-                                        <th class="h-[45px] min-w-[220px] bg-black/[0.04] px-[15px] text-left">
+                                        <th class="h-[45px] min-w-[220px] bg-[#fdfdff] px-[15px] text-left">
                                             Bahan Baku
                                         </th>
 
-                                        <th class="h-[45px] min-w-[110px] bg-black/[0.04] px-[15px] text-left">
+                                        <th class="h-[45px] min-w-[110px] bg-[#fdfdff] px-[15px] text-left">
                                             Jumlah
                                         </th>
 
-                                        <th class="h-[45px] min-w-[160px] bg-black/[0.04] px-[15px] text-left">
+                                        <th class="h-[45px] min-w-[160px] bg-[#fdfdff] px-[15px] text-left">
                                             Harga Satuan (Rp)
                                         </th>
 
-                                        <th class="h-[45px] min-w-[150px] bg-black/[0.04] px-[15px] text-right">
+                                        <th class="h-[45px] min-w-[150px] bg-[#fdfdff] px-[15px] text-right">
                                             Subtotal (Rp)
                                         </th>
 
-                                        <th class="h-[45px] bg-black/[0.04] px-[15px] text-center">
+                                        <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">
                                             Aksi
                                         </th>
                                     </tr>
