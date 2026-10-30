@@ -74,7 +74,6 @@ Route::middleware(['auth'])->group(function () {
         // === ROUTE MASTER DATA PRODUK ===
         Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
         Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
-        Route::get('/produk/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit');
         Route::put('/produk/{id}', [ProdukController::class, 'update'])->name('produk.update');
         Route::delete('/produk/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy');
 
@@ -122,9 +121,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/cabang', [CabangController::class, 'store'])
             ->name('cabang.store');
-
-        Route::get('/cabang/{id}/edit', [CabangController::class, 'edit'])
-            ->name('cabang.edit');
 
         Route::put('/cabang/{id}', [CabangController::class, 'update'])
             ->name('cabang.update');

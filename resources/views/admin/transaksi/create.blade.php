@@ -351,35 +351,6 @@
                         </p>
                     </div>
                 </div>
-
-                {{-- RINGKASAN PER PRODUK --}}
-                <div class="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <p class="text-xs uppercase tracking-wide text-gray-500 font-bold mb-3">
-                        Ringkasan Produk Ini
-                    </p>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-xs text-gray-500">Luas Total</p>
-                            <p class="luas-display font-bold text-gray-800 mt-1">-</p>
-                        </div>
-
-                        <div>
-                            <p class="text-xs text-gray-500">Harga Barang</p>
-                            <p class="harga-display font-semibold text-gray-800 mt-1">Rp0</p>
-                        </div>
-
-                        <div>
-                            <p class="text-xs text-gray-500">Jasa Edit</p>
-                            <p class="edit-display font-semibold text-gray-800 mt-1">Rp0</p>
-                        </div>
-
-                        <div class="border-l border-gray-200 pl-3">
-                            <p class="text-xs text-gray-500">Subtotal</p>
-                            <p class="subtotal-total font-bold text-blue-700 text-lg mt-1">Rp0</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </template>

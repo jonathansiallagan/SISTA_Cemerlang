@@ -43,14 +43,7 @@ class CabangController extends Controller
             ->route('cabang.index')
             ->with('success', 'Data cabang berhasil ditambahkan.');
     }
-
-    public function edit($id)
-    {
-        $cabang = Cabang::findOrFail($id);
-
-        return view('admin.cabang.edit', compact('cabang'));
-    }
-
+    
     public function update(Request $request, $id)
     {
         $cabang = Cabang::findOrFail($id);

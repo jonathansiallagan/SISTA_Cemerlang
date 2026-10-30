@@ -230,6 +230,138 @@
         </form>
     </dialog>
 
+    
+    {{-- MODAL EDIT CABANG --}}
+    <div class="modal fade"
+        id="modalEditCabang"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="judulModalEditCabang"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered"
+            role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white" id="judulModalEditCabang">
+                        <i class="fas fa-edit mr-2"></i>
+                        Edit Data Cabang
+                    </h5>
+
+                    <button type="button"
+                            class="close text-white"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form id="formEditCabang" method="POST" action="#">
+                    @csrf
+                    @method('PUT')
+
+                    <input type="hidden" name="edit_cabang_id" id="edit_cabang_id">
+
+                    <div class="modal-body">
+
+                        @if ($errors->any() && old('edit_cabang_id'))
+                            <div class="alert alert-danger">
+                                <strong>Gagal memperbarui data cabang.</strong>
+                                <ul class="mb-0 mt-2 pl-3">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="form-group">
+                            <label for="edit_cabang_nama">
+                                Nama Cabang <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                name="nama"
+                                id="edit_cabang_nama"
+                                class="form-control @error('nama') is-invalid @enderror"
+                                maxlength="255"
+                                required>
+                            @error('nama')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_cabang_no_hp">
+                                Nomor HP/Telepon <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                name="no_hp"
+                                id="edit_cabang_no_hp"
+                                class="form-control @error('no_hp') is-invalid @enderror"
+                                maxlength="20"
+                                required>
+                            @error('no_hp')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_cabang_alamat">
+                                Alamat Lengkap <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="alamat"
+                                    id="edit_cabang_alamat"
+                                    rows="3"
+                                    maxlength="1000"
+                                    class="form-control @error('alamat') is-invalid @enderror"
+                                    required></textarea>
+                            @error('alamat')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group mb-0">
+                            <label for="edit_cabang_status">
+                                Status Cabang <span class="text-danger">*</span>
+                            </label>
+                            <select name="status"
+                                    id="edit_cabang_status"
+                                    class="form-control @error('status') is-invalid @enderror"
+                                    required>
+                                <option value="aktif">Aktif</option>
+                                <option value="nonaktif">Nonaktif</option>
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button"
+                                class="btn btn-light"
+                                data-dismiss="modal">
+                            <i class="fas fa-times mr-1"></i>
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary"
+                                id="btnUpdateCabang">
+                            <i class="fas fa-save mr-1"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
     {{-- SCRIPT MODAL --}}
     @push('scripts')
         <script>
@@ -285,6 +417,96 @@
                 @endif
             });
         </script>
+        
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalEdit = document.getElementById('modalEditCabang');
+            const formEdit = document.getElementById('formEditCabang');
+            const tombolUpdate = document.getElementById('btnUpdateCabang');
+
+            if (!modalEdit || !formEdit) {
+                console.error('Modal Edit Cabang atau form tidak ditemukan.');
+                return;
+            }
+
+            // Pindahkan modal ke body untuk menghindari masalah layout Stisla.
+            document.body.appendChild(modalEdit);
+
+            const editId = document.getElementById('edit_cabang_id');
+            const editNama = document.getElementById('edit_cabang_nama');
+            const editNoHp = document.getElementById('edit_cabang_no_hp');
+            const editAlamat = document.getElementById('edit_cabang_alamat');
+            const editStatus = document.getElementById('edit_cabang_status');
+
+            // Isi form berdasarkan tombol Edit yang diklik.
+            document.querySelectorAll('.btn-edit-cabang').forEach(function (tombol) {
+                tombol.addEventListener('click', function () {
+                    editId.value = this.dataset.id || '';
+                    editNama.value = this.dataset.nama || '';
+                    editNoHp.value = this.dataset.noHp || '';
+                    editAlamat.value = this.dataset.alamat || '';
+                    editStatus.value = this.dataset.status || 'aktif';
+
+                    formEdit.action = this.dataset.url || '';
+
+                    if (tombolUpdate) {
+                        tombolUpdate.disabled = false;
+                        tombolUpdate.innerHTML =
+                            '<i class="fas fa-save mr-1"></i> Simpan Perubahan';
+                    }
+
+                    if (window.jQuery && typeof jQuery.fn.modal === 'function') {
+                        jQuery(modalEdit).modal('show');
+                    } else {
+                        console.error(
+                            'Bootstrap Modal tidak tersedia. Periksa JavaScript Bootstrap pada layout.'
+                        );
+                    }
+                });
+            });
+
+            // Cegah pengiriman form berkali-kali.
+            formEdit.addEventListener('submit', function (event) {
+                if (!formEdit.action || formEdit.action.endsWith('#')) {
+                    event.preventDefault();
+                    console.error('URL update cabang belum ditentukan.');
+                    return;
+                }
+
+                if (tombolUpdate) {
+                    tombolUpdate.disabled = true;
+                    tombolUpdate.innerHTML =
+                        '<i class="fas fa-spinner fa-spin mr-1"></i> Memperbarui...';
+                }
+            });
+
+            // Buka kembali modal edit apabila validasi server gagal.
+            const oldEditId = @json(old('edit_cabang_id'));
+
+            if (oldEditId) {
+                const tombolLama = Array.from(
+                    document.querySelectorAll('.btn-edit-cabang')
+                ).find(function (tombol) {
+                    return String(tombol.dataset.id) === String(oldEditId);
+                });
+
+                if (tombolLama) {
+                    editId.value = oldEditId;
+                    editNama.value = @json(old('nama', ''));
+                    editNoHp.value = @json(old('no_hp', ''));
+                    editAlamat.value = @json(old('alamat', ''));
+                    editStatus.value = @json(old('status', 'aktif'));
+
+                    formEdit.action = tombolLama.dataset.url || '';
+
+                    if (window.jQuery && typeof jQuery.fn.modal === 'function') {
+                        jQuery(modalEdit).modal('show');
+                    }
+                }
+            }
+        });
+        </script>
+
     @endpush
 
 </x-admin-layout-stisla>

@@ -1,4 +1,5 @@
 <x-admin-layout-stisla>
+
     {{-- HEADER HALAMAN --}}
     <div
         class="mb-[30px] flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[3px] bg-white px-[30px] py-5 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
@@ -380,5 +381,346 @@
         });
     </script>
 
+                            <small class="form-text text-muted">
+                                Upah operator untuk satu satuan produk.
+                            </small>
+                        </div>
+
+                        <hr>
+
+                        {{-- KOMPOSISI BAHAN BAKU --}}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="font-weight-bold text-primary mb-1">
+                                    Komposisi Bahan Baku
+                                </h6>
+                                <small class="text-muted">
+                                    Atur kebutuhan bahan untuk satu satuan produk.
+                                </small>
+                            </div>
+
+                            <button type="button"
+                                    id="editTambahBarisBahan"
+                                    class="btn btn-success btn-sm">
+                                <i class="fas fa-plus mr-1"></i>
+                                Tambah Bahan
+                            </button>
+                        </div>
+
+                        <div id="editDaftarBahan">
+                            {{-- Baris bahan baku diisi melalui JavaScript --}}
+                        </div>
+
+                        {{-- TEMPLATE BARIS BAHAN BAKU --}}
+                        <template id="templateEditBahan">
+                            <div class="border rounded p-3 mb-3 edit-bahan-item">
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong class="edit-nomor-bahan">
+                                        Bahan Baku 1
+                                    </strong>
+
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm edit-hapus-bahan">
+                                        <i class="fas fa-trash mr-1"></i>
+                                        Hapus
+                                    </button>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Nama Bahan Baku</label>
+
+                                    <select name="bahan_baku_id[]"
+                                            class="form-control edit-pilih-bahan"
+                                            required>
+                                        <option value="">-- Pilih Bahan --</option>
+
+                                        @foreach ($bahanBakus as $bahan)
+                                            <option value="{{ $bahan->id }}"
+                                                    data-satuan="{{ $bahan->satuan }}">
+                                                {{ $bahan->nama_bahan }}
+                                                (Stok: {{ $bahan->stok }} {{ $bahan->satuan }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label>Jumlah Pemakaian</label>
+
+                                        <input type="number"
+                                               name="jumlah_pemakaian[]"
+                                               class="form-control"
+                                               min="0.0001"
+                                               step="0.0001"
+                                               placeholder="Contoh: 1 atau 0.03"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Satuan Pemakaian</label>
+
+                                        <input type="text"
+                                               name="satuan_pemakaian[]"
+                                               class="form-control"
+                                               maxlength="30"
+                                               placeholder="Contoh: m²"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div class="alert alert-light border mb-0">
+                            <i class="fas fa-info-circle text-primary mr-1"></i>
+                            Jumlah pemakaian adalah kebutuhan bahan untuk satu satuan produk.
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-dismiss="modal">
+                            <i class="fas fa-times mr-1"></i>
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                                id="btnUpdateProduk"
+                                class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // =========================================
+            // MODAL TAMBAH PRODUK
+            // =========================================
+
+            const modalTambah = document.getElementById('modalTambahProduk');
+            const daftarTambah = document.getElementById('modalDaftarBahan');
+            const tombolTambahBahan = document.getElementById('modalTambahBarisBahan');
+            const formTambah = document.getElementById('formTambahProduk');
+            const tombolSimpanTambah = document.getElementById('modalSimpanProduk');
+
+            if (modalTambah) {
+                document.body.appendChild(modalTambah);
+            }
+
+            function nomorBahanTambah() {
+                if (!daftarTambah) return;
+
+                daftarTambah.querySelectorAll('.modal-bahan-item').forEach((item, index) => {
+                    const nomor = item.querySelector('.modal-nomor-bahan');
+
+                    if (nomor) {
+                        nomor.textContent = 'Bahan Baku ' + (index + 1);
+                    }
+                });
+            }
+
+            if (daftarTambah && tombolTambahBahan) {
+                tombolTambahBahan.addEventListener('click', function () {
+                    const pertama = daftarTambah.querySelector('.modal-bahan-item');
+
+                    if (!pertama) return;
+
+                    const baru = pertama.cloneNode(true);
+
+                    baru.querySelectorAll('select, input').forEach(input => {
+                        input.value = '';
+                    });
+
+                    daftarTambah.appendChild(baru);
+                    nomorBahanTambah();
+                });
+
+                daftarTambah.addEventListener('click', function (event) {
+                    const tombol = event.target.closest('.modal-hapus-bahan');
+
+                    if (!tombol) return;
+
+                    const item = tombol.closest('.modal-bahan-item');
+                    const semua = daftarTambah.querySelectorAll('.modal-bahan-item');
+
+                    if (semua.length === 1) {
+                        item.querySelectorAll('select, input').forEach(input => {
+                            input.value = '';
+                        });
+
+                        return;
+                    }
+
+                    item.remove();
+                    nomorBahanTambah();
+                });
+            }
+
+            if (formTambah && tombolSimpanTambah) {
+                formTambah.addEventListener('submit', function () {
+                    tombolSimpanTambah.disabled = true;
+                    tombolSimpanTambah.innerHTML =
+                        '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
+                });
+            }
+
+            // =========================================
+            // MODAL EDIT PRODUK
+            // =========================================
+
+            const modalEdit = document.getElementById('modalEditProduk');
+            const formEdit = document.getElementById('formEditProduk');
+            const daftarEdit = document.getElementById('editDaftarBahan');
+            const templateEdit = document.getElementById('templateEditBahan');
+            const tombolTambahEdit = document.getElementById('editTambahBarisBahan');
+            const tombolSimpanEdit = document.getElementById('btnUpdateProduk');
+
+            if (modalEdit) {
+                document.body.appendChild(modalEdit);
+            }
+
+            function tambahBarisEdit(data = {}) {
+                if (!daftarEdit || !templateEdit) return;
+
+                const fragmen = templateEdit.content.cloneNode(true);
+                const item = fragmen.querySelector('.edit-bahan-item');
+
+                const pilihBahan = item.querySelector('[name="bahan_baku_id[]"]');
+                const jumlah = item.querySelector('[name="jumlah_pemakaian[]"]');
+                const satuan = item.querySelector('[name="satuan_pemakaian[]"]');
+
+                pilihBahan.value = data.bahan_baku_id ?? '';
+                jumlah.value = data.jumlah_pemakaian ?? '';
+                satuan.value = data.satuan_pemakaian ?? '';
+
+                daftarEdit.appendChild(fragmen);
+                perbaruiNomorEdit();
+            }
+
+            function perbaruiNomorEdit() {
+                if (!daftarEdit) return;
+
+                daftarEdit.querySelectorAll('.edit-bahan-item').forEach((item, index) => {
+                    const nomor = item.querySelector('.edit-nomor-bahan');
+
+                    if (nomor) {
+                        nomor.textContent = 'Bahan Baku ' + (index + 1);
+                    }
+                });
+            }
+
+            if (tombolTambahEdit) {
+                tombolTambahEdit.addEventListener('click', function () {
+                    tambahBarisEdit();
+                });
+            }
+
+            if (daftarEdit) {
+                daftarEdit.addEventListener('click', function (event) {
+                    const tombol = event.target.closest('.edit-hapus-bahan');
+
+                    if (!tombol) return;
+
+                    const item = tombol.closest('.edit-bahan-item');
+                    const semua = daftarEdit.querySelectorAll('.edit-bahan-item');
+
+                    if (semua.length === 1) {
+                        item.querySelectorAll('select, input').forEach(input => {
+                            input.value = '';
+                        });
+
+                        return;
+                    }
+
+                    item.remove();
+                    perbaruiNomorEdit();
+                });
+
+                // Isi satuan bahan berdasarkan pilihan bahan jika masih kosong.
+                daftarEdit.addEventListener('change', function (event) {
+                    if (!event.target.matches('.edit-pilih-bahan')) return;
+
+                    const item = event.target.closest('.edit-bahan-item');
+                    const opsi = event.target.selectedOptions[0];
+                    const satuan = item.querySelector('[name="satuan_pemakaian[]"]');
+
+                    if (opsi && opsi.dataset.satuan && satuan && !satuan.value) {
+                        satuan.value = opsi.dataset.satuan;
+                    }
+                });
+            }
+
+            // Klik tombol Edit pada tabel.
+            document.querySelectorAll('.btn-edit-produk').forEach(function (tombol) {
+                tombol.addEventListener('click', function () {
+                    if (!modalEdit || !formEdit || !daftarEdit) return;
+
+                    formEdit.action = this.dataset.url;
+
+                    document.getElementById('edit_produk_id').value = this.dataset.id;
+                    document.getElementById('edit_nama_produk').value = this.dataset.nama || '';
+                    document.getElementById('edit_satuan_produk').value = this.dataset.satuan || '';
+
+                    // Isi nilai upah operator dari produk yang dipilih.
+                    document.getElementById('edit_upah_operator').value =
+                        this.dataset.upah || 0;
+
+                    // Kosongkan komposisi sebelumnya.
+                    daftarEdit.innerHTML = '';
+
+                    // Ambil komposisi yang sudah tersimpan dari tombol Edit.
+                    let komposisi = [];
+
+                    try {
+                        komposisi = JSON.parse(this.dataset.komposisi || '[]');
+                    } catch (error) {
+                        console.error('Data komposisi produk tidak valid:', error);
+                    }
+
+                    if (komposisi.length > 0) {
+                        komposisi.forEach(function (bahan) {
+                            tambahBarisEdit(bahan);
+                        });
+                    } else {
+                        tambahBarisEdit();
+                    }
+
+                    if (window.jQuery && typeof jQuery.fn.modal === 'function') {
+                        jQuery(modalEdit).modal('show');
+                    }
+                });
+            });
+
+            if (formEdit && tombolSimpanEdit) {
+                formEdit.addEventListener('submit', function () {
+                    tombolSimpanEdit.disabled = true;
+                    tombolSimpanEdit.innerHTML =
+                        '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
+                });
+            }
+
+            // Buka kembali modal yang sesuai jika validasi gagal.
+            @if ($errors->any())
+                @if (old('edit_produk_id'))
+                    if (modalEdit && window.jQuery && typeof jQuery.fn.modal === 'function') {
+                        jQuery(modalEdit).modal('show');
+                    }
+                @else
+                    if (modalTambah && window.jQuery && typeof jQuery.fn.modal === 'function') {
+                        jQuery(modalTambah).modal('show');
+                    }
+                @endif
+            @endif
+
+        });
+    </script>
 
 </x-admin-layout-stisla>

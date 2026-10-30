@@ -12,9 +12,14 @@ use Illuminate\Validation\Rule;
 
 class ProdukController extends Controller
 {
+    /**
+     * Menampilkan daftar produk dan bahan baku aktif.
+     */
     public function index()
     {
-        $produks = Produk::orderBy('nama_produk')->get();
+        $produks = Produk::with('komposisi')
+            ->orderBy('nama_produk')
+            ->get();
 
         $bahanBakus = BahanBaku::where('status', 'aktif')
             ->orderBy('nama_bahan')
@@ -26,6 +31,9 @@ class ProdukController extends Controller
         ));
     }
 
+    /**
+     * Menyimpan produk baru beserta komposisi bahan bakunya.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -35,9 +43,25 @@ class ProdukController extends Controller
                 'max:255',
                 'unique:produks,nama_produk',
             ],
-            'satuan' => 'required|string|max:30',
 
-            'bahan_baku_id' => 'required|array|min:1',
+            'satuan' => [
+                'required',
+                'string',
+                'max:50',
+            ],
+
+            'upah_operator' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
+
+            'bahan_baku_id' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
             'bahan_baku_id.*' => [
                 'required',
                 'integer',
@@ -45,22 +69,53 @@ class ProdukController extends Controller
                 'exists:bahan_baku,id',
             ],
 
-            'jumlah_pemakaian' => 'required|array|min:1',
-            'jumlah_pemakaian.*' => 'required|numeric|min:0.0001',
+            'jumlah_pemakaian' => [
+                'required',
+                'array',
+                'min:1',
+            ],
 
-            'satuan_pemakaian' => 'required|array|min:1',
-            'satuan_pemakaian.*' => 'required|string|max:30',
+            'jumlah_pemakaian.*' => [
+                'required',
+                'numeric',
+                'min:0.0001',
+            ],
+
+            'satuan_pemakaian' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'satuan_pemakaian.*' => [
+                'required',
+                'string',
+                'max:30',
+            ],
         ], [
             'nama_produk.required' => 'Nama produk wajib diisi.',
             'nama_produk.unique' => 'Nama produk sudah terdaftar.',
+            'nama_produk.max' => 'Nama produk maksimal 255 karakter.',
+
             'satuan.required' => 'Satuan produk wajib dipilih.',
+            'satuan.max' => 'Satuan produk maksimal 50 karakter.',
+
+            'upah_operator.required' => 'Upah operator wajib diisi.',
+            'upah_operator.numeric' => 'Upah operator harus berupa angka.',
+            'upah_operator.min' => 'Upah operator tidak boleh negatif.',
+
             'bahan_baku_id.required' => 'Tambahkan minimal satu bahan baku.',
             'bahan_baku_id.*.distinct' => 'Bahan baku tidak boleh dipilih berulang.',
+            'bahan_baku_id.*.exists' => 'Bahan baku yang dipilih tidak ditemukan.',
+
             'jumlah_pemakaian.*.required' => 'Jumlah pemakaian wajib diisi.',
+            'jumlah_pemakaian.*.numeric' => 'Jumlah pemakaian harus berupa angka.',
+            'jumlah_pemakaian.*.min' => 'Jumlah pemakaian harus lebih dari nol.',
+
             'satuan_pemakaian.*.required' => 'Satuan pemakaian wajib diisi.',
         ]);
 
-        // Pastikan jumlah detail setiap array sama.
+        // Pastikan jumlah setiap kelompok data komposisi sama.
         $jumlahBaris = count($validated['bahan_baku_id']);
 
         foreach (['jumlah_pemakaian', 'satuan_pemakaian'] as $field) {
@@ -77,6 +132,7 @@ class ProdukController extends Controller
             $produk = Produk::create([
                 'nama_produk' => $validated['nama_produk'],
                 'satuan' => $validated['satuan'],
+                'upah_operator' => $validated['upah_operator'],
             ]);
 
             foreach ($validated['bahan_baku_id'] as $i => $bahanBakuId) {
@@ -94,13 +150,26 @@ class ProdukController extends Controller
             ->with('success', 'Produk dan komposisi bahan berhasil ditambahkan.');
     }
 
+    /**
+     * Menampilkan halaman edit jika route edit digunakan.
+     */
     public function edit($id)
     {
-        $produk = Produk::findOrFail($id);
+        $produk = Produk::with('komposisi')->findOrFail($id);
 
-        return view('admin.produk.edit', compact('produk'));
+        $bahanBakus = BahanBaku::where('status', 'aktif')
+            ->orderBy('nama_bahan')
+            ->get();
+
+        return view('admin.produk.edit', compact(
+            'produk',
+            'bahanBakus'
+        ));
     }
 
+    /**
+     * Memperbarui produk dan komposisi bahan bakunya.
+     */
     public function update(Request $request, $id)
     {
         $produk = Produk::findOrFail($id);
@@ -112,26 +181,120 @@ class ProdukController extends Controller
                 'max:255',
                 Rule::unique('produks', 'nama_produk')->ignore($produk->id),
             ],
+
             'satuan' => [
                 'required',
                 'string',
                 'max:50',
             ],
+
+            'upah_operator' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
+
+            'bahan_baku_id' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'bahan_baku_id.*' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:bahan_baku,id',
+            ],
+
+            'jumlah_pemakaian' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'jumlah_pemakaian.*' => [
+                'required',
+                'numeric',
+                'min:0.0001',
+            ],
+
+            'satuan_pemakaian' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'satuan_pemakaian.*' => [
+                'required',
+                'string',
+                'max:30',
+            ],
         ], [
             'nama_produk.required' => 'Nama produk wajib diisi.',
             'nama_produk.unique' => 'Nama produk tersebut sudah terdaftar.',
             'nama_produk.max' => 'Nama produk maksimal 255 karakter.',
-            'satuan.required' => 'Satuan wajib dipilih atau diisi.',
-            'satuan.max' => 'Satuan maksimal 50 karakter.',
+
+            'satuan.required' => 'Satuan produk wajib dipilih.',
+            'satuan.max' => 'Satuan produk maksimal 50 karakter.',
+
+            'upah_operator.required' => 'Upah operator wajib diisi.',
+            'upah_operator.numeric' => 'Upah operator harus berupa angka.',
+            'upah_operator.min' => 'Upah operator tidak boleh negatif.',
+
+            'bahan_baku_id.required' => 'Tambahkan minimal satu bahan baku.',
+            'bahan_baku_id.*.distinct' => 'Bahan baku tidak boleh dipilih berulang.',
+            'bahan_baku_id.*.exists' => 'Bahan baku yang dipilih tidak ditemukan.',
+
+            'jumlah_pemakaian.*.required' => 'Jumlah pemakaian wajib diisi.',
+            'jumlah_pemakaian.*.numeric' => 'Jumlah pemakaian harus berupa angka.',
+            'jumlah_pemakaian.*.min' => 'Jumlah pemakaian harus lebih dari nol.',
+
+            'satuan_pemakaian.*.required' => 'Satuan pemakaian wajib diisi.',
         ]);
 
-        $produk->update($validated);
+        // Pastikan jumlah setiap kelompok data komposisi sama.
+        $jumlahBaris = count($validated['bahan_baku_id']);
+
+        foreach (['jumlah_pemakaian', 'satuan_pemakaian'] as $field) {
+            if (count($validated[$field]) !== $jumlahBaris) {
+                return back()
+                    ->withErrors([
+                        $field => 'Data komposisi bahan tidak lengkap.',
+                    ])
+                    ->withInput();
+            }
+        }
+
+        DB::transaction(function () use ($produk, $validated) {
+            // Perbarui informasi produk, termasuk upah operator.
+            $produk->update([
+                'nama_produk' => $validated['nama_produk'],
+                'satuan' => $validated['satuan'],
+                'upah_operator' => $validated['upah_operator'],
+            ]);
+
+            // Ganti komposisi lama dengan komposisi yang dikirim dari form.
+            $produk->komposisi()->delete();
+
+            foreach ($validated['bahan_baku_id'] as $i => $bahanBakuId) {
+                KomposisiProduk::create([
+                    'produk_id' => $produk->id,
+                    'bahan_baku_id' => $bahanBakuId,
+                    'jumlah_pemakaian' => $validated['jumlah_pemakaian'][$i],
+                    'satuan_pemakaian' => $validated['satuan_pemakaian'][$i],
+                ]);
+            }
+        });
 
         return redirect()
             ->route('produk.index')
-            ->with('success', 'Data produk berhasil diperbarui!');
+            ->with('success', 'Data produk dan komposisi bahan berhasil diperbarui.');
     }
 
+    /**
+     * Menghapus produk.
+     */
     public function destroy($id)
     {
         $produk = Produk::findOrFail($id);
