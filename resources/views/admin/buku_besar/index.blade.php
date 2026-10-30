@@ -1,19 +1,20 @@
 <x-admin-layout-stisla>
     {{-- HEADER HALAMAN --}}
-    <div class="section-header">
-        <h1>Buku Besar</h1>
+    <div
+        class="mb-[30px] flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[3px] bg-white px-[30px] py-5 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+        <h1 class="text-2xl font-bold text-[#34395e]">Buku Besar</h1>
 
-        <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active">Buku Besar</div>
-        </div>
+        <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
+            <li class="font-semibold text-[#6777ef]">Buku Besar</li>
+        </ol>
     </div>
 
-    <div class="section-body">
+    <div>
 
         {{-- HEADER DAN TOMBOL EXPORT --}}
-        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+        <div class="mb-4 flex flex-wrap items-center justify-between">
             <div class="mb-2">
-                <p class="text-muted mb-0">
+                <p class="text-[#6c757d]">
                     Laporan mutasi dan saldo per akun perkiraan.
                 </p>
             </div>
@@ -26,15 +27,15 @@
                 ];
             @endphp
 
-            <div class="d-flex flex-wrap mb-2">
+            <div class="mb-2 flex flex-wrap">
                 <a href="{{ route('buku_besar.pdf', $paramCetak) }}"
-                   class="btn btn-danger btn-sm mr-2 mb-1">
+                    class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#fb160a]">
                     <i class="fas fa-file-pdf mr-1"></i>
                     Export PDF
                 </a>
 
                 <a href="{{ route('buku_besar.excel', $paramCetak) }}"
-                   class="btn btn-success btn-sm mb-1">
+                    class="mb-1 inline-flex items-center rounded-[3px] bg-[#54ca68] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#3fb556]">
                     <i class="fas fa-file-excel mr-1"></i>
                     Export Excel
                 </a>
@@ -42,92 +43,88 @@
         </div>
 
         {{-- FORM FILTER --}}
-        <div class="card mb-3">
-            <div class="card-body p-3">
-                <form action="{{ route('buku_besar.index') }}" method="GET">
-                    <div class="form-row align-items-end">
+        <div class="mb-4 rounded-[3px] bg-white p-4 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+            <form action="{{ route('buku_besar.index') }}" method="GET"
+                class="grid grid-cols-1 items-end gap-x-2.5 gap-y-2 md:grid-cols-2 lg:grid-cols-12">
 
-                        {{-- PILIH AKUN --}}
-                        <div class="form-group col-lg-3 col-md-6 mb-2">
-                            <label for="akun_id" class="d-block mb-1">Pilih Akun</label>
-                            <select name="akun_id"
-                                    id="akun_id"
-                                    class="form-control">
-                                <option value="semua"
-                                    {{ ($akun_id ?? 'semua') === 'semua' ? 'selected' : '' }}>
-                                    Semua Akun
+                {{-- PILIH AKUN --}}
+                <div class="lg:col-span-3">
+                    <label for="akun_id" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Pilih Akun
+                    </label>
+                    <select name="akun_id" id="akun_id"
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                        <option value="semua" {{ ($akun_id ?? 'semua') === 'semua' ? 'selected' : '' }}>
+                            Semua Akun
+                        </option>
+
+                        @foreach ($akuns as $akun)
+                            <option value="{{ $akun->id }}"
+                                {{ (string) ($akun_id ?? 'semua') === (string) $akun->id ? 'selected' : '' }}>
+                                {{ $akun->kode_akun }} - {{ $akun->nama_akun }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- TANGGAL MULAI --}}
+                <div class="lg:col-span-2">
+                    <label for="start_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Tanggal Mulai
+                    </label>
+                    <input type="date" id="start_date" name="start_date" value="{{ $start_date }}" required
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                </div>
+
+                {{-- TANGGAL AKHIR --}}
+                <div class="lg:col-span-2">
+                    <label for="end_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Tanggal Akhir
+                    </label>
+                    <input type="date" id="end_date" name="end_date" value="{{ $end_date }}"
+                        min="{{ $start_date }}" required
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                </div>
+
+                {{-- CABANG --}}
+                @if (Auth::user()->role === 'Admin Pusat')
+                    <div class="lg:col-span-2">
+                        <label for="cabang_id"
+                            class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                            Pilih Cabang
+                        </label>
+                        <select name="cabang_id" id="cabang_id"
+                            class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                            <option value="">Semua Cabang</option>
+
+                            @foreach ($cabangs as $cabang)
+                                <option value="{{ $cabang->id }}"
+                                    {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
+                                    {{ $cabang->nama }}
                                 </option>
-
-                                @foreach ($akuns as $akun)
-                                    <option value="{{ $akun->id }}"
-                                        {{ (string) ($akun_id ?? 'semua') === (string) $akun->id ? 'selected' : '' }}>
-                                        {{ $akun->kode_akun }} - {{ $akun->nama_akun }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- TANGGAL MULAI --}}
-                        <div class="form-group col-lg-2 col-md-6 mb-2">
-                            <label for="start_date" class="d-block mb-1">Tanggal Mulai</label>
-                            <input type="date"
-                                id="start_date"
-                                name="start_date"
-                                value="{{ $start_date }}"
-                                class="form-control"
-                                required>
-                        </div>
-
-                        {{-- TANGGAL AKHIR --}}
-                        <div class="form-group col-lg-2 col-md-6 mb-2">
-                            <label for="end_date" class="d-block mb-1">Tanggal Akhir</label>
-                            <input type="date"
-                                id="end_date"
-                                name="end_date"
-                                value="{{ $end_date }}"
-                                min="{{ $start_date }}"
-                                class="form-control"
-                                required>
-                        </div>
-
-                        {{-- CABANG --}}
-                        @if (Auth::user()->role === 'Admin Pusat')
-                            <div class="form-group col-lg-2 col-md-6 mb-2">
-                                <label for="cabang_id" class="d-block mb-1">Pilih Cabang</label>
-                                <select name="cabang_id"
-                                        id="cabang_id"
-                                        class="form-control">
-                                    <option value="">Semua Cabang</option>
-
-                                    @foreach ($cabangs as $cabang)
-                                        <option value="{{ $cabang->id }}"
-                                            {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
-                                            {{ $cabang->nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endif
-
-                        {{-- TOMBOL --}}
-                        <div class="form-group col-lg-3 col-md-12 mb-2">
-                            <div class="d-flex align-items-center flex-wrap">
-                                <button type="submit" class="btn btn-primary mr-2 mb-1">
-                                    <i class="fas fa-filter mr-1"></i>
-                                    Tampilkan
-                                </button>
-
-                                <a href="{{ route('buku_besar.index') }}"
-                                class="btn btn-light mb-1">
-                                    <i class="fas fa-redo mr-1"></i>
-                                    Reset
-                                </a>
-                            </div>
-                        </div>
-
+                            @endforeach
+                        </select>
                     </div>
-                </form>
-            </div>
+                @endif
+
+                {{-- TOMBOL --}}
+                <div class="md:col-span-2 lg:col-span-3">
+                    <div class="flex flex-wrap items-center">
+                        <button type="submit"
+                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                            <i class="fas fa-filter mr-1"></i>
+                            Tampilkan
+                        </button>
+
+                        <a href="{{ route('buku_besar.index') }}"
+                            class="mb-1 inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                            <i class="fas fa-redo mr-1"></i>
+                            Reset
+                        </a>
+                    </div>
+                </div>
+
+            </form>
         </div>
 
         {{-- HASIL LAPORAN --}}
@@ -143,101 +140,92 @@
             @endforeach
 
             {{-- RINGKASAN BUKU BESAR --}}
-            <div class="card mt-3">
-                <div class="card-header bg-primary py-2">
-                    <h4 class="text-white mb-0">
+            <div class="mt-4 overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+                <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
+                    <h4 class="text-base font-semibold leading-7 text-white">
                         <i class="fas fa-chart-bar mr-2"></i>
                         Ringkasan Buku Besar
                     </h4>
                 </div>
 
-                <div class="card-body">
+                <div class="p-[25px]">
                     @php
                         // Saldo awal bersih: Debit positif, Kredit negatif.
                         $totalSaldoAwal = $laporan->sum(function ($item) {
-                            return $item['sisiAwal'] === 'Debit'
-                                ? $item['saldoAwal']
-                                : -$item['saldoAwal'];
+                            return $item['sisiAwal'] === 'Debit' ? $item['saldoAwal'] : -$item['saldoAwal'];
                         });
 
                         // Saldo akhir bersih: Debit positif, Kredit negatif.
                         $totalSaldoAkhir = $laporan->sum(function ($item) {
-                            return $item['sisiAkhir'] === 'Debit'
-                                ? $item['saldoAkhir']
-                                : -$item['saldoAkhir'];
+                            return $item['sisiAkhir'] === 'Debit' ? $item['saldoAkhir'] : -$item['saldoAkhir'];
                         });
 
                         $seimbang = round($grandDebit, 2) === round($grandKredit, 2);
                     @endphp
 
-                    <div class="row">
+                    <div class="mb-4 grid grid-cols-1 gap-x-[30px] gap-y-4 md:grid-cols-2 lg:grid-cols-4">
 
                         {{-- TOTAL DEBIT --}}
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <div class="text-muted small">Total Debit</div>
-                                <h6 class="font-weight-bold text-dark mt-2 mb-0">
-                                    Rp {{ number_format($grandDebit, 2, ',', '.') }}
-                                </h6>
-                            </div>
+                        <div class="h-full rounded border border-[#dee2e6] p-4">
+                            <div class="text-xs text-[#6c757d]">Total Debit</div>
+                            <h6 class="mt-2 text-sm font-bold text-[#191d21]">
+                                Rp {{ number_format($grandDebit, 2, ',', '.') }}
+                            </h6>
                         </div>
 
                         {{-- SALDO AWAL --}}
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <div class="text-muted small">Saldo Awal Bersih</div>
-                                <h6 class="font-weight-bold text-dark mt-2 mb-0">
-                                    Rp {{ number_format(abs($totalSaldoAwal), 2, ',', '.') }}
-                                </h6>
-                                <small class="text-muted">
-                                    {{ $totalSaldoAwal < 0 ? 'Kredit' : 'Debit' }}
-                                </small>
-                            </div>
+                        <div class="h-full rounded border border-[#dee2e6] p-4">
+                            <div class="text-xs text-[#6c757d]">Saldo Awal Bersih</div>
+                            <h6 class="mt-2 text-sm font-bold text-[#191d21]">
+                                Rp {{ number_format(abs($totalSaldoAwal), 2, ',', '.') }}
+                            </h6>
+                            <small class="text-[#6c757d]">
+                                {{ $totalSaldoAwal < 0 ? 'Kredit' : 'Debit' }}
+                            </small>
                         </div>
 
                         {{-- TOTAL KREDIT --}}
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <div class="text-muted small">Total Kredit</div>
-                                <h6 class="font-weight-bold text-dark mt-2 mb-0">
-                                    Rp {{ number_format($grandKredit, 2, ',', '.') }}
-                                </h6>
-                            </div>
+                        <div class="h-full rounded border border-[#dee2e6] p-4">
+                            <div class="text-xs text-[#6c757d]">Total Kredit</div>
+                            <h6 class="mt-2 text-sm font-bold text-[#191d21]">
+                                Rp {{ number_format($grandKredit, 2, ',', '.') }}
+                            </h6>
                         </div>
 
                         {{-- SALDO AKHIR --}}
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <div class="text-muted small">Saldo Akhir Bersih</div>
-                                <h6 class="font-weight-bold text-dark mt-2 mb-0">
-                                    Rp {{ number_format(abs($totalSaldoAkhir), 2, ',', '.') }}
-                                </h6>
-                                <small class="text-muted">
-                                    {{ $totalSaldoAkhir < 0 ? 'Kredit' : 'Debit' }}
-                                </small>
-                            </div>
+                        <div class="h-full rounded border border-[#dee2e6] p-4">
+                            <div class="text-xs text-[#6c757d]">Saldo Akhir Bersih</div>
+                            <h6 class="mt-2 text-sm font-bold text-[#191d21]">
+                                Rp {{ number_format(abs($totalSaldoAkhir), 2, ',', '.') }}
+                            </h6>
+                            <small class="text-[#6c757d]">
+                                {{ $totalSaldoAkhir < 0 ? 'Kredit' : 'Debit' }}
+                            </small>
                         </div>
 
                     </div>
 
                     {{-- STATUS KESEIMBANGAN JURNAL --}}
-                    <div class="border rounded p-3 d-flex flex-wrap align-items-center justify-content-between">
-                        <div class="mb-2 mb-md-0">
-                            <div class="font-weight-bold text-dark">
+                    <div
+                        class="flex flex-wrap items-center justify-between rounded border border-[#dee2e6] p-4">
+                        <div class="mb-2 md:mb-0">
+                            <div class="font-bold text-[#191d21]">
                                 Status Keseimbangan Jurnal
                             </div>
-                            <small class="text-muted">
+                            <small class="text-[#6c757d]">
                                 Perbandingan total debit dan total kredit
                             </small>
                         </div>
 
                         @if ($seimbang)
-                            <span class="badge badge-success p-2">
+                            <span
+                                class="inline-flex items-center rounded-full bg-[#54ca68] px-3 py-2 text-xs font-semibold tracking-[0.3px] text-white">
                                 <i class="fas fa-check-circle mr-1"></i>
                                 Seimbang
                             </span>
                         @else
-                            <span class="badge badge-danger p-2">
+                            <span
+                                class="inline-flex items-center rounded-full bg-[#fc544b] px-3 py-2 text-xs font-semibold tracking-[0.3px] text-white">
                                 <i class="fas fa-exclamation-circle mr-1"></i>
                                 Tidak Seimbang
                             </span>
@@ -246,12 +234,11 @@
 
                 </div>
             </div>
-
         @elseif($akun_id)
-            <div class="card">
-                <div class="card-body text-center text-muted py-4">
-                    <i class="fas fa-file-alt fa-2x mb-2"></i>
-                    <p class="mb-0">
+            <div class="rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+                <div class="px-[25px] py-6 text-center text-[#6c757d]">
+                    <i class="fas fa-file-alt text-[2em]"></i>
+                    <p>
                         Tidak ada akun yang memiliki saldo atau mutasi pada periode ini.
                     </p>
                 </div>

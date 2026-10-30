@@ -1,27 +1,25 @@
-
 <x-admin-layout-stisla>
 
     {{-- HEADER HALAMAN --}}
-    <div class="section-header">
-        <h1>Data Cabang</h1>
+    <div
+        class="mb-[30px] flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[3px] bg-white px-[30px] py-5 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+        <h1 class="text-2xl font-bold text-[#34395e]">Data Cabang</h1>
 
-        <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active">Data Cabang</div>
-        </div>
+        <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
+            <li class="font-semibold text-[#6777ef]">Data Cabang</li>
+        </ol>
     </div>
 
-    <div class="section-body">
+    <div>
 
         {{-- DESKRIPSI DAN TOMBOL TAMBAH --}}
-        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
-            <p class="text-muted mb-2">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <p class="mb-2 text-[#6c757d]">
                 Kelola daftar cabang percetakan CV Cemerlang.
             </p>
 
-            <button type="button"
-                    class="btn btn-primary btn-sm mb-2"
-                    data-toggle="modal"
-                    data-target="#modalTambahCabang">
+            <button type="button" data-modal-open="modalTambahCabang"
+                class="mb-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                 <i class="fas fa-plus mr-1"></i>
                 Tambah Cabang
             </button>
@@ -29,276 +27,208 @@
 
         {{-- NOTIFIKASI SUKSES --}}
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show py-2 mb-3"
-                 role="alert">
-                <i class="fas fa-check-circle mr-2"></i>
-                {{ session('success') }}
-
-                <button type="button"
-                        class="close"
-                        data-dismiss="alert"
-                        aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div role="alert"
+                class="mb-4 flex items-center rounded-[3px] border-l-[3px] border-black/20 bg-[#54ca68] px-5 py-2 text-white">
+                <span class="min-w-0">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    {{ session('success') }}
+                </span>
+                <button type="button" aria-label="Tutup" onclick="this.closest('[role=alert]').remove()"
+                    class="ml-auto pl-4 text-2xl leading-none text-white/80 hover:text-white">&times;</button>
             </div>
         @endif
 
         {{-- NOTIFIKASI ERROR --}}
         @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3"
-                 role="alert">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                {{ session('error') }}
-
-                <button type="button"
-                        class="close"
-                        data-dismiss="alert"
-                        aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div role="alert"
+                class="mb-4 flex items-center rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-2 text-white">
+                <span class="min-w-0">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    {{ session('error') }}
+                </span>
+                <button type="button" aria-label="Tutup" onclick="this.closest('[role=alert]').remove()"
+                    class="ml-auto pl-4 text-2xl leading-none text-white/80 hover:text-white">&times;</button>
             </div>
         @endif
 
         {{-- TABEL DATA CABANG --}}
-        <div class="card">
-            <div class="card-header bg-primary py-2">
-                <h4 class="text-white mb-0">
-                    <i class="fas fa-store mr-2"></i>
-                    Daftar Cabang
-                </h4>
-            </div>
+        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
 
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sista">
-                        <thead>
-                            <tr>
-                                <th class="text-center">#</th>
-                                <th>Nama Cabang</th>
-                                <th>Alamat</th>
-                                <th>No. HP</th>
-                                <th class="text-center">Status Cabang</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
+            {{-- HEADER TABEL --}}
+            <x-slot:head>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">#</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Nama Cabang</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">Alamat</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-left">No. HP</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">Status Cabang</th>
+                <th class="h-[45px] bg-[#fdfdff] px-[15px] text-center">Aksi</th>
+            </x-slot:head>
 
-                        <tbody>
-                            @forelse ($cabangs as $cabang)
-                                <tr>
-                                    <td class="text-center text-muted align-middle">
-                                        {{ $loop->iteration }}
-                                    </td>
+            {{-- ISI TABEL --}}
+            @forelse ($cabangs as $cabang)
+                <tr class="odd:bg-black/[0.025]">
+                    <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
+                        {{ $loop->iteration }}
+                    </td>
 
-                                    <td class="font-weight-bold align-middle">
-                                        {{ $cabang->nama }}
-                                    </td>
+                    <td class="px-[15px] py-3 align-middle font-bold">
+                        {{ $cabang->nama }}
+                    </td>
 
-                                    <td class="align-middle">
-                                        {{ $cabang->alamat ?: '-' }}
-                                    </td>
+                    <td class="px-[15px] py-3 align-middle">
+                        {{ $cabang->alamat ?: '-' }}
+                    </td>
 
-                                    <td class="align-middle text-nowrap">
-                                        {{ $cabang->no_hp ?: '-' }}
-                                    </td>
+                    <td class="whitespace-nowrap px-[15px] py-3 align-middle">
+                        {{ $cabang->no_hp ?: '-' }}
+                    </td>
 
-                                    <td class="text-center align-middle">
-                                        @if (strtolower($cabang->status) === 'aktif')
-                                            <span class="badge badge-success">
-                                                {{ ucfirst($cabang->status) }}
-                                            </span>
-                                        @else
-                                            <span class="badge badge-secondary">
-                                                {{ ucfirst($cabang->status) }}
-                                            </span>
-                                        @endif
-                                    </td>
+                    <td class="px-[15px] py-3 text-center align-middle">
+                        @if (strtolower($cabang->status) === 'aktif')
+                            <span
+                                class="rounded-full bg-[#54ca68] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                {{ ucfirst($cabang->status) }}
+                            </span>
+                        @else
+                            <span
+                                class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                                {{ ucfirst($cabang->status) }}
+                            </span>
+                        @endif
+                    </td>
 
-                                    <td class="text-center align-middle text-nowrap">
-                                        
-                                        <button type="button"
-                                                class="btn btn-primary btn-sm btn-edit-cabang"
-                                                title="Edit Cabang"
-                                                data-id="{{ $cabang->id }}"
-                                                data-url="{{ route('cabang.update', $cabang->id) }}"
-                                                data-nama="{{ $cabang->nama }}"
-                                                data-alamat="{{ $cabang->alamat }}"
-                                                data-no-hp="{{ $cabang->no_hp }}"
-                                                data-status="{{ $cabang->status }}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6"
-                                        class="text-center text-muted py-4">
-                                        <i class="fas fa-store fa-2x mb-2"></i>
-                                        <p class="mb-0">
-                                            Belum ada data cabang.
-                                            Silakan tambah cabang baru.
-                                        </p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
+                    <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
+                        <a href="{{ route('cabang.edit', $cabang->id) }}" title="Edit Cabang"
+                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="px-[15px] py-6 text-center text-[#6c757d]">
+                        <i class="fas fa-store mb-2 text-[2em]"></i>
+                        <p>
+                            Belum ada data cabang.
+                            Silakan tambah cabang baru.
+                        </p>
+                    </td>
+                </tr>
+            @endforelse
+        </x-card-table>
     </div>
 
     {{-- MODAL TAMBAH CABANG --}}
-    <div class="modal fade"
-         id="modalTambahCabang"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="judulModalTambahCabang"
-         aria-hidden="true">
+    <dialog id="modalTambahCabang" aria-labelledby="judulModalTambahCabang"
+        class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40">
 
-        <div class="modal-dialog modal-lg modal-dialog-centered"
-             role="document">
+        {{-- HEADER MODAL --}}
+        <div class="flex items-center justify-between bg-[#6777ef] px-[25px] py-4">
+            <h5 id="judulModalTambahCabang" class="text-lg font-semibold text-white">
+                <i class="fas fa-store mr-2"></i>
+                Tambah Cabang Baru
+            </h5>
 
-            <div class="modal-content">
+            <button type="button" data-modal-close aria-label="Tutup"
+                class="text-2xl leading-none text-white/80 hover:text-white">&times;</button>
+        </div>
 
-                {{-- HEADER MODAL --}}
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title text-white"
-                        id="judulModalTambahCabang">
-                        <i class="fas fa-store mr-2"></i>
-                        Tambah Cabang Baru
-                    </h5>
+        {{-- FORM TAMBAH CABANG --}}
+        <form id="formTambahCabang" action="{{ route('cabang.store') }}" method="POST">
+            @csrf
 
-                    <button type="button"
-                            class="close text-white"
-                            data-dismiss="modal"
-                            aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+            <div class="p-[25px]">
+
+                <p class="mb-6 text-[#6c757d]">
+                    Masukkan informasi cabang percetakan dengan lengkap.
+                </p>
+
+                {{-- NAMA CABANG --}}
+                <div class="mb-[25px]">
+                    <label for="namaCabang" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Nama Cabang <span class="text-[#fc544b]">*</span>
+                    </label>
+
+                    <input type="text" id="namaCabang" name="nama" value="{{ old('nama') }}"
+                        placeholder="Contoh: Cabang Arengka" maxlength="255" required
+                        class="h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:outline-none @error('nama') border-[#fc544b] @else border-[#e4e6fc] focus:border-[#95a0f4] @enderror">
+
+                    @error('nama')
+                        <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                {{-- FORM TAMBAH CABANG --}}
-                <form id="formTambahCabang"
-                      action="{{ route('cabang.store') }}"
-                      method="POST">
+                {{-- NOMOR HP --}}
+                <div class="mb-[25px]">
+                    <label for="noHpCabang" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Nomor HP/Telepon <span class="text-[#fc544b]">*</span>
+                    </label>
 
-                    @csrf
+                    <input type="text" id="noHpCabang" name="no_hp" value="{{ old('no_hp') }}"
+                        placeholder="Contoh: 081234567890" maxlength="20" required
+                        class="h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:outline-none @error('no_hp') border-[#fc544b] @else border-[#e4e6fc] focus:border-[#95a0f4] @enderror">
 
-                    <div class="modal-body">
+                    @error('no_hp')
+                        <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                        <p class="text-muted mb-4">
-                            Masukkan informasi cabang percetakan dengan lengkap.
-                        </p>
+                {{-- ALAMAT --}}
+                <div class="mb-[25px]">
+                    <label for="alamatCabang" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Alamat Lengkap <span class="text-[#fc544b]">*</span>
+                    </label>
 
-                        {{-- NAMA CABANG --}}
-                        <div class="form-group">
-                            <label for="namaCabang">
-                                Nama Cabang <span class="text-danger">*</span>
-                            </label>
+                    <textarea id="alamatCabang" name="alamat" rows="3" maxlength="1000" placeholder="Masukkan alamat lengkap cabang"
+                        required
+                        class="w-full rounded-[3px] border bg-[#fdfdff] px-[15px] py-2.5 text-sm text-[#495057] focus:outline-none @error('alamat') border-[#fc544b] @else border-[#e4e6fc] focus:border-[#95a0f4] @enderror">{{ old('alamat') }}</textarea>
 
-                            <input type="text"
-                                   id="namaCabang"
-                                   name="nama"
-                                   value="{{ old('nama') }}"
-                                   class="form-control @error('nama') is-invalid @enderror"
-                                   placeholder="Contoh: Cabang Arengka"
-                                   maxlength="255"
-                                   required>
+                    @error('alamat')
+                        <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                            @error('nama')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                {{-- STATUS CABANG --}}
+                <div>
+                    <label for="statusCabang"
+                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Status Cabang <span class="text-[#fc544b]">*</span>
+                    </label>
 
-                        {{-- NOMOR HP --}}
-                        <div class="form-group">
-                            <label for="noHpCabang">
-                                Nomor HP/Telepon <span class="text-danger">*</span>
-                            </label>
+                    <select id="statusCabang" name="status" required
+                        class="h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:outline-none @error('status') border-[#fc544b] @else border-[#e4e6fc] focus:border-[#95a0f4] @enderror">
+                        <option value="aktif" {{ old('status', 'aktif') === 'aktif' ? 'selected' : '' }}>
+                            Aktif
+                        </option>
+                        <option value="nonaktif" {{ old('status') === 'nonaktif' ? 'selected' : '' }}>
+                            Nonaktif
+                        </option>
+                    </select>
 
-                            <input type="text"
-                                   id="noHpCabang"
-                                   name="no_hp"
-                                   value="{{ old('no_hp') }}"
-                                   class="form-control @error('no_hp') is-invalid @enderror"
-                                   placeholder="Contoh: 081234567890"
-                                   maxlength="20"
-                                   required>
-
-                            @error('no_hp')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- ALAMAT --}}
-                        <div class="form-group">
-                            <label for="alamatCabang">
-                                Alamat Lengkap <span class="text-danger">*</span>
-                            </label>
-
-                            <textarea id="alamatCabang"
-                                      name="alamat"
-                                      rows="3"
-                                      maxlength="1000"
-                                      class="form-control @error('alamat') is-invalid @enderror"
-                                      placeholder="Masukkan alamat lengkap cabang"
-                                      required>{{ old('alamat') }}</textarea>
-
-                            @error('alamat')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- STATUS CABANG --}}
-                        <div class="form-group mb-0">
-                            <label for="statusCabang">
-                                Status Cabang <span class="text-danger">*</span>
-                            </label>
-
-                            <select id="statusCabang"
-                                    name="status"
-                                    class="form-control @error('status') is-invalid @enderror"
-                                    required>
-                                <option value="aktif"
-                                    {{ old('status', 'aktif') === 'aktif' ? 'selected' : '' }}>
-                                    Aktif
-                                </option>
-                                <option value="nonaktif"
-                                    {{ old('status') === 'nonaktif' ? 'selected' : '' }}>
-                                    Nonaktif
-                                </option>
-                            </select>
-
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                    </div>
-
-                    {{-- FOOTER MODAL --}}
-                    <div class="modal-footer bg-light">
-                        <button type="button"
-                                class="btn btn-light"
-                                data-dismiss="modal">
-                            <i class="fas fa-times mr-1"></i>
-                            Batal
-                        </button>
-
-                        <button type="submit"
-                                id="btnSimpanCabang"
-                                class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i>
-                            Simpan Cabang
-                        </button>
-                    </div>
-
-                </form>
+                    @error('status')
+                        <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
+                    @enderror
+                </div>
 
             </div>
-        </div>
-    </div>
+
+            {{-- FOOTER MODAL --}}
+            <div class="flex items-center justify-end gap-2 bg-[#f8f9fa] px-[25px] py-3">
+                <button type="button" data-modal-close
+                    class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                    <i class="fas fa-times mr-1"></i>
+                    Batal
+                </button>
+
+                <button type="submit" id="btnSimpanCabang"
+                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65">
+                    <i class="fas fa-save mr-1"></i>
+                    Simpan Cabang
+                </button>
+            </div>
+
+        </form>
+    </dialog>
 
     
     {{-- MODAL EDIT CABANG --}}
@@ -435,7 +365,35 @@
     {{-- SCRIPT MODAL --}}
     @push('scripts')
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            // Pembuka/penutup <dialog> (data-modal-open, data-modal-close, klik latar gelap).
+            // Cukup dimuat sekali per halaman; Esc sudah ditangani browser.
+            (function() {
+                if (window.__sistaModalReady) return;
+                window.__sistaModalReady = true;
+
+                document.addEventListener('click', function(e) {
+                    const buka = e.target.closest('[data-modal-open]');
+                    if (buka) {
+                        const dialog = document.getElementById(buka.dataset.modalOpen);
+                        if (dialog && !dialog.open) dialog.showModal();
+                        return;
+                    }
+
+                    const tutup = e.target.closest('[data-modal-close]');
+                    if (tutup) {
+                        const dialog = tutup.closest('dialog');
+                        if (dialog) dialog.close();
+                        return;
+                    }
+
+                    // Klik di latar gelap (target = elemen dialog itu sendiri)
+                    if (e.target instanceof HTMLDialogElement && e.target.open) {
+                        e.target.close();
+                    }
+                });
+            })();
+
+            document.addEventListener('DOMContentLoaded', function() {
                 const modal = document.getElementById('modalTambahCabang');
                 const form = document.getElementById('formTambahCabang');
                 const tombolSimpan = document.getElementById('btnSimpanCabang');
@@ -444,14 +402,8 @@
                     return;
                 }
 
-                /*
-                 * Pindahkan modal ke body untuk menghindari masalah
-                 * stacking context pada layout Stisla.
-                 */
-                document.body.appendChild(modal);
-
                 // Cegah form terkirim berkali-kali.
-                form.addEventListener('submit', function () {
+                form.addEventListener('submit', function() {
                     if (tombolSimpan) {
                         tombolSimpan.disabled = true;
                         tombolSimpan.innerHTML =
@@ -460,11 +412,8 @@
                 });
 
                 // Jika validasi gagal, buka kembali modal dan tampilkan error.
-                @if ($errors->any() && !old('edit_cabang_id'))
-                    if (window.jQuery &&
-                        typeof jQuery.fn.modal === 'function') {
-                        jQuery(modal).modal('show');
-                    }
+                @if ($errors->any())
+                    if (!modal.open) modal.showModal();
                 @endif
             });
         </script>
