@@ -304,17 +304,17 @@
                                     Password <span class="text-danger">*</span>
                                 </label>
 
-                                <input type="password"
+                                                               <x-password-input
                                        id="userPassword"
                                        name="password"
                                        class="form-control @error('password') is-invalid @enderror"
                                        placeholder="Minimal 8 karakter"
                                        minlength="8"
                                        autocomplete="new-password"
-                                       required>
+                                       required />
 
                                 @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
 
                                 <small class="form-text text-muted">
@@ -464,7 +464,7 @@
                 return;
             }
 
-            const adminCabang = roleSelect.value === 'Admin Cabang';
+            const adminCabang = ['Admin Cabang', 'Customer Service'].includes(roleSelect.value);
 
             // Cabang wajib untuk Admin Cabang.
             cabangSelect.required = adminCabang;
@@ -737,15 +737,15 @@
 
                             <div class="form-group col-md-6">
                                 <label for="edit_user_password">Password Baru</label>
-                                <input type="password"
+                                                                <x-password-input
                                     name="password"
                                     id="edit_user_password"
                                     class="form-control @error('password') is-invalid @enderror"
                                     minlength="8"
                                     autocomplete="new-password"
-                                    placeholder="Kosongkan jika tidak diubah">
+                                    placeholder="Kosongkan jika tidak diubah" />
                                 @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                                 <small class="form-text text-muted">
                                     Isi hanya jika ingin mengganti password.

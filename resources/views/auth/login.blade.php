@@ -172,9 +172,12 @@
                 </p>
             </div>
 
-            <!-- Form login Laravel -->
-            <form action="{{ route('login.authenticate') }}" method="POST" class="space-y-4">
-                @csrf
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <x-password-input id="password" name="password" autocomplete="current-password"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="••••••••" required />
+            </div>
 
                 @if ($errors->any())
                     <div class="rounded-lg border border-white/30 bg-red-900/30 p-3 text-sm text-white">
