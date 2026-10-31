@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Cabang;
-use App\Models\Produk;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -20,6 +19,20 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Cabang Utama',
             'alamat' => 'Jl. Sudirman No. 123',
             'no_hp' => '081234567890',
+            'status' => 'aktif',
+        ]);
+
+        $cabang = Cabang::create([
+            'nama' => 'Pekanbaru',
+            'alamat' => 'Ruko Cemerlang, Jl. Riau No. 456',
+            'no_hp' => '081234567891',
+            'status' => 'aktif',
+        ]);
+
+        $cabang = Cabang::create([
+            'nama' => 'Kerinci',
+            'alamat' => 'Jl. Merdeka No. 789',
+            'no_hp' => '081234567891',
             'status' => 'aktif',
         ]);
 
@@ -43,7 +56,17 @@ class DatabaseSeeder extends Seeder
             'role' => 'Admin Cabang',
             'cabang_id' => $cabang->id,
         ]);
-    
+
+        // C. Customer Service
+        User::create([
+            'name' => 'Customer Service',
+            'email' => 'cs@contoh.com',
+            'username' => 'customer_service',
+            'password' => Hash::make('password'),
+            'role' => 'Customer Service',
+            'cabang_id' => $cabang->id,
+        ]);
+
         // Seeder Akun
         $this->call([
             AkunSeeder::class,
@@ -51,6 +74,7 @@ class DatabaseSeeder extends Seeder
             ProdukSeeder::class,
             KomposisiProdukSeeder::class,
             TransaksiSeeder::class,
+            PengeluaranSeeder::class,
         ]);
     
     }
