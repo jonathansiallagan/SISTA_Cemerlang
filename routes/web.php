@@ -35,7 +35,7 @@ Route::middleware(['guest'])->group(function () {
 
 //====================================================================================================//
 // AREA INTERNAL //
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
     // Rute Dashboard Admin (Untuk Pusat & Cabang)
     Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
@@ -117,17 +117,10 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:Admin Pusat'])->group(function () {
         
         // === ROUTE MASTER DATA CABANG ===
-        Route::get('/cabang', [CabangController::class, 'index'])
-            ->name('cabang.index');
-
-        Route::post('/cabang', [CabangController::class, 'store'])
-            ->name('cabang.store');
-
-        Route::put('/cabang/{id}', [CabangController::class, 'update'])
-            ->name('cabang.update');
-
-        Route::patch('/cabang/{id}/status', [CabangController::class, 'toggleStatus'])
-            ->name('cabang.toggle-status');
+        Route::get('/cabang', [CabangController::class, 'index'])->name('cabang.index');
+        Route::post('/cabang', [CabangController::class, 'store'])->name('cabang.store');
+        Route::put('/cabang/{id}', [CabangController::class, 'update'])->name('cabang.update');
+        Route::patch('/cabang/{id}/status', [CabangController::class, 'toggleStatus'])->name('cabang.toggle-status');
 
         // === ROUTE MASTER DATA USER ===
         Route::get('/user', [UserController::class, 'index'])->name('user.index');
