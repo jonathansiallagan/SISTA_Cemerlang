@@ -1,5 +1,17 @@
 <x-admin-layout-stisla>
 
+    @php
+        // Daftar satuan produk (dipakai oleh modal Tambah dan modal Edit).
+        $daftarSatuan = [
+            'pcs' => 'Pcs',
+            'lembar' => 'Lembar',
+            'm2' => 'Meter Persegi (m²)',
+            'buku' => 'Buku',
+            'unit' => 'Unit',
+            'set' => 'Set',
+        ];
+    @endphp
+
     {{-- HEADER HALAMAN --}}
     <div
         class="mb-[30px] flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[3px] bg-white px-[30px] py-5 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
@@ -83,18 +95,29 @@
 
                     {{-- AKSI --}}
                     <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
-                        <a href="{{ route('produk.edit', $produk->id) }}" title="Edit Produk"
-                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
+                        <button type="button" title="Edit Produk"
+                            class="btn-edit-produk inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
+                            data-id="{{ $produk->id }}" data-url="{{ route('produk.update', $produk->id) }}"
+                            data-nama="{{ $produk->nama_produk }}" data-satuan="{{ $produk->satuan }}"
+                            data-upah="{{ $produk->upah_operator ?? 0 }}"
+                            data-komposisi="{{ $produk->komposisi->map(
+                                    fn($item) => [
+                                        'bahan_baku_id' => $item->bahan_baku_id,
+                                        'jumlah_pemakaian' => $item->jumlah_pemakaian,
+                                        'satuan_pemakaian' => $item->satuan_pemakaian,
+                                    ],
+                                )->values()->toJson(JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG) }}">
                             <i class="fas fa-edit"></i>
-                        </a>
+                        </button>
 
                         <form action="{{ route('produk.destroy', $produk->id) }}" method="POST" class="inline"
                             onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
                             @csrf
                             @method('DELETE')
 
-                            <button type="submit" title="Hapus Produk"
-                                class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]">
+                            <button type="button" title="Hapus Produk"
+                                class="btn-hapus-produk inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]"
+                                data-url="{{ route('produk.destroy', $produk->id) }}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
@@ -120,7 +143,6 @@
             <strong>{{ $produks->count() }}</strong>
         </small>
     </div>
-
 
     {{-- MODAL TAMBAH PRODUK --}}
     <dialog id="modalTambahProduk" aria-labelledby="judulModalTambahProduk"
@@ -172,20 +194,29 @@
                     <select id="modal_satuan_produk" name="satuan" required
                         class="h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none @error('satuan') border-[#fc544b] @else border-[#e4e6fc] @enderror">
                         <option value="">-- Pilih Satuan --</option>
-                        @foreach ([
-        'pcs' => 'Pcs',
-        'lembar' => 'Lembar',
-        'm2' => 'Meter Persegi (m²)',
-        'buku' => 'Buku',
-        'unit' => 'Unit',
-        'set' => 'Set',
-    ] as $value => $label)
+                        @foreach ($daftarSatuan as $value => $label)
                             <option value="{{ $value }}" @selected(old('satuan') === $value)>
                                 {{ $label }}
                             </option>
                         @endforeach
                     </select>
                     @error('satuan')
+                        <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="modal_upah_operator"
+                        class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Upah Operator (Rp) <span class="text-[#fc544b]">*</span>
+                    </label>
+                    <input type="number" id="modal_upah_operator" name="upah_operator" min="0"
+                        step="any" value="{{ old('upah_operator', 0) }}" required
+                        class="h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none @error('upah_operator') border-[#fc544b] @else border-[#e4e6fc] @enderror">
+                    <small class="mt-1 block text-[#6c757d]">
+                        Upah operator untuk satu satuan produk.
+                    </small>
+                    @error('upah_operator')
                         <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
                     @enderror
                 </div>
@@ -297,229 +328,245 @@
         </form>
     </dialog>
 
+    {{-- MODAL EDIT PRODUK --}}
+    <dialog id="modalEditProduk" aria-labelledby="judulModalEditProduk"
+        class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-hidden rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop:bg-black/50 open:flex open:flex-col">
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('modalTambahProduk');
-            const daftar = document.getElementById('modalDaftarBahan');
-            const tombolTambah = document.getElementById('modalTambahBarisBahan');
-            const form = document.getElementById('formTambahProduk');
-            const tombolSimpan = document.getElementById('modalSimpanProduk');
+        <div class="flex shrink-0 items-start justify-between bg-[#6777ef] px-6 py-4 text-white">
+            <div>
+                <h5 id="judulModalEditProduk" class="text-lg font-semibold text-white">
+                    <i class="fas fa-edit mr-2"></i>
+                    Edit Produk &amp; Layanan
+                </h5>
+                <small>Perbarui informasi produk dan komposisi bahan baku.</small>
+            </div>
 
-            if (!modal || !daftar || !tombolTambah || !form) return;
+            <button type="button" data-modal-close aria-label="Tutup"
+                class="-mt-1 text-3xl leading-none text-white/80 hover:text-white">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
 
-            // Buka dan tutup modal (elemen <dialog> bawaan browser).
-            document.querySelectorAll('[data-modal-open="modalTambahProduk"]').forEach(function(tombol) {
-                tombol.addEventListener('click', function() {
-                    modal.showModal();
-                });
-            });
+        <form action="#" method="POST" id="formEditProduk" class="flex min-h-0 flex-1 flex-col">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="edit_produk_id" id="edit_produk_id" value="">
 
-            modal.querySelectorAll('[data-modal-close]').forEach(function(tombol) {
-                tombol.addEventListener('click', function() {
-                    modal.close();
-                });
-            });
+            <div class="min-h-0 flex-1 overflow-y-auto p-6">
 
-            // Klik pada latar gelap menutup modal.
-            modal.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    modal.close();
-                }
-            });
+                @if ($errors->any() && old('edit_produk_id'))
+                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#fc544b] px-5 py-4 text-white">
+                        <strong>Periksa kembali data yang diisi.</strong>
+                        <ul class="mt-2 list-disc pl-4">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-            function perbaruiNomor() {
-                daftar.querySelectorAll('.modal-bahan-item').forEach((item, index) => {
-                    item.querySelector('.modal-nomor-bahan').textContent =
-                        'Bahan Baku ' + (index + 1);
-                });
-            }
+                <h6 class="mb-4 text-sm font-bold text-[#6777ef]">
+                    Informasi Produk
+                </h6>
 
-            tombolTambah.addEventListener('click', function() {
-                const pertama = daftar.querySelector('.modal-bahan-item');
-                if (!pertama) return;
+                <div class="mb-4">
+                    <label for="edit_nama_produk"
+                        class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Nama Produk / Layanan <span class="text-[#fc544b]">*</span>
+                    </label>
+                    <input type="text" id="edit_nama_produk" name="nama_produk" maxlength="255"
+                        placeholder="Contoh: Spanduk Flexi" required
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                </div>
 
-                const baru = pertama.cloneNode(true);
+                <div class="mb-4">
+                    <label for="edit_satuan_produk"
+                        class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Satuan Produk <span class="text-[#fc544b]">*</span>
+                    </label>
+                    <select id="edit_satuan_produk" name="satuan" required
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                        <option value="">-- Pilih Satuan --</option>
+                        @foreach ($daftarSatuan as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-                baru.querySelector('select').value = '';
-                baru.querySelectorAll('input').forEach(input => {
-                    input.value = '';
-                });
+                <div class="mb-4">
+                    <label for="edit_upah_operator"
+                        class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Upah Operator (Rp)
+                    </label>
+                    <input type="number" id="edit_upah_operator" name="upah_operator" min="0"
+                        step="any" value="0"
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                    <small class="mt-1 block text-[#6c757d]">
+                        Upah operator untuk satu satuan produk.
+                    </small>
+                </div>
 
-                daftar.appendChild(baru);
-                perbaruiNomor();
-            });
+                <hr class="my-4 border-t border-black/10">
 
-            daftar.addEventListener('click', function(event) {
-                const tombolHapus = event.target.closest('.modal-hapus-bahan');
-                if (!tombolHapus) return;
+                {{-- KOMPOSISI BAHAN BAKU --}}
+                <div class="mb-4 flex items-center justify-between">
+                    <div>
+                        <h6 class="mb-1 text-sm font-bold text-[#6777ef]">
+                            Komposisi Bahan Baku
+                        </h6>
+                        <small class="text-[#6c757d]">
+                            Atur kebutuhan bahan untuk satu satuan produk.
+                        </small>
+                    </div>
 
-                const item = tombolHapus.closest('.modal-bahan-item');
-                const semuaItem = daftar.querySelectorAll('.modal-bahan-item');
+                    <button type="button" id="editTambahBarisBahan"
+                        class="inline-flex shrink-0 items-center rounded-[3px] bg-[#54ca68] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#3fb556]">
+                        <i class="fas fa-plus mr-1"></i> Tambah Bahan
+                    </button>
+                </div>
 
-                if (semuaItem.length === 1) {
-                    item.querySelector('select').value = '';
-                    item.querySelectorAll('input').forEach(input => {
-                        input.value = '';
-                    });
-                    return;
-                }
+                {{-- Baris bahan baku diisi melalui JavaScript --}}
+                <div id="editDaftarBahan"></div>
 
-                item.remove();
-                perbaruiNomor();
-            });
-
-            form.addEventListener('submit', function() {
-                tombolSimpan.disabled = true;
-                tombolSimpan.innerHTML =
-                    '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
-            });
-
-            @if ($errors->any())
-                modal.showModal();
-            @endif
-        });
-    </script>
-
-                            <small class="form-text text-muted">
-                                Upah operator untuk satu satuan produk.
-                            </small>
-                        </div>
-
-                        <hr>
-
-                        {{-- KOMPOSISI BAHAN BAKU --}}
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <h6 class="font-weight-bold text-primary mb-1">
-                                    Komposisi Bahan Baku
-                                </h6>
-                                <small class="text-muted">
-                                    Atur kebutuhan bahan untuk satu satuan produk.
-                                </small>
-                            </div>
-
+                {{-- TEMPLATE BARIS BAHAN BAKU --}}
+                {{-- Class edit-* di bawah dipakai oleh JavaScript, jangan dihapus. --}}
+                <template id="templateEditBahan">
+                    <div class="edit-bahan-item mb-4 rounded border border-[#dee2e6] p-4">
+                        <div class="mb-2 flex items-center justify-between">
+                            <strong class="edit-nomor-bahan font-bold text-[#34395e]">
+                                Bahan Baku 1
+                            </strong>
                             <button type="button"
-                                    id="editTambahBarisBahan"
-                                    class="btn btn-success btn-sm">
-                                <i class="fas fa-plus mr-1"></i>
-                                Tambah Bahan
+                                class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-[#fc544b] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-[#fc544b] transition-colors hover:bg-[#fc544b] hover:text-white">
+                                <i class="fas fa-trash mr-1"></i> Hapus
                             </button>
                         </div>
 
-                        <div id="editDaftarBahan">
-                            {{-- Baris bahan baku diisi melalui JavaScript --}}
+                        <div class="mb-4">
+                            <label class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                                Nama Bahan Baku
+                            </label>
+                            <select name="bahan_baku_id[]" required
+                                class="edit-pilih-bahan h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                                <option value="">-- Pilih Bahan --</option>
+                                @foreach ($bahanBakus as $bahan)
+                                    <option value="{{ $bahan->id }}" data-satuan="{{ $bahan->satuan }}">
+                                        {{ $bahan->nama_bahan }}
+                                        (Stok: {{ $bahan->stok }} {{ $bahan->satuan }})
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        {{-- TEMPLATE BARIS BAHAN BAKU --}}
-                        <template id="templateEditBahan">
-                            <div class="border rounded p-3 mb-3 edit-bahan-item">
-
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <strong class="edit-nomor-bahan">
-                                        Bahan Baku 1
-                                    </strong>
-
-                                    <button type="button"
-                                            class="btn btn-outline-danger btn-sm edit-hapus-bahan">
-                                        <i class="fas fa-trash mr-1"></i>
-                                        Hapus
-                                    </button>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Nama Bahan Baku</label>
-
-                                    <select name="bahan_baku_id[]"
-                                            class="form-control edit-pilih-bahan"
-                                            required>
-                                        <option value="">-- Pilih Bahan --</option>
-
-                                        @foreach ($bahanBakus as $bahan)
-                                            <option value="{{ $bahan->id }}"
-                                                    data-satuan="{{ $bahan->satuan }}">
-                                                {{ $bahan->nama_bahan }}
-                                                (Stok: {{ $bahan->stok }} {{ $bahan->satuan }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label>Jumlah Pemakaian</label>
-
-                                        <input type="number"
-                                               name="jumlah_pemakaian[]"
-                                               class="form-control"
-                                               min="0.0001"
-                                               step="0.0001"
-                                               placeholder="Contoh: 1 atau 0.03"
-                                               required>
-                                    </div>
-
-                                    <div class="form-group col-md-6">
-                                        <label>Satuan Pemakaian</label>
-
-                                        <input type="text"
-                                               name="satuan_pemakaian[]"
-                                               class="form-control"
-                                               maxlength="30"
-                                               placeholder="Contoh: m²"
-                                               required>
-                                    </div>
-                                </div>
+                        <div class="grid grid-cols-1 gap-x-2.5 gap-y-4 md:grid-cols-2">
+                            <div>
+                                <label class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                                    Jumlah Pemakaian
+                                </label>
+                                <input type="number" name="jumlah_pemakaian[]" min="0.0001" step="0.0001"
+                                    placeholder="Contoh: 1 atau 0.03" required
+                                    class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
                             </div>
-                        </template>
 
-                        <div class="alert alert-light border mb-0">
-                            <i class="fas fa-info-circle text-primary mr-1"></i>
-                            Jumlah pemakaian adalah kebutuhan bahan untuk satu satuan produk.
+                            <div>
+                                <label class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                                    Satuan Pemakaian
+                                </label>
+                                <input type="text" name="satuan_pemakaian[]" maxlength="30"
+                                    placeholder="Contoh: m²" required
+                                    class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                            </div>
                         </div>
                     </div>
+                </template>
 
-                    <div class="modal-footer bg-light">
-                        <button type="button"
-                                class="btn btn-secondary"
-                                data-dismiss="modal">
-                            <i class="fas fa-times mr-1"></i>
-                            Batal
-                        </button>
-
-                        <button type="submit"
-                                id="btnUpdateProduk"
-                                class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i>
-                            Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
+                <div class="rounded-[3px] border border-[#e3eaef] bg-[#fefefe] px-5 py-4 text-[#6c757d]">
+                    <i class="fas fa-info-circle mr-1 text-[#6777ef]"></i>
+                    Jumlah pemakaian adalah kebutuhan bahan untuk satu satuan produk.
+                </div>
             </div>
+
+            <div class="flex shrink-0 items-center justify-end gap-2 border-t border-[#e3eaef] bg-[#f6f8fb] px-6 py-4">
+                <button type="button" data-modal-close
+                    class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                    <i class="fas fa-times mr-1"></i>
+                    Batal
+                </button>
+                <button type="submit" id="btnUpdateProduk"
+                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-60">
+                    <i class="fas fa-save mr-1"></i>
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    {{-- MODAL KONFIRMASI HAPUS --}}
+    <dialog id="modalHapusProduk"
+        class="m-auto max-w-[400px] rounded-[3px] bg-white p-0 shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop:bg-black/50 open:flex open:flex-col">
+        <div class="p-6 text-center">
+            {{-- Ikon Peringatan --}}
+            <div
+                class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#fc544b]/10 text-[#fc544b]">
+                <i class="fas fa-exclamation-triangle text-2xl"></i>
+            </div>
+
+            <h5 class="mb-2 text-lg font-bold text-[#34395e]">Konfirmasi Hapus</h5>
+            <p class="mb-6 text-sm text-[#6c757d]">
+                Apakah Anda yakin ingin menghapus produk ini? <br>Data akan diarsipkan dan tidak muncul lagi di sistem.
+            </p>
+
+            <form id="formHapusProduk" method="POST" action="">
+                @csrf
+                @method('DELETE')
+
+                <div class="flex justify-center gap-3">
+                    <button type="button" data-modal-close
+                        class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-4 py-2 text-sm font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnKonfirmasiHapus"
+                        class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-4 py-2 text-sm font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#fb160a] disabled:cursor-not-allowed disabled:opacity-60">
+                        Ya, Hapus Produk
+                    </button>
+                </div>
+            </form>
         </div>
-    </div>
+    </dialog>
+
+    @php
+        // Dipakai untuk membuka kembali modal edit (lengkap dengan isinya) jika validasi gagal.
+        $oldEditKomposisi = collect(old('bahan_baku_id', []))
+            ->map(
+                fn($bahanId, $i) => [
+                    'bahan_baku_id' => $bahanId,
+                    'jumlah_pemakaian' => old('jumlah_pemakaian.' . $i),
+                    'satuan_pemakaian' => old('satuan_pemakaian.' . $i),
+                ],
+            )
+            ->values();
+    @endphp
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            // =========================================
-            // MODAL TAMBAH PRODUK
-            // =========================================
-
+        document.addEventListener('DOMContentLoaded', function() {
             const modalTambah = document.getElementById('modalTambahProduk');
-            const daftarTambah = document.getElementById('modalDaftarBahan');
-            const tombolTambahBahan = document.getElementById('modalTambahBarisBahan');
-            const formTambah = document.getElementById('formTambahProduk');
-            const tombolSimpanTambah = document.getElementById('modalSimpanProduk');
+            const modalEdit = document.getElementById('modalEditProduk');
 
-            if (modalTambah) {
-                document.body.appendChild(modalTambah);
+            if (!modalTambah || !modalEdit) return;
+
+            // =========================================
+            // FUNGSI BANTU
+            // =========================================
+
+            function kosongkanIsian(item) {
+                item.querySelectorAll('select, input').forEach(function(el) {
+                    el.value = '';
+                });
             }
 
-            function nomorBahanTambah() {
-                if (!daftarTambah) return;
-
-                daftarTambah.querySelectorAll('.modal-bahan-item').forEach((item, index) => {
-                    const nomor = item.querySelector('.modal-nomor-bahan');
+            function perbaruiNomor(daftar, selektorItem, selektorNomor) {
+                daftar.querySelectorAll(selektorItem).forEach(function(item, index) {
+                    const nomor = item.querySelector(selektorNomor);
 
                     if (nomor) {
                         nomor.textContent = 'Bahan Baku ' + (index + 1);
@@ -527,156 +574,158 @@
                 });
             }
 
+            function kunciTombolSimpan(form, tombol) {
+                if (!form || !tombol) return;
+
+                form.addEventListener('submit', function() {
+                    tombol.disabled = true;
+                    tombol.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
+                });
+            }
+
+            // Tombol tutup dan klik pada latar gelap menutup modal (elemen dialog bawaan browser).
+            [modalTambah, modalEdit].forEach(function(modal) {
+                modal.querySelectorAll('[data-modal-close]').forEach(function(tombol) {
+                    tombol.addEventListener('click', function() {
+                        modal.close();
+                    });
+                });
+
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.close();
+                    }
+                });
+            });
+
+            // =========================================
+            // MODAL TAMBAH PRODUK
+            // =========================================
+
+            const daftarTambah = document.getElementById('modalDaftarBahan');
+            const tombolTambahBahan = document.getElementById('modalTambahBarisBahan');
+
+            document.querySelectorAll('[data-modal-open="modalTambahProduk"]').forEach(function(tombol) {
+                tombol.addEventListener('click', function() {
+                    modalTambah.showModal();
+                });
+            });
+
             if (daftarTambah && tombolTambahBahan) {
-                tombolTambahBahan.addEventListener('click', function () {
+                tombolTambahBahan.addEventListener('click', function() {
                     const pertama = daftarTambah.querySelector('.modal-bahan-item');
 
                     if (!pertama) return;
 
                     const baru = pertama.cloneNode(true);
 
-                    baru.querySelectorAll('select, input').forEach(input => {
-                        input.value = '';
-                    });
-
+                    kosongkanIsian(baru);
                     daftarTambah.appendChild(baru);
-                    nomorBahanTambah();
+                    perbaruiNomor(daftarTambah, '.modal-bahan-item', '.modal-nomor-bahan');
                 });
 
-                daftarTambah.addEventListener('click', function (event) {
+                daftarTambah.addEventListener('click', function(event) {
                     const tombol = event.target.closest('.modal-hapus-bahan');
 
                     if (!tombol) return;
 
                     const item = tombol.closest('.modal-bahan-item');
-                    const semua = daftarTambah.querySelectorAll('.modal-bahan-item');
 
-                    if (semua.length === 1) {
-                        item.querySelectorAll('select, input').forEach(input => {
-                            input.value = '';
-                        });
-
+                    // Sisakan satu baris; jika tinggal satu, cukup dikosongkan.
+                    if (daftarTambah.querySelectorAll('.modal-bahan-item').length === 1) {
+                        kosongkanIsian(item);
                         return;
                     }
 
                     item.remove();
-                    nomorBahanTambah();
+                    perbaruiNomor(daftarTambah, '.modal-bahan-item', '.modal-nomor-bahan');
                 });
             }
 
-            if (formTambah && tombolSimpanTambah) {
-                formTambah.addEventListener('submit', function () {
-                    tombolSimpanTambah.disabled = true;
-                    tombolSimpanTambah.innerHTML =
-                        '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
-                });
-            }
+            kunciTombolSimpan(
+                document.getElementById('formTambahProduk'),
+                document.getElementById('modalSimpanProduk')
+            );
 
             // =========================================
             // MODAL EDIT PRODUK
             // =========================================
 
-            const modalEdit = document.getElementById('modalEditProduk');
             const formEdit = document.getElementById('formEditProduk');
             const daftarEdit = document.getElementById('editDaftarBahan');
             const templateEdit = document.getElementById('templateEditBahan');
             const tombolTambahEdit = document.getElementById('editTambahBarisBahan');
-            const tombolSimpanEdit = document.getElementById('btnUpdateProduk');
 
-            if (modalEdit) {
-                document.body.appendChild(modalEdit);
-            }
-
-            function tambahBarisEdit(data = {}) {
-                if (!daftarEdit || !templateEdit) return;
+            function tambahBarisEdit(data) {
+                data = data || {};
 
                 const fragmen = templateEdit.content.cloneNode(true);
                 const item = fragmen.querySelector('.edit-bahan-item');
 
-                const pilihBahan = item.querySelector('[name="bahan_baku_id[]"]');
-                const jumlah = item.querySelector('[name="jumlah_pemakaian[]"]');
-                const satuan = item.querySelector('[name="satuan_pemakaian[]"]');
-
-                pilihBahan.value = data.bahan_baku_id ?? '';
-                jumlah.value = data.jumlah_pemakaian ?? '';
-                satuan.value = data.satuan_pemakaian ?? '';
+                item.querySelector('[name="bahan_baku_id[]"]').value = data.bahan_baku_id ?? '';
+                item.querySelector('[name="jumlah_pemakaian[]"]').value = data.jumlah_pemakaian ?? '';
+                item.querySelector('[name="satuan_pemakaian[]"]').value = data.satuan_pemakaian ?? '';
 
                 daftarEdit.appendChild(fragmen);
-                perbaruiNomorEdit();
+                perbaruiNomor(daftarEdit, '.edit-bahan-item', '.edit-nomor-bahan');
             }
 
-            function perbaruiNomorEdit() {
-                if (!daftarEdit) return;
+            function isiFormEdit(data) {
+                formEdit.action = data.url;
 
-                daftarEdit.querySelectorAll('.edit-bahan-item').forEach((item, index) => {
-                    const nomor = item.querySelector('.edit-nomor-bahan');
+                document.getElementById('edit_produk_id').value = data.id;
+                document.getElementById('edit_nama_produk').value = data.nama || '';
+                document.getElementById('edit_satuan_produk').value = data.satuan || '';
+                document.getElementById('edit_upah_operator').value = data.upah || 0;
 
-                    if (nomor) {
-                        nomor.textContent = 'Bahan Baku ' + (index + 1);
-                    }
-                });
-            }
+                // Kosongkan komposisi sebelumnya, lalu isi ulang.
+                daftarEdit.innerHTML = '';
 
-            if (tombolTambahEdit) {
-                tombolTambahEdit.addEventListener('click', function () {
+                if (data.komposisi && data.komposisi.length > 0) {
+                    data.komposisi.forEach(function(bahan) {
+                        tambahBarisEdit(bahan);
+                    });
+                } else {
                     tambahBarisEdit();
-                });
+                }
             }
 
-            if (daftarEdit) {
-                daftarEdit.addEventListener('click', function (event) {
-                    const tombol = event.target.closest('.edit-hapus-bahan');
+            tombolTambahEdit.addEventListener('click', function() {
+                tambahBarisEdit();
+            });
 
-                    if (!tombol) return;
+            daftarEdit.addEventListener('click', function(event) {
+                const tombol = event.target.closest('.edit-hapus-bahan');
 
-                    const item = tombol.closest('.edit-bahan-item');
-                    const semua = daftarEdit.querySelectorAll('.edit-bahan-item');
+                if (!tombol) return;
 
-                    if (semua.length === 1) {
-                        item.querySelectorAll('select, input').forEach(input => {
-                            input.value = '';
-                        });
+                const item = tombol.closest('.edit-bahan-item');
 
-                        return;
-                    }
+                if (daftarEdit.querySelectorAll('.edit-bahan-item').length === 1) {
+                    kosongkanIsian(item);
+                    return;
+                }
 
-                    item.remove();
-                    perbaruiNomorEdit();
-                });
+                item.remove();
+                perbaruiNomor(daftarEdit, '.edit-bahan-item', '.edit-nomor-bahan');
+            });
 
-                // Isi satuan bahan berdasarkan pilihan bahan jika masih kosong.
-                daftarEdit.addEventListener('change', function (event) {
-                    if (!event.target.matches('.edit-pilih-bahan')) return;
+            // Isi satuan pemakaian otomatis dari satuan bahan jika masih kosong.
+            daftarEdit.addEventListener('change', function(event) {
+                if (!event.target.matches('.edit-pilih-bahan')) return;
 
-                    const item = event.target.closest('.edit-bahan-item');
-                    const opsi = event.target.selectedOptions[0];
-                    const satuan = item.querySelector('[name="satuan_pemakaian[]"]');
+                const item = event.target.closest('.edit-bahan-item');
+                const opsi = event.target.selectedOptions[0];
+                const satuan = item.querySelector('[name="satuan_pemakaian[]"]');
 
-                    if (opsi && opsi.dataset.satuan && satuan && !satuan.value) {
-                        satuan.value = opsi.dataset.satuan;
-                    }
-                });
-            }
+                if (opsi && opsi.dataset.satuan && satuan && !satuan.value) {
+                    satuan.value = opsi.dataset.satuan;
+                }
+            });
 
             // Klik tombol Edit pada tabel.
-            document.querySelectorAll('.btn-edit-produk').forEach(function (tombol) {
-                tombol.addEventListener('click', function () {
-                    if (!modalEdit || !formEdit || !daftarEdit) return;
-
-                    formEdit.action = this.dataset.url;
-
-                    document.getElementById('edit_produk_id').value = this.dataset.id;
-                    document.getElementById('edit_nama_produk').value = this.dataset.nama || '';
-                    document.getElementById('edit_satuan_produk').value = this.dataset.satuan || '';
-
-                    // Isi nilai upah operator dari produk yang dipilih.
-                    document.getElementById('edit_upah_operator').value =
-                        this.dataset.upah || 0;
-
-                    // Kosongkan komposisi sebelumnya.
-                    daftarEdit.innerHTML = '';
-
-                    // Ambil komposisi yang sudah tersimpan dari tombol Edit.
+            document.querySelectorAll('.btn-edit-produk').forEach(function(tombol) {
+                tombol.addEventListener('click', function() {
                     let komposisi = [];
 
                     try {
@@ -685,41 +734,65 @@
                         console.error('Data komposisi produk tidak valid:', error);
                     }
 
-                    if (komposisi.length > 0) {
-                        komposisi.forEach(function (bahan) {
-                            tambahBarisEdit(bahan);
-                        });
-                    } else {
-                        tambahBarisEdit();
-                    }
+                    isiFormEdit({
+                        id: this.dataset.id,
+                        url: this.dataset.url,
+                        nama: this.dataset.nama,
+                        satuan: this.dataset.satuan,
+                        upah: this.dataset.upah,
+                        komposisi: komposisi,
+                    });
 
-                    if (window.jQuery && typeof jQuery.fn.modal === 'function') {
-                        jQuery(modalEdit).modal('show');
-                    }
+                    modalEdit.showModal();
                 });
             });
 
-            if (formEdit && tombolSimpanEdit) {
-                formEdit.addEventListener('submit', function () {
-                    tombolSimpanEdit.disabled = true;
-                    tombolSimpanEdit.innerHTML =
-                        '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
-                });
-            }
+            kunciTombolSimpan(formEdit, document.getElementById('btnUpdateProduk'));
 
-            // Buka kembali modal yang sesuai jika validasi gagal.
+            // =========================================
+            // MODAL KONFIRMASI HAPUS
+            // =========================================
+            const modalHapus = document.getElementById('modalHapusProduk');
+            const formHapus = document.getElementById('formHapusProduk');
+
+            document.querySelectorAll('.btn-hapus-produk').forEach(function(tombol) {
+                tombol.addEventListener('click', function() {
+                    formHapus.action = this.dataset.url;
+
+                    modalHapus.showModal();
+                });
+            });
+
+            kunciTombolSimpan(formHapus, document.getElementById('btnKonfirmasiHapus'));
+
+            modalHapus.querySelectorAll('[data-modal-close]').forEach(function(tombol) {
+                tombol.addEventListener('click', function() {
+                    modalHapus.close();
+                });
+            });
+            modalHapus.addEventListener('click', function(event) {
+                if (event.target === modalHapus) modalHapus.close();
+            });
+
+            // =========================================
+            // BUKA KEMBALI MODAL JIKA VALIDASI GAGAL
+            // =========================================
+
             @if ($errors->any())
                 @if (old('edit_produk_id'))
-                    if (modalEdit && window.jQuery && typeof jQuery.fn.modal === 'function') {
-                        jQuery(modalEdit).modal('show');
-                    }
+                    isiFormEdit({
+                        id: @js(old('edit_produk_id')),
+                        url: @js(route('produk.update', old('edit_produk_id'))),
+                        nama: @js(old('nama_produk')),
+                        satuan: @js(old('satuan')),
+                        upah: @js(old('upah_operator', 0)),
+                        komposisi: @js($oldEditKomposisi),
+                    });
+                    modalEdit.showModal();
                 @else
-                    if (modalTambah && window.jQuery && typeof jQuery.fn.modal === 'function') {
-                        jQuery(modalTambah).modal('show');
-                    }
+                    modalTambah.showModal();
                 @endif
             @endif
-
         });
     </script>
 
