@@ -23,15 +23,6 @@ class UserController extends Controller
         return view('admin.user.index', compact('users', 'cabangs'));
     }
 
-    public function create()
-    {
-        $cabangs = Cabang::where('status', 'aktif')
-            ->orderBy('nama')
-            ->get();
-
-        return view('admin.user.create', compact('cabangs'));
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
