@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -10,8 +12,8 @@
 
 
 /* ========================================
-   TABEL GLOBAL SISTA
-   Gunakan class: table-sista
+    TABEL GLOBAL SISTA
+    Gunakan class: table-sista
 ======================================== */
 
 .table-sista {
@@ -46,4 +48,32 @@
 
 .table-sista .text-nowrap {
     white-space: nowrap;
+}
+
+
+/* ========================================
+    DARK MODE UNTUK TABEL SISTA
+
+    ======================================== */
+.dark .table-sista {
+    border-color: #374151; /* gray-700 */
+}
+
+.dark .table-sista th,
+.dark .table-sista td {
+    border-color: #4b5563; /* gray-600 */
+}
+
+.dark .table-sista thead th {
+    background-color: #1f2937; /* gray-800 */
+    color: #e5e7eb; /* gray-200 */
+    border-bottom-color: #4b5563;
+}
+
+.dark .table-sista tbody tr:nth-child(even) {
+    background-color: #111827; /* gray-900 */
+}
+
+.dark .table-sista tbody tr:hover {
+    background-color: #374151; /* gray-700 */
 }

@@ -1,7 +1,11 @@
 @php
     $user = auth()->user();
 
-    $avatarUrl = $user->avatar_url ?? ($user->avatar ? asset('storage/' . $user->avatar) : asset('stisla/assets/img/avatar/avatar-1.png'));
+    $avatarUrl =
+        $user->avatar_url ??
+        ($user->avatar ? asset('storage/' . $user->avatar) : asset('stisla/assets/img/avatar/avatar-1.png'));
+
+    $themePref = $user->preferences['theme'] ?? 'light';
 @endphp
 
 <!DOCTYPE html>
@@ -25,9 +29,22 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
+
+    {{-- SKRIP INJEKSI DARK MODE --}}
+    <script>
+        (function() {
+            const theme = "{{ $themePref }}";
+            if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 </head>
 
-<body class="bg-[#f4f6f9] font-['Nunito',sans-serif] text-[13px] text-[#6c757d] antialiased">
+<body
+    class="bg-[#f4f6f9] dark:bg-[#0b1120] font-['Nunito',sans-serif] text-[13px] text-[#6c757d] dark:text-[#a0aec0] antialiased">
 
     {{--
         Kerangka layout (grid 2x2 dengan flex):
@@ -51,7 +68,8 @@
         <div class="relative z-50 flex h-[70px] shrink-0">
 
             {{-- 1. LOGO (kiri atas) --}}
-            <div class="flex h-[70px] w-[var(--sidebar-w)] shrink-0 items-center bg-white">
+            <div
+                class="flex h-[70px] w-[var(--sidebar-w)] shrink-0 items-center bg-white dark:bg-[#111827] dark:border-b dark:border-[#1f2937]">
 
                 {{-- Logo lengkap (desktop, sidebar terbuka) --}}
                 <a href="{{ url('/') }}"
@@ -81,7 +99,8 @@
             </div>
 
             {{-- 2. NAVBAR (kanan atas) --}}
-            <nav class="flex min-w-0 flex-1 items-center justify-between bg-[#6777ef] px-4 lg:px-[30px]">
+            <nav
+                class="flex min-w-0 flex-1 items-center justify-between bg-[#6777ef] dark:bg-[#111827] dark:border-b dark:border-[#1f2937] px-4 lg:px-[30px]">
 
                 {{-- Tombol buka/tutup sidebar --}}
                 <button id="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar"
@@ -137,7 +156,7 @@
 
             {{-- 3. SIDEBAR (kiri bawah) --}}
             <aside id="sidebar"
-                class="fixed bottom-0 left-0 top-[70px] z-40 w-64 -translate-x-full overflow-y-auto overflow-x-hidden bg-white shadow-[0_4px_25px_0_rgba(0,0,0,0.1)] transition-transform duration-300 group-data-[drawer=true]/layout:translate-x-0 lg:relative lg:inset-auto lg:z-10 lg:w-[var(--sidebar-w)] lg:shrink-0 lg:translate-x-0 lg:transition-[width]">
+                class="fixed bottom-0 left-0 top-[70px] z-40 w-64 -translate-x-full overflow-y-auto overflow-x-hidden bg-white dark:bg-[#111827] dark:border-r dark:border-[#1f2937] shadow-[0_4px_25px_0_rgba(0,0,0,0.1)] transition-transform duration-300 group-data-[drawer=true]/layout:translate-x-0 lg:relative lg:inset-auto lg:z-10 lg:w-[var(--sidebar-w)] lg:shrink-0 lg:translate-x-0 lg:transition-[width]">
 
                 <ul class="mt-2">
                     @foreach ($menuSections as $section)
@@ -191,7 +210,7 @@
                 </div>
 
                 <footer
-                    class="flex items-center justify-between border-t border-[#e3eaef] bg-[#f4f6f9] px-4 py-5 text-[#98a6ad] sm:px-[30px]">
+                    class="flex items-center justify-between border-t border-[#e3eaef] dark:border-[#1f2937] bg-[#f4f6f9] dark:bg-[#0b1120] px-4 py-5 text-[#98a6ad] sm:px-[30px]">
                     <div>
                         SISTA &copy; {{ date('Y') }} CV Cemerlang
                     </div>
