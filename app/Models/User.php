@@ -56,4 +56,9 @@ class User extends Authenticatable
         
         return 'admin.dashboard';
     }
+
+    public function produks()
+    {
+        return $this->hasMany(Produk::class);
+    }
 }

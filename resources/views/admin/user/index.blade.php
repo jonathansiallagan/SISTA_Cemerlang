@@ -294,11 +294,11 @@
                     <div>
                         <label for="userCabang" class="{{ $kelasLabel }}">
                             Penempatan Cabang
-                            <span id="labelWajibCabang" class="hidden text-[#fc544b]">*</span>
+                            <span class="text-[#fc544b]">*</span>
                         </label>
 
-                        <select id="userCabang" name="cabang_id" class="{{ $kelasField($errTambah, 'cabang_id') }}">
-                            <option value="">-- Pusat / Tidak ada cabang spesifik --</option>
+                        <select id="userCabang" name="cabang_id" required class="{{ $kelasField($errTambah, 'cabang_id') }}">
+                            <option value="">-- Pilih Cabang --</option>
                             @foreach ($cabangs as $cabang)
                                 <option value="{{ $cabang->id }}" @selected((string) $oldTambah('cabang_id') === (string) $cabang->id)>
                                     {{ $cabang->nama }}
@@ -309,10 +309,6 @@
                         @if ($errTambah->has('cabang_id'))
                             <div class="{{ $kelasPesanError }}">{{ $errTambah->first('cabang_id') }}</div>
                         @endif
-
-                        <small class="{{ $kelasBantuan }}">
-                            Admin Cabang wajib memiliki penempatan cabang.
-                        </small>
                     </div>
                 </div>
             </div>
@@ -446,7 +442,7 @@
                         </label>
                         <select name="cabang_id" id="edit_user_cabang"
                             class="{{ $kelasField($errEdit, 'cabang_id') }}">
-                            <option value="">-- Pusat / Tidak ada cabang spesifik --</option>
+                            <option value="">-- Pilih Cabang --</option>
                             @foreach ($cabangs as $cabang)
                                 <option value="{{ $cabang->id }}">{{ $cabang->nama }}</option>
                             @endforeach
@@ -454,9 +450,6 @@
                         @if ($errEdit->has('cabang_id'))
                             <div class="{{ $kelasPesanError }}">{{ $errEdit->first('cabang_id') }}</div>
                         @endif
-                        <small class="{{ $kelasBantuan }}">
-                            Admin Cabang wajib memiliki penempatan cabang.
-                        </small>
                     </div>
                 </div>
             </div>
@@ -510,252 +503,351 @@
         </div>
     </dialog>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const html = document.documentElement;
+    
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const html = document.documentElement;
 
-            const modalTambah = document.getElementById('modalTambahUser');
-            const modalEdit = document.getElementById('modalEditUser');
-            const modalHapus = document.getElementById('modalHapusUser');
-            const formTambah = document.getElementById('formTambahUser');
-            const formEdit = document.getElementById('formEditUser');
-            const formHapus = document.getElementById('formHapusUser');
+        // =========================================
+        // ELEMEN MODAL DAN FORM
+        // =========================================
 
-            if (!modalTambah || !modalEdit || !modalHapus || !formTambah || !formEdit || !formHapus) {
-                console.error('Modal pengguna tidak lengkap. Periksa id elemen pada halaman ini.');
+        const modalTambah = document.getElementById('modalTambahUser');
+        const modalEdit = document.getElementById('modalEditUser');
+        const modalHapus = document.getElementById('modalHapusUser');
+
+        const formTambah = document.getElementById('formTambahUser');
+        const formEdit = document.getElementById('formEditUser');
+        const formHapus = document.getElementById('formHapusUser');
+
+        // Pastikan seluruh elemen utama tersedia.
+        if (
+            !modalTambah ||
+            !modalEdit ||
+            !modalHapus ||
+            !formTambah ||
+            !formEdit ||
+            !formHapus
+        ) {
+            console.error(
+                'Modal pengguna tidak lengkap. Periksa ID elemen pada halaman ini.'
+            );
+            return;
+        }
+
+        // =========================================
+        // ELEMEN FORM TAMBAH
+        // =========================================
+
+        const kolomTambah = {
+            role: document.getElementById('userRole'),
+            cabang: document.getElementById('userCabang'),
+        };
+
+        // =========================================
+        // ELEMEN FORM EDIT
+        // =========================================
+
+        const kolomEdit = {
+            id: document.getElementById('edit_user_id'),
+            nama: document.getElementById('edit_user_name'),
+            email: document.getElementById('edit_user_email'),
+            username: document.getElementById('edit_user_username'),
+            password: document.getElementById('edit_user_password'),
+            role: document.getElementById('edit_user_role'),
+            cabang: document.getElementById('edit_user_cabang'),
+        };
+
+        // =========================================
+        // FUNGSI BANTU
+        // =========================================
+
+        // Membuka modal.
+        function bukaModal(dialog) {
+            if (dialog && !dialog.open) {
+                dialog.showModal();
+                html.classList.add('overflow-hidden');
+            }
+        }
+
+        // Mengatur scroll halaman ketika semua modal sudah tertutup.
+        document.addEventListener('close', function (event) {
+            if (
+                event.target instanceof HTMLDialogElement &&
+                !document.querySelector('dialog[open]')
+            ) {
+                html.classList.remove('overflow-hidden');
+            }
+        }, true);
+
+        // Memilih option berdasarkan value tanpa membedakan huruf besar/kecil.
+        function pilihOpsi(select, nilai, cadangan = '') {
+            if (!select) return;
+
+            const cari = String(
+                nilai === null || nilai === undefined ? '' : nilai
+            ).trim().toLowerCase();
+
+            const opsi = Array.from(select.options).find(function (option) {
+                return option.value.toLowerCase() === cari;
+            });
+
+            select.value = opsi ? opsi.value : cadangan;
+        }
+
+        // =========================================
+        // MENGISI FORM EDIT
+        // =========================================
+
+        function isiFormEdit(data) {
+            if (
+                !kolomEdit.id ||
+                !kolomEdit.nama ||
+                !kolomEdit.email ||
+                !kolomEdit.username ||
+                !kolomEdit.password ||
+                !kolomEdit.role ||
+                !kolomEdit.cabang
+            ) {
+                console.error('Elemen form edit pengguna tidak lengkap.');
                 return;
             }
 
-            const kolomTambah = {
-                role: document.getElementById('userRole'),
-                cabang: document.getElementById('userCabang'),
-                label: document.getElementById('labelWajibCabang'),
-            };
+            kolomEdit.id.value = data.id || '';
+            kolomEdit.nama.value = data.nama || '';
+            kolomEdit.email.value = data.email || '';
+            kolomEdit.username.value = data.username || '';
+            kolomEdit.password.value = '';
 
-            const kolomEdit = {
-                id: document.getElementById('edit_user_id'),
-                nama: document.getElementById('edit_user_name'),
-                email: document.getElementById('edit_user_email'),
-                username: document.getElementById('edit_user_username'),
-                password: document.getElementById('edit_user_password'),
-                role: document.getElementById('edit_user_role'),
-                cabang: document.getElementById('edit_user_cabang'),
-                label: document.getElementById('editLabelWajibCabang'),
-            };
+            // Mengisi role pengguna.
+            pilihOpsi(
+                kolomEdit.role,
+                data.role,
+                'Customer Service'
+            );
 
-            // =========================================
-            // FUNGSI BANTU
-            // =========================================
+            // Mengisi cabang pengguna.
+            // Semua role wajib memiliki cabang.
+            pilihOpsi(
+                kolomEdit.cabang,
+                data.cabang,
+                ''
+            );
 
-            function bukaModal(dialog) {
-                if (dialog && !dialog.open) {
-                    dialog.showModal();
-                    html.classList.add('overflow-hidden'); // kunci scroll halaman di belakang modal
-                }
-            }
+            // Mengatur URL tujuan update.
+            formEdit.setAttribute('action', data.url || '#');
+        }
 
-            // Event "close" tidak bubble, jadi didengarkan lewat capture.
-            // Dipicu oleh tombol Batal, klik latar gelap, maupun tombol Esc.
-            document.addEventListener('close', function (event) {
-                if (event.target instanceof HTMLDialogElement && !document.querySelector('dialog[open]')) {
-                    html.classList.remove('overflow-hidden');
-                }
-            }, true);
+        // =========================================
+        // MENCEGAH PENGIRIMAN FORM BERULANG
+        // =========================================
 
-            // Cabang wajib untuk Admin Cabang; Admin Pusat tidak ditempatkan pada cabang tertentu.
-            function aturCabang(roleSelect, cabangSelect, labelWajib) {
-                if (!roleSelect || !cabangSelect) return;
+        function kunciPengiriman(form, tombol, teksProses) {
+            if (!form || !tombol) return;
 
-                const adminCabang = roleSelect.value === 'Admin Cabang';
+            const isiAwal = tombol.innerHTML;
 
-                cabangSelect.required = adminCabang;
+            form.addEventListener('submit', function (event) {
+                if (event.defaultPrevented) return;
 
-                if (labelWajib) {
-                    labelWajib.classList.toggle('hidden', !adminCabang);
-                }
+                tombol.disabled = true;
 
-                if (roleSelect.value === 'Admin Pusat') {
-                    cabangSelect.value = '';
-                }
-            }
-
-            // Pilih <option> tanpa peduli huruf besar/kecil; pakai cadangan bila tidak ada yang cocok.
-            function pilihOpsi(select, nilai, cadangan) {
-                const cari = String(nilai === null || nilai === undefined ? '' : nilai).trim().toLowerCase();
-                const opsi = Array.from(select.options).find(function (o) {
-                    return o.value.toLowerCase() === cari;
-                });
-                select.value = opsi ? opsi.value : cadangan;
-            }
-
-            // Isi modal edit dengan data pengguna yang dipilih.
-            function isiFormEdit(data) {
-                kolomEdit.id.value = data.id || '';
-                kolomEdit.nama.value = data.nama || '';
-                kolomEdit.email.value = data.email || '';
-                kolomEdit.username.value = data.username || '';
-                kolomEdit.password.value = ''; // password tidak pernah diisi ulang
-
-                pilihOpsi(kolomEdit.role, data.role, 'Customer Service');
-                pilihOpsi(kolomEdit.cabang, data.cabang, '');
-
-                formEdit.setAttribute('action', data.url || '#');
-
-                aturCabang(kolomEdit.role, kolomEdit.cabang, kolomEdit.label);
-            }
-
-            // Cegah form terkirim berkali-kali, dan pulihkan tombol bila
-            // halaman ditampilkan kembali dari cache (tombol Back browser).
-            function kunciPengiriman(form, tombol, teksProses) {
-                if (!tombol) return;
-
-                const isiAwal = tombol.innerHTML;
-
-                form.addEventListener('submit', function (event) {
-                    if (event.defaultPrevented) return;
-
-                    tombol.disabled = true;
-                    tombol.innerHTML = '<i class="fas fa-spinner animate-spin mr-1"></i> ' + teksProses;
-                });
-
-                window.addEventListener('pageshow', function (event) {
-                    if (event.persisted) {
-                        tombol.disabled = false;
-                        tombol.innerHTML = isiAwal;
-                    }
-                });
-            }
-
-            // =========================================
-            // KLIK: BUKA/TUTUP MODAL, TOMBOL EDIT/HAPUS, TUTUP NOTIFIKASI
-            // =========================================
-
-            // Klik pada latar gelap hanya menutup modal jika tekan dan lepas mouse
-            // sama-sama di latar. Tanpa ini, memilih teks di input lalu melepas
-            // mouse di luar modal akan menutup modal dan membuang isian.
-            let targetTekan = null;
-
-            document.addEventListener('mousedown', function (event) {
-                targetTekan = event.target;
+                tombol.innerHTML =
+                    '<i class="fas fa-spinner animate-spin mr-1"></i> ' +
+                    teksProses;
             });
 
-            document.addEventListener('click', function (event) {
-                const target = event.target instanceof Element ? event.target : null;
-                if (!target) return;
-
-                const buka = target.closest('[data-modal-open]');
-                if (buka) {
-                    bukaModal(document.getElementById(buka.dataset.modalOpen));
-                    return;
-                }
-
-                const tutup = target.closest('[data-modal-close]');
-                if (tutup) {
-                    const dialog = tutup.closest('dialog');
-                    if (dialog) dialog.close();
-                    return;
-                }
-
-                const tutupNotifikasi = target.closest('[data-alert-close]');
-                if (tutupNotifikasi) {
-                    const notifikasi = tutupNotifikasi.closest('[role="alert"]');
-                    if (notifikasi) notifikasi.remove();
-                    return;
-                }
-
-                const tombolEdit = target.closest('.btn-edit-user');
-                if (tombolEdit) {
-                    isiFormEdit({
-                        id: tombolEdit.dataset.id,
-                        nama: tombolEdit.dataset.name,
-                        email: tombolEdit.dataset.email,
-                        username: tombolEdit.dataset.username,
-                        role: tombolEdit.dataset.role,
-                        cabang: tombolEdit.dataset.cabang,
-                        url: tombolEdit.dataset.url,
-                    });
-                    bukaModal(modalEdit);
-                    return;
-                }
-
-                const tombolHapus = target.closest('.btn-hapus-user');
-                if (tombolHapus) {
-                    formHapus.setAttribute('action', tombolHapus.dataset.url || '#');
-                    bukaModal(modalHapus);
-                    return;
-                }
-
-                // Klik di latar gelap (target = elemen dialog itu sendiri).
-                if (
-                    target instanceof HTMLDialogElement &&
-                    target.open &&
-                    targetTekan === target
-                ) {
-                    target.close();
+            // Memulihkan tombol jika halaman dibuka kembali
+            // menggunakan tombol Back browser.
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted) {
+                    tombol.disabled = false;
+                    tombol.innerHTML = isiAwal;
                 }
             });
+        }
 
-            // =========================================
-            // PENGIRIMAN FORM
-            // =========================================
+        // =========================================
+        // KLIK BUKA DAN TUTUP MODAL
+        // =========================================
 
-            // Jangan kirim form edit/hapus jika URL tujuan belum terisi.
-            [
-                [formEdit, 'URL update pengguna belum ditentukan.'],
-                [formHapus, 'URL hapus pengguna belum ditentukan.'],
-            ].forEach(function (item) {
-                item[0].addEventListener('submit', function (event) {
-                    const action = item[0].getAttribute('action');
+        let targetTekan = null;
 
-                    if (!action || action === '#') {
-                        event.preventDefault();
-                        console.error(item[1]);
-                    }
-                });
-            });
-
-            kunciPengiriman(formTambah, document.getElementById('btnSimpanUser'), 'Menyimpan...');
-            kunciPengiriman(formEdit, document.getElementById('btnUpdateUser'), 'Memperbarui...');
-            kunciPengiriman(formHapus, document.getElementById('btnKonfirmasiHapus'), 'Menghapus...');
-
-            // =========================================
-            // EVENT PERUBAHAN ROLE
-            // =========================================
-
-            if (kolomTambah.role) {
-                kolomTambah.role.addEventListener('change', function () {
-                    aturCabang(kolomTambah.role, kolomTambah.cabang, kolomTambah.label);
-                });
-            }
-
-            if (kolomEdit.role) {
-                kolomEdit.role.addEventListener('change', function () {
-                    aturCabang(kolomEdit.role, kolomEdit.cabang, kolomEdit.label);
-                });
-            }
-
-            aturCabang(kolomTambah.role, kolomTambah.cabang, kolomTambah.label);
-
-            // =========================================
-            // BUKA KEMBALI MODAL JIKA VALIDASI GAGAL
-            // =========================================
-
-            @if ($editGagal)
-                isiFormEdit({
-                    id: @js(old('edit_user_id')),
-                    nama: @js(old('name', '')),
-                    email: @js(old('email', '')),
-                    username: @js(old('username', '')),
-                    role: @js(old('role', 'Customer Service')),
-                    cabang: @js(old('cabang_id', '')),
-                    url: @js(route('user.update', old('edit_user_id'))),
-                });
-                bukaModal(modalEdit);
-            @elseif ($tambahGagal)
-                aturCabang(kolomTambah.role, kolomTambah.cabang, kolomTambah.label);
-                bukaModal(modalTambah);
-            @endif
+        // Mencatat elemen tempat mouse ditekan.
+        document.addEventListener('mousedown', function (event) {
+            targetTekan = event.target;
         });
-    </script>
+
+        document.addEventListener('click', function (event) {
+            const target = event.target instanceof Element
+                ? event.target
+                : null;
+
+            if (!target) return;
+
+            // -------------------------------------
+            // BUKA MODAL
+            // -------------------------------------
+
+            const tombolBuka = target.closest('[data-modal-open]');
+
+            if (tombolBuka) {
+                const namaModal = tombolBuka.dataset.modalOpen;
+                const dialog = document.getElementById(namaModal);
+
+                bukaModal(dialog);
+                return;
+            }
+
+            // -------------------------------------
+            // TUTUP MODAL
+            // -------------------------------------
+
+            const tombolTutup = target.closest('[data-modal-close]');
+
+            if (tombolTutup) {
+                const dialog = tombolTutup.closest('dialog');
+
+                if (dialog) {
+                    dialog.close();
+                }
+
+                return;
+            }
+
+            // -------------------------------------
+            // TUTUP NOTIFIKASI
+            // -------------------------------------
+
+            const tombolTutupNotifikasi =
+                target.closest('[data-alert-close]');
+
+            if (tombolTutupNotifikasi) {
+                const notifikasi =
+                    tombolTutupNotifikasi.closest('[role="alert"]');
+
+                if (notifikasi) {
+                    notifikasi.remove();
+                }
+
+                return;
+            }
+
+            // =====================================
+            // TOMBOL EDIT PENGGUNA
+            // =====================================
+
+            const tombolEdit = target.closest('.btn-edit-user');
+
+            if (tombolEdit) {
+                isiFormEdit({
+                    id: tombolEdit.dataset.id,
+                    nama: tombolEdit.dataset.name,
+                    email: tombolEdit.dataset.email,
+                    username: tombolEdit.dataset.username,
+                    role: tombolEdit.dataset.role,
+                    cabang: tombolEdit.dataset.cabang,
+                    url: tombolEdit.dataset.url,
+                });
+
+                bukaModal(modalEdit);
+                return;
+            }
+
+            // =====================================
+            // TOMBOL HAPUS PENGGUNA
+            // =====================================
+
+            const tombolHapus = target.closest('.btn-hapus-user');
+
+            if (tombolHapus) {
+                formHapus.setAttribute(
+                    'action',
+                    tombolHapus.dataset.url || '#'
+                );
+
+                bukaModal(modalHapus);
+                return;
+            }
+
+            // =====================================
+            // KLIK LATAR BELAKANG MODAL
+            // =====================================
+
+            if (
+                target instanceof HTMLDialogElement &&
+                target.open &&
+                targetTekan === target
+            ) {
+                target.close();
+            }
+        });
+
+        // =========================================
+        // VALIDASI URL FORM EDIT DAN HAPUS
+        // =========================================
+
+        [
+            [formEdit, 'URL update pengguna belum ditentukan.'],
+            [formHapus, 'URL hapus pengguna belum ditentukan.'],
+        ].forEach(function (item) {
+            const form = item[0];
+            const pesan = item[1];
+
+            form.addEventListener('submit', function (event) {
+                const action = form.getAttribute('action');
+
+                if (!action || action === '#') {
+                    event.preventDefault();
+                    console.error(pesan);
+                }
+            });
+        });
+
+        // =========================================
+        // KUNCI TOMBOL KETIKA FORM DIKIRIM
+        // =========================================
+
+        kunciPengiriman(
+            formTambah,
+            document.getElementById('btnSimpanUser'),
+            'Menyimpan...'
+        );
+
+        kunciPengiriman(
+            formEdit,
+            document.getElementById('btnUpdateUser'),
+            'Memperbarui...'
+        );
+
+        kunciPengiriman(
+            formHapus,
+            document.getElementById('btnKonfirmasiHapus'),
+            'Menghapus...'
+        );
+
+        // =========================================
+        // MEMBUKA KEMBALI MODAL JIKA VALIDASI GAGAL
+        // =========================================
+
+        @if ($editGagal)
+            isiFormEdit({
+                id: @js(old('edit_user_id')),
+                nama: @js(old('name', '')),
+                email: @js(old('email', '')),
+                username: @js(old('username', '')),
+                role: @js(old('role', 'Customer Service')),
+                cabang: @js(old('cabang_id', '')),
+                url: @js(route('user.update', old('edit_user_id'))),
+            });
+
+            bukaModal(modalEdit);
+
+        @elseif ($tambahGagal)
+            bukaModal(modalTambah);
+        @endif
+    });
+</script>
+
 
 </x-admin-layout-stisla>
