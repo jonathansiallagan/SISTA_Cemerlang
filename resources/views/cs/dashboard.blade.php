@@ -162,27 +162,24 @@
 
 
                 {{-- TOMBOL AKSI --}}
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
 
                     {{-- RIWAYAT TRANSAKSI --}}
-                    <a href="{{ route('transaksi.index') }}"
-                       class="inline-flex items-center justify-center gap-2 rounded-full border border-[#d9deef] bg-white px-5 py-2.5 text-[13px] font-bold text-[#34395e] no-underline transition duration-200 hover:-translate-y-0.5 hover:border-[#6777ef] hover:text-[#6777ef]">
-
-                        <i class="fas fa-history"></i>
-
+                    <a
+                        href="{{ route('transaksi.index') }}"
+                        class="inline-flex items-center rounded-[3px] border border-gray-300 bg-gray-100 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-200"
+                    >
+                        <i class="fas fa-history mr-1"></i>
                         Riwayat Transaksi
-
                     </a>
 
-
                     {{-- TRANSAKSI BARU --}}
-                    <a href="{{ route('transaksi.create') }}"
-                       class="inline-flex items-center justify-center gap-2 rounded-full bg-[#6777ef] px-5 py-2.5 text-[13px] font-bold text-white no-underline shadow-lg shadow-indigo-200 transition duration-200 hover:-translate-y-0.5 hover:bg-[#5565e0]">
-
-                        <i class="fas fa-plus"></i>
-
+                    <a
+                        href="{{ route('transaksi.create') }}"
+                        class="inline-flex items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]"
+                    >
+                        <i class="fas fa-plus mr-1"></i>
                         Transaksi Baru
-
                     </a>
 
                 </div>

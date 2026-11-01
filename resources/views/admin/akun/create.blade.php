@@ -127,15 +127,16 @@
 
                 <button
                     type="submit"
-                    class="bg-blue-600 text-white px-6 py-2 rounded-lg"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
                 >
+                    <i class="fas fa-save mr-1"></i>
                     Simpan Akun
                 </button>
 
-                <a
-                    href="{{ route('akun.index') }}"
-                    class="bg-gray-100 text-gray-600 px-6 py-2 rounded-lg"
+                <a href="{{ route('akun.index') }}"
+                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg"
                 >
+                    <i class="fas fa-times mr-2"></i>
                     Batal
                 </a>
 

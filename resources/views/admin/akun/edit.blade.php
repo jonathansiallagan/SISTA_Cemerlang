@@ -199,8 +199,9 @@
 
                 <a
                     href="{{ route('akun.index') }}"
-                    class="bg-gray-100 text-gray-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
+                    class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-2 font-medium text-white transition hover:bg-red-700"
                 >
+                    <span aria-hidden="true">×</span>
                     Batal
                 </a>
             </div>

@@ -174,15 +174,25 @@
 
                 {{-- Tombol --}}
                 <div class="mt-3 flex flex-col-reverse gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:justify-end">
-                    <a href="{{ route('pengeluaran.index') }}"
-                        class="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50">
+
+                    {{-- BATAL --}}
+                    <a
+                        href="{{ route('pengeluaran.index') }}"
+                        class="inline-flex items-center justify-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
+                    >
+                        <i class="fas fa-times mr-1"></i>
                         Batal
                     </a>
-                    <button type="submit"
-                        class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+
+                    {{-- SIMPAN PENGELUARAN --}}
+                    <button
+                        type="submit"
+                        class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                    >
                         <i class="fa-solid fa-floppy-disk mr-1"></i>
                         Simpan Pengeluaran
                     </button>
+
                 </div>
             </form>
         </div>

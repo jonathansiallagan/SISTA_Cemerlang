@@ -87,10 +87,12 @@
                 </p>
             </div>
 
-            <button type="button"
-                    id="modal-tambah-produk"
-                    class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
-                <i class="fas fa-plus"></i>
+            <button
+                type="button"
+                id="modal-tambah-produk"
+                class="inline-flex items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]"
+            >
+                <i class="fas fa-plus mr-1"></i>
                 Tambah Produk
             </button>
 
@@ -240,12 +242,12 @@
                 {{-- AKSI --}}
                 <td class="p-3 text-center">
 
-                    <button type="button"
-                            class="modal-hapus-produk rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50">
-
+                    <button
+                        type="button"
+                        class="modal-hapus-produk inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
+                    >
                         <i class="fas fa-trash-alt mr-1"></i>
                         Hapus
-
                     </button>
 
                 </td>
@@ -301,22 +303,22 @@
         {{-- TOMBOL FORM --}}
         <div class="mt-6 flex flex-col justify-end gap-3 border-t border-gray-200 pt-5 sm:flex-row">
 
-            <button type="button"
-                    id="modal-tombol-batal"
-                    class="rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">
-
+            <button
+                type="button"
+                id="modal-tombol-batal"
+                class="inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
+            >
                 <i class="fas fa-times mr-1"></i>
                 Batal
-
             </button>
 
-            <button type="submit"
-                    id="modal-tombol-proses"
-                    class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
-
+            <button
+                type="submit"
+                id="modal-tombol-proses"
+                class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+            >
                 <i class="fas fa-save mr-1"></i>
                 Simpan Transaksi
-
             </button>
 
         </div>

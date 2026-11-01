@@ -271,13 +271,13 @@
             {{-- FOOTER MODAL --}}
             <div class="flex items-center justify-end gap-2 bg-[#f8f9fa] px-[25px] py-3">
                 <button type="button" data-modal-close
-                    class="inline-flex items-center rounded-[3px] bg-[#cdd3d8] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#bcc4cb]">
+                    class="inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
                     <i class="fas fa-times mr-1"></i>
                     Batal
                 </button>
 
                 <button type="submit" id="btnSimpanBahan"
-                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65">
+                   class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
                     <i class="fas fa-save mr-1"></i>
                     Simpan Bahan Baku
                 </button>
@@ -408,9 +408,11 @@
                             Batal
                         </button>
 
-                        <button type="submit"
-                                id="btnUpdateBahan"
-                                class="btn btn-primary">
+                        <button
+                            type="submit"
+                            id="btnUpdateBahan"
+                            class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                        >
                             <i class="fas fa-save mr-1"></i>
                             Simpan Perubahan
                         </button>

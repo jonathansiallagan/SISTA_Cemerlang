@@ -207,19 +207,14 @@
                                 </li>
                             @endforelse
                         </ul>
-                        
-                        <a href="{{ route('produk.index') }}"
-                           class="mt-3 flex w-full items-center justify-center rounded-[3px] border border-[#6777ef] px-4 py-2 text-[13px] font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
-                           <i class="fas fa-box-open mr-2"></i>
-                           Lihat Katalog Produk
-                        </a>
-                    
-                    </div>
 
-                    <a href="{{ route('produk.index') }}"
-                        class="mt-4 flex h-[38px] w-full items-center justify-center rounded-[3px] border border-[#6777ef] text-xs font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
-                        Lihat Katalog Produk
-                    </a>
+                        <a href="{{ route('produk.index') }}"
+                            class="mt-3 flex w-full items-center justify-center rounded-[3px] border border-[#6777ef] px-4 py-2 text-[13px] font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
+                            <i class="fas fa-box-open mr-2"></i>
+                            Lihat Katalog Produk
+                        </a>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -230,8 +225,9 @@
                 <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#6777ef]">Transaksi Terbaru</h4>
                 <div class="ml-auto">
                     <a href="{{ route('transaksi.index') }}"
-                        class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
-                        {{ number_format($jumlahTransaksi) }} Transaksi
+                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                            <i class="fas fa-receipt mr-2"></i>
+                            {{ number_format($jumlahTransaksi) }} Transaksi
                     </a>
                 </div>
             </div>
@@ -344,7 +340,8 @@
                 <div class="border-t border-black/5 px-[25px] py-4 text-right">
                     <a href="{{ route('jurnal.index') }}"
                         class="inline-flex items-center rounded-[3px] border border-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
-                        Lihat Jurnal Umum
+                            <i class="fas fa-book-open mr-2"></i>
+                            Lihat Jurnal Umum
                     </a>
                 </div>
             </div>
@@ -363,11 +360,13 @@
 
                     <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#6777ef] px-5 py-4 text-white">
                         <div class="text-xs">Total Kredit</div>
-                        <h5 class="text-base font-semibold">Rp {{ number_format($totalKredit ?? 0, 0, ',', '.') }}</h5>
+                        <h5 class="text-base font-semibold">Rp {{ number_format($totalKredit ?? 0, 0, ',', '.') }}
+                        </h5>
                     </div>
 
                     <a href="{{ route('buku_besar.index') }}"
                         class="flex h-[38px] w-full items-center justify-center rounded-[3px] border border-[#6777ef] text-xs font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
+                        <i class="fas fa-book mr-2"></i>
                         Lihat Buku Besar
                     </a>
                 </div>
@@ -375,7 +374,7 @@
         </div>
     </div>
 
-    {{-- Grafik omzet --}}
+    {{-- Grafik Omzet & Transaksi --}}
     <script src="{{ asset('stisla/assets/modules/chart.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -386,45 +385,79 @@
             }
 
             const labels = {{ \Illuminate\Support\Js::from($tanggalChart) }};
-            const values = {{ \Illuminate\Support\Js::from($omzetChart) }};
+            const omzetValues = {{ \Illuminate\Support\Js::from($omzetChart) }};
+            const transaksiValues = {{ \Illuminate\Support\Js::from($transaksiChart) }};
 
             new Chart(canvas.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Omzet',
-                        data: values,
-                        borderColor: '#6777ef',
-                        backgroundColor: 'rgba(103, 119, 239, 0.12)',
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        pointBackgroundColor: '#6777ef',
-                        fill: true,
-                        lineTension: 0.3
-                    }]
+                            label: 'Omzet',
+                            data: omzetValues,
+                            yAxisID: 'y-omzet', // Terhubung ke sumbu Y kiri
+                            borderColor: '#6777ef', // Biru Stisla
+                            backgroundColor: 'rgba(103, 119, 239, 0.12)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#6777ef',
+                            fill: true,
+                            lineTension: 0.3
+                        },
+                        {
+                            label: 'Total Transaksi',
+                            data: transaksiValues,
+                            yAxisID: 'y-transaksi', // Terhubung ke sumbu Y kanan
+                            borderColor: '#ffa426', // Oranye Stisla
+                            backgroundColor: 'transparent', // Tanpa fill agar tidak menimpa
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#ffa426',
+                            borderDash: [5, 5], // Garis putus-putus agar beda
+                            fill: false,
+                            lineTension: 0.3
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     legend: {
-                        display: false
+                        display: true, // Tampilkan legenda agar user tahu garis apa saja
+                        position: 'top'
                     },
                     scales: {
                         yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                callback: function(value) {
-                                    return 'Rp ' + new Intl.NumberFormat('id-ID', {
-                                        notation: 'compact',
-                                        maximumFractionDigits: 1
-                                    }).format(value);
+                                id: 'y-omzet',
+                                position: 'left',
+                                ticks: {
+                                    beginAtZero: true,
+                                    callback: function(value) {
+                                        return 'Rp ' + new Intl.NumberFormat('id-ID', {
+                                            notation: 'compact',
+                                            maximumFractionDigits: 1
+                                        }).format(value);
+                                    }
+                                },
+                                gridLines: {
+                                    color: '#f2f2f2'
                                 }
                             },
-                            gridLines: {
-                                color: '#f2f2f2'
+                            {
+                                id: 'y-transaksi',
+                                position: 'right',
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize: 1, // Pastikan angkanya bulat
+                                    callback: function(value) {
+                                        return value + ' Trx';
+                                    }
+                                },
+                                gridLines: {
+                                    display: false // Sembunyikan garis grid agar tidak semrawut
+                                }
                             }
-                        }],
+                        ],
                         xAxes: [{
                             gridLines: {
                                 display: false
@@ -433,9 +466,14 @@
                     },
                     tooltips: {
                         callbacks: {
-                            label: function(tooltipItem) {
-                                return 'Omzet: Rp ' +
-                                    new Intl.NumberFormat('id-ID').format(tooltipItem.yLabel);
+                            label: function(tooltipItem, data) {
+                                let datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
+                                if (datasetLabel === 'Omzet') {
+                                    return datasetLabel + ': Rp ' + new Intl.NumberFormat('id-ID')
+                                        .format(tooltipItem.yLabel);
+                                } else {
+                                    return datasetLabel + ': ' + tooltipItem.yLabel + ' Transaksi';
+                                }
                             }
                         }
                     }
