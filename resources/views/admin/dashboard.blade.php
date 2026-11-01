@@ -298,7 +298,7 @@
                     <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#6777ef]">Jurnal Terbaru</h4>
                     <div class="ml-auto">
                         <span
-                            class="rounded-full bg-[#e3eaef] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-[#191d21]">
+                            class="rounded-full bg-[#6777ef] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
                             {{ $jurnalTerbaru->count() }} Catatan
                         </span>
                     </div>
