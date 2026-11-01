@@ -68,23 +68,24 @@
         <div class="relative z-50 flex h-[70px] shrink-0">
 
             {{-- 1. LOGO (kiri atas) --}}
-            <div
-                class="flex h-[70px] w-[var(--sidebar-w)] shrink-0 items-center bg-white dark:bg-[#111827] dark:border-b dark:border-[#1f2937]">
+            <div class="flex h-[70px] w-[var(--sidebar-w)] shrink-0 items-center bg-[#6777ef]">
 
                 {{-- Logo lengkap (desktop, sidebar terbuka) --}}
                 <a href="{{ url('/') }}"
                     class="hidden h-[70px] w-full items-center justify-start gap-[9px] px-[18px] no-underline lg:group-data-[mini=false]/layout:flex">
 
                     <img src="{{ asset('images/logo-cemerlang.png') }}" alt="Logo CV Cemerlang"
-                        class="h-[38px] w-[38px] shrink-0 rounded-[11px] border-2 border-[#6777ef] bg-white object-contain p-[2px]">
+                        class="h-[38px] w-[38px] shrink-0 rounded-[11px] border-2 border-white bg-white object-contain p-[2px]">
 
                     <div class="min-w-0 text-left leading-[1.15]">
-                        <div class="text-[19px] font-bold tracking-[-0.3px] text-[#34395e]">
+                        {{-- Ubah teks SISTA menjadi putih --}}
+                        <div class="text-[19px] font-bold tracking-[-0.3px] text-white">
                             SISTA
                         </div>
 
+                        {{-- Ubah teks CV Cemerlang menjadi putih sedikit transparan --}}
                         <div
-                            class="mt-[5px] flex items-center gap-1.5 whitespace-nowrap text-[11px] font-normal text-[#98a6ad]">
+                            class="mt-[5px] flex items-center gap-1.5 whitespace-nowrap text-[11px] font-normal text-white/80">
                             <span class="h-[7px] w-[7px] shrink-0 rounded-full bg-[#47cfa0]"></span>
                             <span>CV Cemerlang</span>
                         </div>
@@ -94,13 +95,13 @@
                 {{-- Logo kecil (mobile / sidebar mini) --}}
                 <a href="{{ url('/') }}"
                     class="flex h-[70px] w-full items-center justify-center lg:group-data-[mini=false]/layout:hidden">
-                    <img src="{{ asset('images/logo-cemerlang.png') }}" alt="Logo SISTA" class="h-8 w-8 object-contain">
+                    <img src="{{ asset('images/logo-cemerlang.png') }}" alt="Logo SISTA"
+                        class="h-8 w-8 rounded-lg bg-white p-0.5 object-contain">
                 </a>
             </div>
 
             {{-- 2. NAVBAR (kanan atas) --}}
-            <nav
-                class="flex min-w-0 flex-1 items-center justify-between bg-[#6777ef] dark:bg-[#111827] dark:border-b dark:border-[#1f2937] px-4 lg:px-[30px]">
+            <nav class="flex min-w-0 flex-1 items-center justify-between bg-[#6777ef] px-4 lg:px-[30px]">
 
                 {{-- Tombol buka/tutup sidebar --}}
                 <button id="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar"

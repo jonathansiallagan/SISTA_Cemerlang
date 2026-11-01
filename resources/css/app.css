@@ -53,27 +53,89 @@
 
 /* ========================================
     DARK MODE UNTUK TABEL SISTA
-
     ======================================== */
+
+/* Mengubah warna border tabel */
 .dark .table-sista {
-    border-color: #374151; /* gray-700 */
+    border-color: #374151;
 }
 
 .dark .table-sista th,
 .dark .table-sista td {
-    border-color: #4b5563; /* gray-600 */
+    border-color: #4b5563;
 }
 
 .dark .table-sista thead th {
-    background-color: #1f2937; /* gray-800 */
-    color: #e5e7eb; /* gray-200 */
+    background-color: #1f2937;
+    color: #e5e7eb;
     border-bottom-color: #4b5563;
 }
 
 .dark .table-sista tbody tr:nth-child(even) {
-    background-color: #111827; /* gray-900 */
+    background-color: #111827;
 }
 
 .dark .table-sista tbody tr:hover {
-    background-color: #374151; /* gray-700 */
+    background-color: #374151;
+}
+
+/* Mengubah warna kartu dan tajuk */
+.dark .bg-white {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+/* Memastikan teks yang sebelumnya gelap diubah menjadi terang pada mode gelap */
+.dark .text-\[\#34395e\],
+.dark .text-\[\#191d21\],
+.dark .text-\[\#6c757d\] {
+    color: #e5e7eb !important;
+}
+
+/* Penyesuaian garis batas bawah yang ada di beberapa kartu */
+.dark .border-\[\#f9f9f9\],
+.dark .border-\[\#f2f2f2\],
+.dark .border-\[\#e4e6fc\] {
+    border-color: #374151 !important;
+}
+
+/* Membuat input, select, dan textarea menjadi gelap */
+.dark input.bg-\[\#fdfdff\],
+.dark select.bg-\[\#fdfdff\],
+.dark textarea.bg-\[\#fdfdff\] {
+    background-color: #111827 !important;
+    border-color: #374151 !important;
+    color: #e5e7eb !important;
+}
+
+/* Memperbaiki label pada form agar menjadi terang */
+.dark label.text-\[\#34395e\] {
+    color: #d1d5db !important;
+}
+
+/* Memperbaiki tombol abu-abu (Reset/Batal) agar teksnya terlihat */
+.dark .bg-\[\#e3eaef\] {
+    background-color: #374151 !important;
+    color: #e5e7eb !important;
+    border-color: #4b5563 !important;
+}
+
+.dark .hover\:bg-\[\#d3dde4\]:hover {
+    background-color: #4b5563 !important;
+}
+
+/* Baris Saldo Awal & Total Mutasi */
+.dark tr.bg-\[\#f9fafb\],
+.dark tr.bg-\[\#f8f9fa\] {
+    background-color: #29313b !important;
+    color: #e5e7eb !important;
+}
+
+/* Memastikan sel di dalamnya juga berwarna terang */
+.dark tr.bg-\[\#f9fafb\] td,
+.dark tr.bg-\[\#f8f9fa\] td,
+.dark tr.bg-\[\#f9fafb\] td span,
+.dark tr.bg-\[\#f8f9fa\] td span {
+    color: #f3f4f6 !important;
 }
