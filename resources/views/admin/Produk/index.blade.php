@@ -233,9 +233,13 @@
                         </small>
                     </div>
 
-                    <button type="button" id="modalTambahBarisBahan"
-                        class="inline-flex shrink-0 items-center rounded-[3px] bg-[#54ca68] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#3fb556]">
-                        <i class="fas fa-plus mr-1"></i> Tambah Bahan
+                    <button
+                        type="button"
+                        id="modalTambahBarisBahan"
+                        class="inline-flex shrink-0 items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]"
+                    >
+                        <i class="fas fa-plus mr-1"></i>
+                        Tambah Bahan
                     </button>
                 </div>
 
@@ -253,9 +257,12 @@
                                 <strong class="modal-nomor-bahan font-bold text-[#34395e]">
                                     Bahan Baku {{ $i + 1 }}
                                 </strong>
-                                <button type="button"
-                                    class="modal-hapus-bahan inline-flex items-center rounded-[3px] border border-[#fc544b] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-[#fc544b] transition-colors hover:bg-[#fc544b] hover:text-white">
-                                    <i class="fas fa-trash mr-1"></i> Hapus
+                                <button
+                                    type="button"
+                                    class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
+                                >
+                                    <i class="fas fa-trash mr-1"></i>
+                                    Hapus
                                 </button>
                             </div>
 
@@ -316,12 +323,15 @@
             </div>
 
             <div class="flex shrink-0 items-center justify-end gap-2 border-t border-[#e3eaef] bg-[#f6f8fb] px-6 py-4">
-                <button type="button" data-modal-close
-                    class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                <button
+                    type="button"
+                    data-modal-close
+                    class="inline-flex items-center gap-2 rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
+                    <i class="fas fa-times"></i>
                     Batal
                 </button>
                 <button type="submit" id="modalSimpanProduk"
-                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-60">
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
                     <i class="fas fa-save mr-1"></i> Simpan Produk
                 </button>
             </div>
@@ -420,7 +430,7 @@
                     </div>
 
                     <button type="button" id="editTambahBarisBahan"
-                        class="inline-flex shrink-0 items-center rounded-[3px] bg-[#54ca68] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#3fb556]">
+                        class="inline-flex items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]">
                         <i class="fas fa-plus mr-1"></i> Tambah Bahan
                     </button>
                 </div>
@@ -436,9 +446,12 @@
                             <strong class="edit-nomor-bahan font-bold text-[#34395e]">
                                 Bahan Baku 1
                             </strong>
-                            <button type="button"
-                                class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-[#fc544b] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-[#fc544b] transition-colors hover:bg-[#fc544b] hover:text-white">
-                                <i class="fas fa-trash mr-1"></i> Hapus
+                            <button
+                                type="button"
+                                class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
+                            >
+                                <i class="fas fa-trash mr-1"></i>
+                                Hapus
                             </button>
                         </div>
 

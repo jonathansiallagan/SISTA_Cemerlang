@@ -31,8 +31,10 @@
 
         <!-- HEADER & TOMBOL KEMBALI -->
         <div class="flex items-center justify-between mb-6">
-            <a href="{{ route(Auth::user()->homeRoute()) }}"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition shadow-sm">
+            <a
+                href="{{ route(Auth::user()->homeRoute()) }}"
+                class="inline-flex items-center gap-2 rounded-lg border border-[#6777ef] bg-[#6777ef] px-4 py-2 text-sm text-white shadow-sm transition hover:border-[#5665d8] hover:bg-[#5665d8]"
+            >
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Kembali ke Dashboard</span>
             </a>
@@ -140,8 +142,11 @@
                             </div>
 
                             <div class="pt-4">
-                                <button type="submit"
-                                    class="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                                <button
+                                    type="submit"
+                                    class="inline-flex items-center gap-2 rounded-lg border border-green-600 bg-green-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:border-green-700 hover:bg-green-700"
+                                >
+                                    <i class="fas fa-save"></i>
                                     Simpan Perubahan Profil
                                 </button>
                             </div>
@@ -185,8 +190,11 @@
                             </div>
 
                             <div class="pt-4">
-                                <button type="submit"
-                                    class="px-6 py-2 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-900 transition">
+                                <button
+                                    type="submit"
+                                    class="inline-flex items-center gap-2 rounded-lg bg-gray-800 px-6 py-2 text-sm font-medium text-white transition hover:bg-gray-900"
+                                >
+                                    <i class="fas fa-key"></i>
                                     Update Password
                                 </button>
                             </div>
@@ -251,10 +259,13 @@
                             @enderror
 
                             <div class="pt-6 border-t border-gray-100 mt-8">
-                                <button type="submit"
-                                    class="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
-                                    Terapkan Preferensi
-                                </button>
+                                <button
+                                type="submit"
+                                class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                            >
+                                <i class="fas fa-check"></i>
+                                Terapkan Preferensi
+                            </button>
                             </div>
                         </div>
                     </form>
@@ -382,9 +393,13 @@
 
         <!-- TOMBOL KELUAR DI BAWAH -->
         <div class="mt-6 flex justify-end">
-            <button type="button" onclick="openLogoutModal()"
-                class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition shadow-sm">
-                <i class="fa-solid fa-right-from-bracket"></i> Keluar dari Sistem
+            <button
+                type="button"
+                onclick="openLogoutModal()"
+                class="flex items-center gap-2 rounded-lg border border-red-600 bg-red-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:border-red-700 hover:bg-red-700"
+            >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Keluar dari Sistem
             </button>
         </div>
     </div>

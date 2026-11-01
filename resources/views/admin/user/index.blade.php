@@ -14,13 +14,18 @@
         $kelasLabel = 'mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]';
         $kelasPesanError = 'mt-1 text-xs text-[#fc544b]';
         $kelasBantuan = 'mt-1 block text-xs text-[#6c757d]';
-        $kelasBtnBatal = 'inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]';
-        $kelasBtnUtama = 'inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65';
+
+        // Tombol Batal: merah
+        $kelasBtnBatal = 'inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700';
+
+        // Tombol Simpan: hijau
+        $kelasBtnUtama = 'inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600';
+
         $kelasDialog = 'm-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40';
 
         $kelasField = fn($bag, string $field) => $kelasInput . ' ' . ($bag->has($field) ? $kelasInputError : $kelasInputNormal);
     @endphp
-
+    
     {{-- HEADER HALAMAN --}}
     <div
         class="mb-[30px] flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[3px] bg-white px-[30px] py-5 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
@@ -460,8 +465,11 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnUpdateUser"
-                    class="{{ $kelasBtnUtama }}">
+                <button
+                    type="submit"
+                    id="btnUpdateBahan"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                >
                     <i class="fas fa-save mr-1"></i>
                     Simpan Perubahan
                 </button>
