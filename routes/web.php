@@ -35,7 +35,7 @@ Route::middleware(['guest'])->group(function () {
 
 //====================================================================================================//
 // AREA INTERNAL //
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
     // Rute Dashboard Admin (Untuk Pusat & Cabang)
     Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
@@ -51,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::put('/profil/preferensi', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
+    
     // Route khusus untuk upload avatar via AJAX
     Route::post('/profil/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
 
@@ -83,51 +84,28 @@ Route::middleware(['auth'])->group(function () {
 
         // === ROUTE BUKU BESAR ===
         Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
-        Route::get('/buku-besar/export/pdf', [
-            BukuBesarController::class,
-            'cetakPdf',
-        ])->name('buku_besar.pdf');
-
-        Route::get('/buku-besar/export/excel', [
-            BukuBesarController::class,
-            'cetakExcel',
-        ])->name('buku_besar.excel');
+        Route::get('/buku-besar/export/pdf', [BukuBesarController::class,'cetakPdf',])->name('buku_besar.pdf');
+        Route::get('/buku-besar/export/excel', [BukuBesarController::class,'cetakExcel',])->name('buku_besar.excel');
 
         // === ROUTE LAPORAN LABA RUGI ===
-        Route::get('/laporan-laba-rugi', [
-            LaporanLabaRugiController::class,
-            'index'
-        ])->name('laporan_laba_rugi.index');
-            });
+        Route::get('/laporan-laba-rugi', [LaporanLabaRugiController::class,'index'])->name('laporan_laba_rugi.index');
 
         // === ROUTE BAHAN BAKU ===
-        Route::resource('bahan-baku', BahanBakuController::class)
-            ->names('bahan-baku')
-            ->except(['show']);
+        Route::resource('bahan-baku', BahanBakuController::class)->names('bahan-baku')->except(['show']);
 
         // === ROUTE PERSEDIAAN ===
-        Route::get('/persediaan', [PersediaanController::class, 'index'])
-            ->name('persediaan.index');
-
-        Route::post('/persediaan', [PersediaanController::class, 'store'])
-            ->name('persediaan.store');
-
+        Route::get('/persediaan', [PersediaanController::class, 'index'])->name('persediaan.index');
+        Route::post('/persediaan', [PersediaanController::class, 'store'])->name('persediaan.store');
+    });
 //====================================================================================================//
     // === ROUTE yang hanya bisa diakses ADMIN PUSAT ===
     Route::middleware(['role:Admin Pusat'])->group(function () {
         
         // === ROUTE MASTER DATA CABANG ===
-        Route::get('/cabang', [CabangController::class, 'index'])
-            ->name('cabang.index');
-
-        Route::post('/cabang', [CabangController::class, 'store'])
-            ->name('cabang.store');
-
-        Route::put('/cabang/{id}', [CabangController::class, 'update'])
-            ->name('cabang.update');
-
-        Route::patch('/cabang/{id}/status', [CabangController::class, 'toggleStatus'])
-            ->name('cabang.toggle-status');
+        Route::get('/cabang', [CabangController::class, 'index'])->name('cabang.index');
+        Route::post('/cabang', [CabangController::class, 'store'])->name('cabang.store');
+        Route::put('/cabang/{id}', [CabangController::class, 'update'])->name('cabang.update');
+        Route::patch('/cabang/{id}/status', [CabangController::class, 'toggleStatus'])->name('cabang.toggle-status');
 
         // === ROUTE MASTER DATA USER ===
         Route::get('/user', [UserController::class, 'index'])->name('user.index');

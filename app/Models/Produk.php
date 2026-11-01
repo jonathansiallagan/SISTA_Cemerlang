@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[Fillable(['nama_produk', 'satuan', 'upah_operator'])]
 class Produk extends Model
@@ -18,4 +20,7 @@ class Produk extends Model
     {
         return $this->hasMany(KomposisiProduk::class, 'produk_id');
     }
+
+    use HasFactory, SoftDeletes;
+    protected $guarded = ['id'];
 }

@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,152 +10,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <style>
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .login-background {
-            background: #293f91;
-            isolation: isolate;
-        }
-
-        .glow {
-            position: absolute;
-            pointer-events: none;
-            border-radius: 50%;
-            filter: blur(45px);
-            z-index: -1;
-        }
-
-        .glow-red {
-            width: 580px;
-            height: 580px;
-            background: #f20d18;
-            opacity: .94;
-            left: -235px;
-            top: -20px;
-        }
-
-        .glow-red-top {
-            width: 300px;
-            height: 650px;
-            background: #ed1728;
-            opacity: .9;
-            left: 30%;
-            top: -390px;
-            transform: rotate(-28deg);
-        }
-
-        .glow-yellow {
-            width: 500px;
-            height: 500px;
-            background: #ffdf16;
-            opacity: .98;
-            right: -130px;
-            bottom: -170px;
-        }
-
-        .glow-yellow-bottom {
-            width: 250px;
-            height: 260px;
-            background: #ffdb16;
-            opacity: .95;
-            right: 26%;
-            bottom: -180px;
-        }
-
-        .login-card {
-            width: 440px;
-            min-height: 611px;
-            padding: 36px 32px;
-            background: rgba(255,255,255,.16);
-            border: 1.5px solid rgba(255,255,255,.55);
-            border-radius: 36px;
-            box-shadow: 0 25px 60px rgba(9,20,65,.25),
-                        inset 0 1px 1px rgba(255,255,255,.3);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-        }
-
-        .login-input {
-            display: block;
-            width: 100%;
-            height: 46px;
-            padding: 0 14px;
-            color: #172554;
-            background: #fff;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            outline: none;
-            transition: .2s;
-        }
-
-        .login-input:focus {
-            border-color: #d60000;
-            box-shadow: 0 0 0 3px rgba(255,255,255,.2);
-        }
-
-        .login-button {
-            height: 48px;
-            background: #d60000;
-            box-shadow: 0 8px 18px rgba(150,0,0,.28);
-            transition: .2s;
-        }
-
-        .login-button:hover {
-            background: #bd0000;
-            transform: translateY(-1px);
-        }
-
-        .color-line {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            height: 6px;
-            overflow: hidden;
-            border-radius: 99px;
-        }
-
-        @media (max-width: 520px) {
-            .login-card {
-                width: min(440px, calc(100vw - 32px));
-                min-height: auto;
-                padding: 32px 24px;
-                border-radius: 28px;
-            }
-
-            .glow-red { left: -350px; }
-            .glow-yellow { right: -300px; }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
-<body>
-    <main class="login-background relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8">
+<body class="m-0 font-['Inter',sans-serif] antialiased">
+    <main class="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#293f91] px-4 py-8">
 
         <!-- Efek background merah, biru, dan kuning -->
-        <div class="glow glow-red"></div>
-        <div class="glow glow-red-top"></div>
-        <div class="glow glow-yellow"></div>
-        <div class="glow glow-yellow-bottom"></div>
+        <div aria-hidden="true"
+            class="pointer-events-none absolute -left-[235px] -top-[20px] -z-10 h-[580px] w-[580px] rounded-full bg-[#f20d18] opacity-[.94] blur-[45px] max-[520px]:-left-[350px]">
+        </div>
+        <div aria-hidden="true"
+            class="pointer-events-none absolute left-[30%] -top-[390px] -z-10 h-[650px] w-[300px] -rotate-[28deg] rounded-full bg-[#ed1728] opacity-90 blur-[45px]">
+        </div>
+        <div aria-hidden="true"
+            class="pointer-events-none absolute -bottom-[170px] -right-[130px] -z-10 h-[500px] w-[500px] rounded-full bg-[#ffdf16] opacity-[.98] blur-[45px] max-[520px]:-right-[300px]">
+        </div>
+        <div aria-hidden="true"
+            class="pointer-events-none absolute -bottom-[180px] right-[26%] -z-10 h-[260px] w-[250px] rounded-full bg-[#ffdb16] opacity-95 blur-[45px]">
+        </div>
 
         <!-- Kartu login transparan -->
-        <section class="login-card relative z-10 text-white">
+        <section
+            class="relative z-10 min-h-[611px] w-[min(440px,calc(100vw_-_32px))] rounded-[36px] border-[1.5px] border-white/[.55] bg-white/[.16] px-8 py-9 text-white shadow-[0_25px_60px_rgba(9,20,65,0.25),inset_0_1px_1px_rgba(255,255,255,0.3)] backdrop-blur-[18px] max-[520px]:min-h-0 max-[520px]:rounded-[28px] max-[520px]:px-6 max-[520px]:py-8">
 
             <!-- Logo perusahaan -->
             <div class="mb-5 flex justify-center">
-                <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-lg">
-                    <img
-                        src="{{ asset('images/logo-cemerlang.png') }}"
-                        alt="Logo CV Cemerlang"
-                        class="h-full w-full object-contain"
-                    >
+                <div
+                    class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-lg">
+                    <img src="{{ asset('images/logo-cemerlang.png') }}" alt="Logo CV Cemerlang" width="96"
+                        height="96" class="h-full w-full object-contain">
                 </div>
             </div>
 
@@ -163,7 +47,7 @@
             <div class="mb-5 text-center">
                 <h1 class="text-4xl font-extrabold tracking-wide">SISTA</h1>
 
-                <p class="mt-1 text-sm font-medium text-white">
+                <p class="mt-1 text-sm font-medium">
                     Sistem Informasi dan Transaksi Akuntansi
                 </p>
 
@@ -172,72 +56,82 @@
                 </p>
             </div>
 
-            <div class="mb-6">
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <x-password-input id="password" name="password" autocomplete="current-password"
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="••••••••" required />
-            </div>
+            <!-- FORM LOGIN -->
+            <form action="{{ route('login') }}" method="POST">
+                @csrf
 
                 @if ($errors->any())
-                    <div class="rounded-lg border border-white/30 bg-red-900/30 p-3 text-sm text-white">
+                    <div role="alert"
+                        class="mb-5 rounded-lg border border-white/30 bg-red-900/30 p-3 text-sm text-white">
                         @foreach ($errors->all() as $error)
                             <p>{{ $error }}</p>
                         @endforeach
                     </div>
                 @endif
 
-                <div>
+                <div class="mb-4">
                     <label for="username" class="mb-2 block pl-1 text-xs font-bold tracking-wide text-white">
                         USERNAME
                     </label>
-
-                    <input
-                        type="text"
-                        name="username"
-                        id="username"
-                        value="{{ old('username') }}"
-                        class="login-input"
-                        autocomplete="username"
-                        placeholder=""
-                        required
-                        autofocus
-                    >
+                    <input type="text" name="username" id="username" value="{{ old('username') }}"
+                        autocomplete="username" required autofocus
+                        class="block h-[46px] w-full rounded-xl border border-slate-300 bg-white px-[14px] text-[#172554] transition duration-200 focus:border-[#d60000] focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,255,255,0.2)]">
                 </div>
 
-                <div>
+                <div class="mb-6">
                     <label for="password" class="mb-2 block pl-1 text-xs font-bold tracking-wide text-white">
                         PASSWORD
                     </label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" autocomplete="current-password" required
+                            class="block h-[46px] w-full rounded-xl border border-slate-300 bg-white pl-[14px] pr-11 text-[#172554] transition duration-200 focus:border-[#d60000] focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,255,255,0.2)]">
 
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="login-input"
-                        autocomplete="current-password"
-                        placeholder=""
-                        required
-                    >
+                        <!-- Tombol toggle mata -->
+                        <button type="button" id="togglePassword" aria-label="Tampilkan password" aria-pressed="false"
+                            class="absolute inset-y-0 right-0 flex cursor-pointer items-center rounded-r-xl pr-4 text-[#172554] opacity-70 transition hover:opacity-100 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-[#d60000]">
+                            <i class="fa-solid fa-eye" id="eyeIcon" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <button
-                    type="submit"
-                    class="login-button mt-1 w-full rounded-xl text-sm font-extrabold tracking-wide text-white"
-                >
-                     <i class="fa-solid fa-right-to-bracket mr-2"></i>
+                <button type="submit"
+                    class="mt-1 h-12 w-full cursor-pointer rounded-xl bg-[#d60000] text-sm font-extrabold tracking-wide text-white shadow-[0_8px_18px_rgba(150,0,0,0.28)] transition duration-200 hover:-translate-y-px hover:bg-[#bd0000] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40 active:translate-y-0">
+                    <i class="fa-solid fa-right-to-bracket mr-2" aria-hidden="true"></i>
                     MASUK KE SISTA
                 </button>
             </form>
 
             <!-- Aksen warna di bagian bawah -->
-            <div class="color-line mt-7">
-                <div style="background-color: #29387F;"></div>
+            <div aria-hidden="true" class="mt-7 grid h-1.5 grid-cols-3 overflow-hidden rounded-full">
+                <div class="bg-[#29387f]"></div>
                 <div class="bg-red-600"></div>
                 <div class="bg-yellow-400"></div>
             </div>
 
         </section>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tombolToggle = document.getElementById('togglePassword');
+            const inputPassword = document.getElementById('password');
+            const ikonMata = document.getElementById('eyeIcon');
+
+            tombolToggle.addEventListener('click', function () {
+                // Jika sedang tersembunyi (type=password), tampilkan teksnya, dan sebaliknya.
+                const tampilkan = inputPassword.type === 'password';
+
+                inputPassword.type = tampilkan ? 'text' : 'password';
+
+                // Mata terbuka saat password tersembunyi, mata tercoret saat terlihat.
+                ikonMata.classList.toggle('fa-eye', !tampilkan);
+                ikonMata.classList.toggle('fa-eye-slash', tampilkan);
+
+                tombolToggle.setAttribute('aria-pressed', String(tampilkan));
+                tombolToggle.setAttribute('aria-label', tampilkan ? 'Sembunyikan password' : 'Tampilkan password');
+            });
+        });
+    </script>
 </body>
+
 </html>
