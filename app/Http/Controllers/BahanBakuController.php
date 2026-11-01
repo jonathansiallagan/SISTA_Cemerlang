@@ -37,6 +37,9 @@ class BahanBakuController extends Controller
         );
     }
 
+    /**
+     * Menampilkan daftar bahan baku.
+     */
     public function index()
     {
         $bahanBakus = BahanBaku::orderBy('nama_bahan')->get();
@@ -50,23 +53,37 @@ class BahanBakuController extends Controller
         );
     }
 
+    /**
+     * Menyimpan bahan baku baru.
+     */
     public function store(Request $request)
     {
+        // Membersihkan spasi di awal dan akhir input.
+        $request->merge([
+            'nama_bahan' => trim($request->nama_bahan ?? ''),
+            'spesifikasi' => $request->filled('spesifikasi')
+                ? trim($request->spesifikasi)
+                : null,
+        ]);
+
         $validated = $request->validate([
             'nama_bahan' => [
                 'required',
                 'string',
-                'max:255',
+                'max:150',
+                Rule::unique('bahan_baku', 'nama_bahan'),
             ],
+
             'spesifikasi' => [
                 'nullable',
                 'string',
-                'max:255',
+                'max:150',
             ],
+
             'satuan' => [
                 'required',
                 'string',
-                'max:50',
+                'max:30',
                 Rule::in([
                     'lembar',
                     'rim',
@@ -80,22 +97,28 @@ class BahanBakuController extends Controller
                     'pak',
                 ]),
             ],
+
             'status' => [
                 'required',
                 Rule::in(['aktif', 'nonaktif']),
             ],
         ], [
             'nama_bahan.required' => 'Nama bahan wajib diisi.',
-            'nama_bahan.max' => 'Nama bahan maksimal 255 karakter.',
-            'spesifikasi.max' => 'Spesifikasi maksimal 255 karakter.',
+            'nama_bahan.max' => 'Nama bahan maksimal 150 karakter.',
+            'nama_bahan.unique' => 'Nama bahan baku sudah terdaftar. Silakan gunakan nama lain.',
+
+            'spesifikasi.max' => 'Spesifikasi maksimal 150 karakter.',
+
             'satuan.required' => 'Satuan wajib dipilih.',
             'satuan.in' => 'Satuan yang dipilih tidak valid.',
+
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Status yang dipilih tidak valid.',
         ]);
 
         try {
             DB::transaction(function () use ($validated) {
+
                 // Kode dibuat ulang di server saat menyimpan.
                 $validated['kode_bahan'] = $this->generateKodeBahan();
 
@@ -105,16 +128,26 @@ class BahanBakuController extends Controller
 
                 BahanBaku::create($validated);
             });
+
         } catch (QueryException $e) {
-            // Misalnya terjadi konflik kode ketika ada penyimpanan bersamaan.
             report($e);
+
+            // Menangani konflik UNIQUE pada database.
+            if ($e->getCode() === '23000') {
+                return redirect()
+                    ->route('bahan-baku.index')
+                    ->withInput($request->except('_token'))
+                    ->withErrors([
+                        'nama_bahan' => 'Nama atau kode bahan baku sudah terdaftar. Periksa kembali data yang dimasukkan.',
+                    ]);
+            }
 
             return redirect()
                 ->route('bahan-baku.index')
                 ->withInput($request->except('_token'))
                 ->with(
                     'error',
-                    'Bahan baku gagal disimpan. Silakan coba kembali.'
+                    'Terjadi kesalahan database. Data bahan baku gagal disimpan.'
                 );
         }
 
@@ -126,32 +159,48 @@ class BahanBakuController extends Controller
             );
     }
 
+    /**
+     * Memperbarui data bahan baku.
+     */
     public function update(Request $request, $id)
     {
         $bahanBaku = BahanBaku::findOrFail($id);
+
+        // Membersihkan spasi di awal dan akhir input.
+        $request->merge([
+            'nama_bahan' => trim($request->nama_bahan ?? ''),
+            'spesifikasi' => $request->filled('spesifikasi')
+                ? trim($request->spesifikasi)
+                : null,
+        ]);
 
         $validated = $request->validate([
             'kode_bahan' => [
                 'required',
                 'string',
-                'max:50',
+                'max:30',
                 Rule::unique('bahan_baku', 'kode_bahan')
                     ->ignore($bahanBaku->id),
             ],
+
             'nama_bahan' => [
                 'required',
                 'string',
-                'max:255',
+                'max:150',
+                Rule::unique('bahan_baku', 'nama_bahan')
+                    ->ignore($bahanBaku->id),
             ],
+
             'spesifikasi' => [
                 'nullable',
                 'string',
-                'max:255',
+                'max:150',
             ],
+
             'satuan' => [
                 'required',
                 'string',
-                'max:50',
+                'max:30',
                 Rule::in([
                     'lembar',
                     'rim',
@@ -165,6 +214,7 @@ class BahanBakuController extends Controller
                     'pak',
                 ]),
             ],
+
             'status' => [
                 'required',
                 Rule::in(['aktif', 'nonaktif']),
@@ -172,9 +222,16 @@ class BahanBakuController extends Controller
         ], [
             'kode_bahan.required' => 'Kode bahan wajib diisi.',
             'kode_bahan.unique' => 'Kode bahan sudah digunakan.',
+
             'nama_bahan.required' => 'Nama bahan wajib diisi.',
+            'nama_bahan.max' => 'Nama bahan maksimal 150 karakter.',
+            'nama_bahan.unique' => 'Nama bahan baku sudah digunakan. Silakan gunakan nama lain.',
+
+            'spesifikasi.max' => 'Spesifikasi maksimal 150 karakter.',
+
             'satuan.required' => 'Satuan wajib dipilih.',
             'satuan.in' => 'Satuan yang dipilih tidak valid.',
+
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Status yang dipilih tidak valid.',
         ]);
@@ -190,13 +247,19 @@ class BahanBakuController extends Controller
             );
     }
 
+    /**
+     * Menghapus bahan baku.
+     */
     public function destroy($id)
     {
         $bahanBaku = BahanBaku::findOrFail($id);
 
         try {
             $bahanBaku->delete();
+
         } catch (QueryException $e) {
+            report($e);
+
             return redirect()
                 ->route('bahan-baku.index')
                 ->with(
