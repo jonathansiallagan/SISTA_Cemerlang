@@ -223,7 +223,9 @@
                             </button>
 
                             <a href="{{ route('transaksi.index') }}"
-                               class="block text-center bg-white/10 hover:bg-white/20 font-semibold px-4 py-3 rounded-xl mt-3 transition">
+                              class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg"
+                            >
+                                <i class="fas fa-times mr-2"></i>
                                 Batal
                             </a>
                         </div>

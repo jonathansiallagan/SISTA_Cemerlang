@@ -244,14 +244,18 @@
             </div>
 
             <div class="flex items-center justify-end gap-2 bg-[#f8f9fa] px-[25px] py-3">
-                <button type="button" data-modal-close
-                    class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
-                    <i class="fas fa-times mr-1"></i>
+                 <button
+                    type="button"
+                    data-modal-close
+                    class="inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
+                    <i class="fas fa-times mr-2"></i>
                     Batal
                 </button>
 
-                <button type="submit" id="btnSimpanAkun"
-                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65">
+                <button
+                    type="submit"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                >
                     <i class="fas fa-save mr-1"></i>
                     Simpan Akun
                 </button>
@@ -541,14 +545,19 @@
             </div>
 
             <div class="flex items-center justify-end gap-2 bg-[#f8f9fa] px-[25px] py-3">
-                <button type="button" data-modal-close
-                    class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                <button
+                    type="button"
+                    data-modal-close
+                    class="inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
+                >
                     <i class="fas fa-times mr-1"></i>
                     Batal
                 </button>
 
-                <button type="submit" id="btnUpdateAkun"
-                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65">
+                <button
+                    type="submit"
+                    id="btnUpdateAkun"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
                     <i class="fas fa-save mr-1"></i>
                     Simpan Perubahan
                 </button>

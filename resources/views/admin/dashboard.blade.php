@@ -215,11 +215,6 @@
                         </a>
 
                     </div>
-
-                    <a href="{{ route('produk.index') }}"
-                        class="mt-4 flex h-[38px] w-full items-center justify-center rounded-[3px] border border-[#6777ef] text-xs font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
-                        Lihat Katalog Produk
-                    </a>
                 </div>
             </div>
         </div>
@@ -230,8 +225,9 @@
                 <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#6777ef]">Transaksi Terbaru</h4>
                 <div class="ml-auto">
                     <a href="{{ route('transaksi.index') }}"
-                        class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
-                        {{ number_format($jumlahTransaksi) }} Transaksi
+                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                            <i class="fas fa-receipt mr-2"></i>
+                            {{ number_format($jumlahTransaksi) }} Transaksi
                     </a>
                 </div>
             </div>
@@ -344,7 +340,8 @@
                 <div class="border-t border-black/5 px-[25px] py-4 text-right">
                     <a href="{{ route('jurnal.index') }}"
                         class="inline-flex items-center rounded-[3px] border border-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
-                        Lihat Jurnal Umum
+                            <i class="fas fa-book-open mr-2"></i>
+                            Lihat Jurnal Umum
                     </a>
                 </div>
             </div>
@@ -369,6 +366,7 @@
 
                     <a href="{{ route('buku_besar.index') }}"
                         class="flex h-[38px] w-full items-center justify-center rounded-[3px] border border-[#6777ef] text-xs font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
+                        <i class="fas fa-book mr-2"></i>
                         Lihat Buku Besar
                     </a>
                 </div>
