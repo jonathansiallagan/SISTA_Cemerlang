@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -51,7 +52,7 @@ class ProdukController extends Controller
      */
     private function cabangId(): int
     {
-        $cabangId = auth()->user()->cabang_id;
+        $cabangId = Auth::user()?->cabang_id;
 
         abort_if(
             !$cabangId,
@@ -103,7 +104,7 @@ class ProdukController extends Controller
 
             $produk = Produk::create([
                 'cabang_id' => $cabangId,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 ...$this->dataProduk($validated),
             ]);
 
