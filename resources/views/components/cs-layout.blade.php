@@ -5,8 +5,7 @@
     $user = auth()->user();
 
     $avatarUrl = $user->avatar_url
-        ?? $user->avatar
-        ?? null;
+        ?? ($user->avatar ? asset('storage/' . $user->avatar) : null);
 @endphp
 
 <!DOCTYPE html>

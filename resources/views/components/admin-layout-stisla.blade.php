@@ -1,7 +1,7 @@
 @php
     $user = auth()->user();
 
-    $avatarUrl = $user->avatar_url ?? ($user->avatar ?? asset('stisla/assets/img/avatar/avatar-1.png'));
+    $avatarUrl = $user->avatar_url ?? ($user->avatar ? asset('storage/' . $user->avatar) : asset('stisla/assets/img/avatar/avatar-1.png'));
 @endphp
 
 <!DOCTYPE html>
