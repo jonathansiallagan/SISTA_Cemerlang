@@ -51,4 +51,15 @@ class Cabang extends Model
     {
         return $this->hasMany(Jurnal::class);
     }
+
+        /*
+    |--------------------------------------------------------------------------
+    | RELASI PRODUK
+    |--------------------------------------------------------------------------
+    */
+
+    public function produks()
+    {
+        return $this->hasMany(Produk::class);
+    }
 }

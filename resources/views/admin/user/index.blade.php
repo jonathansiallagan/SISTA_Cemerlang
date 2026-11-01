@@ -5,20 +5,26 @@
         $tambahGagal = $errors->any() && !$editGagal;
         $errTambah = $editGagal ? new \Illuminate\Support\ViewErrorBag() : $errors;
         $errEdit = $editGagal ? $errors : new \Illuminate\Support\ViewErrorBag();
-        $oldTambah = fn (string $key, $default = null) => $editGagal ? $default : old($key, $default);
+        $oldTambah = fn(string $key, $default = null) => $editGagal ? $default : old($key, $default);
 
         // Kelas Tailwind yang dipakai berulang.
-        $kelasInput = 'h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:outline-none';
+        $kelasInput =
+            'h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:outline-none';
         $kelasInputNormal = 'border-[#e4e6fc] focus:border-[#95a0f4]';
         $kelasInputError = 'border-[#fc544b]';
         $kelasLabel = 'mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]';
         $kelasPesanError = 'mt-1 text-xs text-[#fc544b]';
         $kelasBantuan = 'mt-1 block text-xs text-[#6c757d]';
-        $kelasBtnBatal = 'inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]';
-        $kelasBtnUtama = 'inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65';
-        $kelasDialog = 'm-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40';
+        $kelasBtnBatal =
+            'inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]';
+        $kelasBtnUtama =
+            'inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65';
+        $kelasDialog =
+            'm-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40';
 
-        $kelasField = fn($bag, string $field) => $kelasInput . ' ' . ($bag->has($field) ? $kelasInputError : $kelasInputNormal);
+        $kelasField = fn($bag, string $field) => $kelasInput .
+            ' ' .
+            ($bag->has($field) ? $kelasInputError : $kelasInputNormal);
     @endphp
 
     {{-- HEADER HALAMAN --}}
@@ -135,7 +141,8 @@
                             </button>
 
                             {{-- Tombol hapus: membuka modal konfirmasi (form hapus ada di modal) --}}
-                            <button type="button" title="Hapus Pengguna" aria-label="Hapus pengguna {{ $user->name }}"
+                            <button type="button" title="Hapus Pengguna"
+                                aria-label="Hapus pengguna {{ $user->name }}"
                                 class="btn-hapus-user inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]"
                                 data-url="{{ route('user.destroy', $user->id) }}">
                                 <i class="fas fa-trash"></i>
@@ -277,7 +284,8 @@
                             Role <span class="text-[#fc544b]">*</span>
                         </label>
 
-                        <select id="userRole" name="role" required class="{{ $kelasField($errTambah, 'role') }}">
+                        <select id="userRole" name="role" required
+                            class="{{ $kelasField($errTambah, 'role') }}">
                             <option value="">-- Pilih Role --</option>
                             @foreach (['Admin Pusat', 'Admin Cabang', 'Customer Service'] as $opsiRole)
                                 <option value="{{ $opsiRole }}" @selected($oldTambah('role') === $opsiRole)>
@@ -294,11 +302,12 @@
                     <div>
                         <label for="userCabang" class="{{ $kelasLabel }}">
                             Penempatan Cabang
-                            <span id="labelWajibCabang" class="hidden text-[#fc544b]">*</span>
+                            <span class="text-[#fc544b]">*</span>
                         </label>
 
-                        <select id="userCabang" name="cabang_id" class="{{ $kelasField($errTambah, 'cabang_id') }}">
-                            <option value="">-- Pusat / Tidak ada cabang spesifik --</option>
+                        <select id="userCabang" name="cabang_id" required
+                            class="{{ $kelasField($errTambah, 'cabang_id') }}">
+                            <option value="">-- Pilih Cabang --</option>
                             @foreach ($cabangs as $cabang)
                                 <option value="{{ $cabang->id }}" @selected((string) $oldTambah('cabang_id') === (string) $cabang->id)>
                                     {{ $cabang->nama }}
@@ -309,10 +318,6 @@
                         @if ($errTambah->has('cabang_id'))
                             <div class="{{ $kelasPesanError }}">{{ $errTambah->first('cabang_id') }}</div>
                         @endif
-
-                        <small class="{{ $kelasBantuan }}">
-                            Admin Cabang wajib memiliki penempatan cabang.
-                        </small>
                     </div>
                 </div>
             </div>
@@ -324,8 +329,7 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnSimpanUser"
-                    class="{{ $kelasBtnUtama }}">
+                <button type="submit" id="btnSimpanUser" class="{{ $kelasBtnUtama }}">
                     <i class="fas fa-save mr-1"></i>
                     Simpan Pengguna
                 </button>
@@ -446,7 +450,7 @@
                         </label>
                         <select name="cabang_id" id="edit_user_cabang"
                             class="{{ $kelasField($errEdit, 'cabang_id') }}">
-                            <option value="">-- Pusat / Tidak ada cabang spesifik --</option>
+                            <option value="">-- Pilih Cabang --</option>
                             @foreach ($cabangs as $cabang)
                                 <option value="{{ $cabang->id }}">{{ $cabang->nama }}</option>
                             @endforeach
@@ -454,9 +458,6 @@
                         @if ($errEdit->has('cabang_id'))
                             <div class="{{ $kelasPesanError }}">{{ $errEdit->first('cabang_id') }}</div>
                         @endif
-                        <small class="{{ $kelasBantuan }}">
-                            Admin Cabang wajib memiliki penempatan cabang.
-                        </small>
                     </div>
                 </div>
             </div>
@@ -467,8 +468,7 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnUpdateUser"
-                    class="{{ $kelasBtnUtama }}">
+                <button type="submit" id="btnUpdateUser" class="{{ $kelasBtnUtama }}">
                     <i class="fas fa-save mr-1"></i>
                     Simpan Perubahan
                 </button>
@@ -511,26 +511,48 @@
     </dialog>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const html = document.documentElement;
+
+            // =========================================
+            // ELEMEN MODAL DAN FORM
+            // =========================================
 
             const modalTambah = document.getElementById('modalTambahUser');
             const modalEdit = document.getElementById('modalEditUser');
             const modalHapus = document.getElementById('modalHapusUser');
+
             const formTambah = document.getElementById('formTambahUser');
             const formEdit = document.getElementById('formEditUser');
             const formHapus = document.getElementById('formHapusUser');
 
-            if (!modalTambah || !modalEdit || !modalHapus || !formTambah || !formEdit || !formHapus) {
-                console.error('Modal pengguna tidak lengkap. Periksa id elemen pada halaman ini.');
+            // Pastikan seluruh elemen utama tersedia.
+            if (
+                !modalTambah ||
+                !modalEdit ||
+                !modalHapus ||
+                !formTambah ||
+                !formEdit ||
+                !formHapus
+            ) {
+                console.error(
+                    'Modal pengguna tidak lengkap. Periksa ID elemen pada halaman ini.'
+                );
                 return;
             }
+
+            // =========================================
+            // ELEMEN FORM TAMBAH
+            // =========================================
 
             const kolomTambah = {
                 role: document.getElementById('userRole'),
                 cabang: document.getElementById('userCabang'),
-                label: document.getElementById('labelWajibCabang'),
             };
+
+            // =========================================
+            // ELEMEN FORM EDIT
+            // =========================================
 
             const kolomEdit = {
                 id: document.getElementById('edit_user_id'),
@@ -540,85 +562,110 @@
                 password: document.getElementById('edit_user_password'),
                 role: document.getElementById('edit_user_role'),
                 cabang: document.getElementById('edit_user_cabang'),
-                label: document.getElementById('editLabelWajibCabang'),
             };
 
             // =========================================
             // FUNGSI BANTU
             // =========================================
 
+            // Membuka modal.
             function bukaModal(dialog) {
                 if (dialog && !dialog.open) {
                     dialog.showModal();
-                    html.classList.add('overflow-hidden'); // kunci scroll halaman di belakang modal
+                    html.classList.add('overflow-hidden');
                 }
             }
 
-            // Event "close" tidak bubble, jadi didengarkan lewat capture.
-            // Dipicu oleh tombol Batal, klik latar gelap, maupun tombol Esc.
-            document.addEventListener('close', function (event) {
-                if (event.target instanceof HTMLDialogElement && !document.querySelector('dialog[open]')) {
+            // Mengatur scroll halaman ketika semua modal sudah tertutup.
+            document.addEventListener('close', function(event) {
+                if (
+                    event.target instanceof HTMLDialogElement &&
+                    !document.querySelector('dialog[open]')
+                ) {
                     html.classList.remove('overflow-hidden');
                 }
             }, true);
 
-            // Cabang wajib untuk Admin Cabang; Admin Pusat tidak ditempatkan pada cabang tertentu.
-            function aturCabang(roleSelect, cabangSelect, labelWajib) {
-                if (!roleSelect || !cabangSelect) return;
+            // Memilih option berdasarkan value tanpa membedakan huruf besar/kecil.
+            function pilihOpsi(select, nilai, cadangan = '') {
+                if (!select) return;
 
-                const adminCabang = roleSelect.value === 'Admin Cabang';
+                const cari = String(
+                    nilai === null || nilai === undefined ? '' : nilai
+                ).trim().toLowerCase();
 
-                cabangSelect.required = adminCabang;
-
-                if (labelWajib) {
-                    labelWajib.classList.toggle('hidden', !adminCabang);
-                }
-
-                if (roleSelect.value === 'Admin Pusat') {
-                    cabangSelect.value = '';
-                }
-            }
-
-            // Pilih <option> tanpa peduli huruf besar/kecil; pakai cadangan bila tidak ada yang cocok.
-            function pilihOpsi(select, nilai, cadangan) {
-                const cari = String(nilai === null || nilai === undefined ? '' : nilai).trim().toLowerCase();
-                const opsi = Array.from(select.options).find(function (o) {
-                    return o.value.toLowerCase() === cari;
+                const opsi = Array.from(select.options).find(function(option) {
+                    return option.value.toLowerCase() === cari;
                 });
+
                 select.value = opsi ? opsi.value : cadangan;
             }
 
-            // Isi modal edit dengan data pengguna yang dipilih.
+            // =========================================
+            // MENGISI FORM EDIT
+            // =========================================
+
             function isiFormEdit(data) {
+                if (
+                    !kolomEdit.id ||
+                    !kolomEdit.nama ||
+                    !kolomEdit.email ||
+                    !kolomEdit.username ||
+                    !kolomEdit.password ||
+                    !kolomEdit.role ||
+                    !kolomEdit.cabang
+                ) {
+                    console.error('Elemen form edit pengguna tidak lengkap.');
+                    return;
+                }
+
                 kolomEdit.id.value = data.id || '';
                 kolomEdit.nama.value = data.nama || '';
                 kolomEdit.email.value = data.email || '';
                 kolomEdit.username.value = data.username || '';
-                kolomEdit.password.value = ''; // password tidak pernah diisi ulang
+                kolomEdit.password.value = '';
 
-                pilihOpsi(kolomEdit.role, data.role, 'Customer Service');
-                pilihOpsi(kolomEdit.cabang, data.cabang, '');
+                // Mengisi role pengguna.
+                pilihOpsi(
+                    kolomEdit.role,
+                    data.role,
+                    'Customer Service'
+                );
 
+                // Mengisi cabang pengguna.
+                // Semua role wajib memiliki cabang.
+                pilihOpsi(
+                    kolomEdit.cabang,
+                    data.cabang,
+                    ''
+                );
+
+                // Mengatur URL tujuan update.
                 formEdit.setAttribute('action', data.url || '#');
-
-                aturCabang(kolomEdit.role, kolomEdit.cabang, kolomEdit.label);
             }
 
-            // Cegah form terkirim berkali-kali, dan pulihkan tombol bila
-            // halaman ditampilkan kembali dari cache (tombol Back browser).
+            // =========================================
+            // MENCEGAH PENGIRIMAN FORM BERULANG
+            // =========================================
+
             function kunciPengiriman(form, tombol, teksProses) {
-                if (!tombol) return;
+                if (!form || !tombol) return;
 
                 const isiAwal = tombol.innerHTML;
 
-                form.addEventListener('submit', function (event) {
+                form.addEventListener('submit', function(event) {
                     if (event.defaultPrevented) return;
 
                     tombol.disabled = true;
-                    tombol.innerHTML = '<i class="fas fa-spinner animate-spin mr-1"></i> ' + teksProses;
+
+                    tombol.innerHTML =
+                        '<i class="fas fa-spinner animate-spin mr-1"></i> ' +
+                        teksProses;
                 });
 
-                window.addEventListener('pageshow', function (event) {
+                // Memulihkan tombol jika halaman dibuka kembali
+                // menggunakan tombol Back browser.
+                window.addEventListener('pageshow', function(event) {
                     if (event.persisted) {
                         tombol.disabled = false;
                         tombol.innerHTML = isiAwal;
@@ -627,43 +674,77 @@
             }
 
             // =========================================
-            // KLIK: BUKA/TUTUP MODAL, TOMBOL EDIT/HAPUS, TUTUP NOTIFIKASI
+            // KLIK BUKA DAN TUTUP MODAL
             // =========================================
 
-            // Klik pada latar gelap hanya menutup modal jika tekan dan lepas mouse
-            // sama-sama di latar. Tanpa ini, memilih teks di input lalu melepas
-            // mouse di luar modal akan menutup modal dan membuang isian.
             let targetTekan = null;
 
-            document.addEventListener('mousedown', function (event) {
+            // Mencatat elemen tempat mouse ditekan.
+            document.addEventListener('mousedown', function(event) {
                 targetTekan = event.target;
             });
 
-            document.addEventListener('click', function (event) {
-                const target = event.target instanceof Element ? event.target : null;
+            document.addEventListener('click', function(event) {
+                const target = event.target instanceof Element ?
+                    event.target :
+                    null;
+
                 if (!target) return;
 
-                const buka = target.closest('[data-modal-open]');
-                if (buka) {
-                    bukaModal(document.getElementById(buka.dataset.modalOpen));
+                // -------------------------------------
+                // BUKA MODAL
+                // -------------------------------------
+
+                const tombolBuka = target.closest('[data-modal-open]');
+
+                if (tombolBuka) {
+                    const namaModal = tombolBuka.dataset.modalOpen;
+                    const dialog = document.getElementById(namaModal);
+
+                    bukaModal(dialog);
                     return;
                 }
 
-                const tutup = target.closest('[data-modal-close]');
-                if (tutup) {
-                    const dialog = tutup.closest('dialog');
-                    if (dialog) dialog.close();
+                // -------------------------------------
+                // TUTUP MODAL
+                // -------------------------------------
+
+                const tombolTutup = target.closest('[data-modal-close]');
+
+                if (tombolTutup) {
+                    const dialog = tombolTutup.closest('dialog');
+
+                    if (dialog) {
+                        dialog.close();
+                    }
+
                     return;
                 }
 
-                const tutupNotifikasi = target.closest('[data-alert-close]');
-                if (tutupNotifikasi) {
-                    const notifikasi = tutupNotifikasi.closest('[role="alert"]');
-                    if (notifikasi) notifikasi.remove();
+                // -------------------------------------
+                // TUTUP NOTIFIKASI
+                // -------------------------------------
+
+                const tombolTutupNotifikasi =
+                    target.closest('[data-alert-close]');
+
+                if (tombolTutupNotifikasi) {
+                    const notifikasi =
+                        tombolTutupNotifikasi.closest('[role="alert"]');
+
+                    if (notifikasi) {
+                        notifikasi.remove();
+                    }
+
                     return;
                 }
+
+                // =====================================
+                // TOMBOL EDIT PENGGUNA
+                // =====================================
 
                 const tombolEdit = target.closest('.btn-edit-user');
+
                 if (tombolEdit) {
                     isiFormEdit({
                         id: tombolEdit.dataset.id,
@@ -674,18 +755,31 @@
                         cabang: tombolEdit.dataset.cabang,
                         url: tombolEdit.dataset.url,
                     });
+
                     bukaModal(modalEdit);
                     return;
                 }
 
+                // =====================================
+                // TOMBOL HAPUS PENGGUNA
+                // =====================================
+
                 const tombolHapus = target.closest('.btn-hapus-user');
+
                 if (tombolHapus) {
-                    formHapus.setAttribute('action', tombolHapus.dataset.url || '#');
+                    formHapus.setAttribute(
+                        'action',
+                        tombolHapus.dataset.url || '#'
+                    );
+
                     bukaModal(modalHapus);
                     return;
                 }
 
-                // Klik di latar gelap (target = elemen dialog itu sendiri).
+                // =====================================
+                // KLIK LATAR BELAKANG MODAL
+                // =====================================
+
                 if (
                     target instanceof HTMLDialogElement &&
                     target.open &&
@@ -696,48 +790,50 @@
             });
 
             // =========================================
-            // PENGIRIMAN FORM
+            // VALIDASI URL FORM EDIT DAN HAPUS
             // =========================================
 
-            // Jangan kirim form edit/hapus jika URL tujuan belum terisi.
             [
                 [formEdit, 'URL update pengguna belum ditentukan.'],
                 [formHapus, 'URL hapus pengguna belum ditentukan.'],
-            ].forEach(function (item) {
-                item[0].addEventListener('submit', function (event) {
-                    const action = item[0].getAttribute('action');
+            ].forEach(function(item) {
+                const form = item[0];
+                const pesan = item[1];
+
+                form.addEventListener('submit', function(event) {
+                    const action = form.getAttribute('action');
 
                     if (!action || action === '#') {
                         event.preventDefault();
-                        console.error(item[1]);
+                        console.error(pesan);
                     }
                 });
             });
 
-            kunciPengiriman(formTambah, document.getElementById('btnSimpanUser'), 'Menyimpan...');
-            kunciPengiriman(formEdit, document.getElementById('btnUpdateUser'), 'Memperbarui...');
-            kunciPengiriman(formHapus, document.getElementById('btnKonfirmasiHapus'), 'Menghapus...');
-
             // =========================================
-            // EVENT PERUBAHAN ROLE
+            // KUNCI TOMBOL KETIKA FORM DIKIRIM
             // =========================================
 
-            if (kolomTambah.role) {
-                kolomTambah.role.addEventListener('change', function () {
-                    aturCabang(kolomTambah.role, kolomTambah.cabang, kolomTambah.label);
-                });
-            }
+            kunciPengiriman(
+                formTambah,
+                document.getElementById('btnSimpanUser'),
+                'Menyimpan...'
+            );
 
-            if (kolomEdit.role) {
-                kolomEdit.role.addEventListener('change', function () {
-                    aturCabang(kolomEdit.role, kolomEdit.cabang, kolomEdit.label);
-                });
-            }
+            kunciPengiriman(
+                formEdit,
+                document.getElementById('btnUpdateUser'),
+                'Memperbarui...'
+            );
 
-            aturCabang(kolomTambah.role, kolomTambah.cabang, kolomTambah.label);
+            kunciPengiriman(
+                formHapus,
+                document.getElementById('btnKonfirmasiHapus'),
+                'Menghapus...'
+            );
 
             // =========================================
-            // BUKA KEMBALI MODAL JIKA VALIDASI GAGAL
+            // MEMBUKA KEMBALI MODAL JIKA VALIDASI GAGAL
             // =========================================
 
             @if ($editGagal)
@@ -750,12 +846,13 @@
                     cabang: @js(old('cabang_id', '')),
                     url: @js(route('user.update', old('edit_user_id'))),
                 });
+
                 bukaModal(modalEdit);
             @elseif ($tambahGagal)
-                aturCabang(kolomTambah.role, kolomTambah.cabang, kolomTambah.label);
                 bukaModal(modalTambah);
             @endif
         });
     </script>
+
 
 </x-admin-layout-stisla>

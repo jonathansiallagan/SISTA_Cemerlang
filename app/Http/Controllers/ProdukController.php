@@ -8,24 +8,19 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ProdukController extends Controller
 {
     /**
-     * Kode SQLSTATE untuk pelanggaran foreign key
-     * (MySQL, MariaDB, SQLite: 23000 | PostgreSQL: 23503).
-     */
-    private const SQLSTATE_FOREIGN_KEY = ['23000', '23503'];
-
-    /**
-     * Pesan validasi, dipakai bersama oleh tambah dan ubah produk.
+     * Pesan validasi untuk tambah dan edit produk.
      */
     private const PESAN_VALIDASI = [
         'nama_produk.required' => 'Nama produk wajib diisi.',
         'nama_produk.max' => 'Nama produk maksimal 255 karakter.',
-        'nama_produk.unique' => 'Nama produk sudah terdaftar.',
+        'nama_produk.unique' => 'Nama produk sudah terdaftar di cabang ini.',
 
         'satuan.required' => 'Satuan produk wajib dipilih.',
         'satuan.max' => 'Satuan produk maksimal 50 karakter.',
@@ -53,11 +48,36 @@ class ProdukController extends Controller
     ];
 
     /**
-     * Menampilkan daftar produk beserta modal tambah dan modal edit.
+     * Mengambil ID cabang pengguna yang sedang login.
+     */
+    private function cabangId(): int
+    {
+        $cabangId = Auth::user()?->cabang_id;
+
+        abort_if(
+            !$cabangId,
+            403,
+            'Akun pengguna belum terhubung dengan cabang.'
+        );
+
+        return (int) $cabangId;
+    }
+
+    /**
+     * Query produk yang hanya menampilkan produk milik cabang pengguna.
+     */
+    private function queryProduk()
+    {
+        return Produk::where('cabang_id', $this->cabangId());
+    }
+
+    /**
+     * Menampilkan daftar produk beserta komposisi bahan bakunya.
      */
     public function index(): View
     {
-        $produks = Produk::with('komposisi')
+        $produks = $this->queryProduk()
+            ->with('komposisi')
             ->orderBy('nama_produk')
             ->get();
 
@@ -76,12 +96,21 @@ class ProdukController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $validated = $this->validasiProduk($request);
+        $cabangId = $this->cabangId();
 
-        DB::transaction(function () use ($validated) {
-            $produk = Produk::create($this->dataProduk($validated));
+        $validated = $this->validasiProduk($request, $cabangId);
 
-            $produk->komposisi()->createMany($this->dataKomposisi($validated));
+        DB::transaction(function () use ($validated, $cabangId) {
+
+            $produk = Produk::create([
+                'cabang_id' => $cabangId,
+                'user_id' => Auth::id(),
+                ...$this->dataProduk($validated),
+            ]);
+
+            $produk->komposisi()->createMany(
+                $this->dataKomposisi($validated)
+            );
         });
 
         return redirect()
@@ -94,16 +123,27 @@ class ProdukController extends Controller
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        $produk = Produk::findOrFail($id);
+        $cabangId = $this->cabangId();
 
-        $validated = $this->validasiProduk($request, $produk);
+        // Produk hanya bisa ditemukan jika dimiliki cabang pengguna.
+        $produk = $this->queryProduk()->findOrFail($id);
+
+        $validated = $this->validasiProduk(
+            $request,
+            $cabangId,
+            $produk
+        );
 
         DB::transaction(function () use ($produk, $validated) {
+
             $produk->update($this->dataProduk($validated));
 
-            // Ganti komposisi lama dengan komposisi yang dikirim dari modal edit.
+            // Mengganti komposisi lama dengan komposisi terbaru.
             $produk->komposisi()->delete();
-            $produk->komposisi()->createMany($this->dataKomposisi($validated));
+
+            $produk->komposisi()->createMany(
+                $this->dataKomposisi($validated)
+            );
         });
 
         return redirect()
@@ -112,11 +152,13 @@ class ProdukController extends Controller
     }
 
     /**
-     * Menghapus produk (Soft Delete).
+     * Menghapus produk menggunakan Soft Delete.
      */
     public function destroy($id): RedirectResponse
     {
-        $produk = Produk::findOrFail($id);
+        // Produk hanya bisa dihapus oleh pengguna dari cabang pemiliknya.
+        $produk = $this->queryProduk()->findOrFail($id);
+
         $produk->delete();
 
         return redirect()
@@ -125,47 +167,95 @@ class ProdukController extends Controller
     }
 
     /**
-     * Memvalidasi isian modal tambah/edit produk.
+     * Memvalidasi data produk dan komposisi bahan.
      */
-    private function validasiProduk(Request $request, ?Produk $produk = null): array
-    {
-        $jumlahBaris = count(Arr::wrap($request->input('bahan_baku_id')));
+    private function validasiProduk(
+        Request $request,
+        int $cabangId,
+        ?Produk $produk = null
+    ): array {
+        $jumlahBaris = count(
+            Arr::wrap($request->input('bahan_baku_id'))
+        );
 
         return $request->validate([
+
             'nama_produk' => [
                 'required',
                 'string',
                 'max:255',
                 Rule::unique('produks', 'nama_produk')
-                    ->ignore($produk?->id)
-                    ->whereNull('deleted_at'),
+                    ->where('cabang_id', $cabangId)
+                    ->whereNull('deleted_at')
+                    ->ignore($produk?->id),
             ],
 
-            'satuan' => ['required', 'string', 'max:50'],
+            'satuan' => [
+                'required',
+                'string',
+                'max:50',
+            ],
 
-            'upah_operator' => ['required', 'numeric', 'min:0'],
+            'upah_operator' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
 
-            'bahan_baku_id' => ['required', 'array', 'min:1'],
-            'bahan_baku_id.*' => ['required', 'integer', 'distinct', 'exists:bahan_baku,id'],
+            'bahan_baku_id' => [
+                'required',
+                'array',
+                'min:1',
+            ],
 
-            'jumlah_pemakaian' => ['required', 'array', 'size:' . $jumlahBaris],
-            'jumlah_pemakaian.*' => ['required', 'numeric', 'min:0.0001'],
+            'bahan_baku_id.*' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:bahan_baku,id',
+            ],
 
-            'satuan_pemakaian' => ['required', 'array', 'size:' . $jumlahBaris],
-            'satuan_pemakaian.*' => ['required', 'string', 'max:30'],
+            'jumlah_pemakaian' => [
+                'required',
+                'array',
+                'size:' . $jumlahBaris,
+            ],
+
+            'jumlah_pemakaian.*' => [
+                'required',
+                'numeric',
+                'min:0.0001',
+            ],
+
+            'satuan_pemakaian' => [
+                'required',
+                'array',
+                'size:' . $jumlahBaris,
+            ],
+
+            'satuan_pemakaian.*' => [
+                'required',
+                'string',
+                'max:30',
+            ],
+
         ], self::PESAN_VALIDASI);
     }
 
     /**
-     * Mengambil kolom milik produk dari data yang sudah tervalidasi.
+     * Mengambil kolom produk dari data tervalidasi.
      */
     private function dataProduk(array $validated): array
     {
-        return Arr::only($validated, ['nama_produk', 'satuan', 'upah_operator']);
+        return Arr::only($validated, [
+            'nama_produk',
+            'satuan',
+            'upah_operator',
+        ]);
     }
 
     /**
-     * Mengubah tiga daftar paralel dari form menjadi satu daftar baris komposisi.
+     * Mengubah data komposisi menjadi kumpulan baris.
      */
     private function dataKomposisi(array $validated): array
     {

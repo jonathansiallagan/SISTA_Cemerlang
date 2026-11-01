@@ -18,8 +18,18 @@ class CabangController extends Controller
 
     public function store(Request $request)
     {
+        // Hilangkan spasi di awal dan akhir nama.
+        $request->merge([
+            'nama' => trim($request->nama ?? ''),
+        ]);
+
         $validated = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
+            'nama' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('cabangs', 'nama'),
+            ],
             'alamat' => ['required', 'string', 'max:1000'],
             'no_hp' => ['required', 'string', 'max:20'],
             'status' => [
@@ -29,6 +39,7 @@ class CabangController extends Controller
         ], [
             'nama.required' => 'Nama cabang wajib diisi.',
             'nama.max' => 'Nama cabang maksimal 255 karakter.',
+            'nama.unique' => 'Nama cabang sudah terdaftar. Gunakan nama lain.',
             'alamat.required' => 'Alamat cabang wajib diisi.',
             'alamat.max' => 'Alamat maksimal 1000 karakter.',
             'no_hp.required' => 'Nomor HP/telepon wajib diisi.',
@@ -43,13 +54,23 @@ class CabangController extends Controller
             ->route('cabang.index')
             ->with('success', 'Data cabang berhasil ditambahkan.');
     }
-    
+
     public function update(Request $request, $id)
     {
         $cabang = Cabang::findOrFail($id);
 
+        // Hilangkan spasi di awal dan akhir nama.
+        $request->merge([
+            'nama' => trim($request->nama ?? ''),
+        ]);
+
         $validated = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
+            'nama' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('cabangs', 'nama')->ignore($cabang->id),
+            ],
             'alamat' => ['required', 'string', 'max:1000'],
             'no_hp' => ['required', 'string', 'max:20'],
             'status' => [
@@ -59,6 +80,7 @@ class CabangController extends Controller
         ], [
             'nama.required' => 'Nama cabang wajib diisi.',
             'nama.max' => 'Nama cabang maksimal 255 karakter.',
+            'nama.unique' => 'Nama cabang sudah digunakan oleh cabang lain.',
             'alamat.required' => 'Alamat cabang wajib diisi.',
             'alamat.max' => 'Alamat maksimal 1000 karakter.',
             'no_hp.required' => 'Nomor HP/telepon wajib diisi.',
