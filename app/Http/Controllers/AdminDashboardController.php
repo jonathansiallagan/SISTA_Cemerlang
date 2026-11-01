@@ -236,9 +236,10 @@ class AdminDashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        // CHART OMZET 7 HARI TERAKHIR (Dari branch lama)
+        // CHART OMZET & TRANSAKSI 7 HARI TERAKHIR (Dari branch lama)
         $tanggalChart = [];
         $omzetChart = [];
+        $transaksiChart = [];
 
         for ($i = 6; $i >= 0; $i--) {
             $hari = Carbon::parse($tanggal)->subDays($i);
@@ -249,7 +250,11 @@ class AdminDashboardController extends Controller
                 $queryGrafik->where('cabang_id', $cabangId);
             }
 
+            // Simpan total uang (omzet)
             $omzetChart[] = (float) $queryGrafik->sum('total_transaksi');
+            
+            // Simpan jumlah nota (transaksi)
+            $transaksiChart[] = (int) $queryGrafik->count();
         }
 
         // CHART PER JAM (Dari AdminDashboardController kita sebelumnya)
@@ -313,7 +318,7 @@ class AdminDashboardController extends Controller
             'totalCabang', 'totalUser', 'totalProduk', 'totalAkun',
             'totalDebit', 'totalKredit',
             
-            'tanggalChart', 'omzetChart', 
+            'tanggalChart', 'omzetChart', 'transaksiChart',
             'chartLabels', 'chartData',
             
             'ringkasanCabang'
