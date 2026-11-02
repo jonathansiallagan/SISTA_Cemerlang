@@ -106,10 +106,14 @@
                     </td>
 
                     <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
-                        <a href="{{ route('bahan-baku.edit', $bahan->id) }}" title="Edit Bahan Baku"
-                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
+                        <button type="button" title="Edit Bahan Baku"
+                            class="btn-edit-bahan inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
+                            data-id="{{ $bahan->id }}" data-kode="{{ $bahan->kode_bahan }}"
+                            data-nama="{{ $bahan->nama_bahan }}" data-spesifikasi="{{ $bahan->spesifikasi }}"
+                            data-satuan="{{ $bahan->satuan }}" data-status="{{ $bahan->status }}"
+                            data-url="{{ route('bahan-baku.update', $bahan->id) }}">
                             <i class="fas fa-edit"></i>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             @empty
@@ -134,7 +138,7 @@
             <strong class="font-bold">{{ $bahanBakus->count() }}</strong>
         </small>
     </div>
-    
+
     {{-- MODAL TAMBAH BAHAN BAKU --}}
     <dialog id="modalTambahBahan" aria-labelledby="judulModalTambahBahan"
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40">
@@ -277,7 +281,7 @@
                 </button>
 
                 <button type="submit" id="btnSimpanBahan"
-                   class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
                     <i class="fas fa-save mr-1"></i>
                     Simpan Bahan Baku
                 </button>
@@ -286,142 +290,118 @@
         </form>
     </dialog>
 
-    {{-- MODAL EDIT BAHAN BAKU --}}
-    <div class="modal fade"
-        id="modalEditBahan"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="judulModalEditBahan"
-        aria-hidden="true">
+    {{-- MODAL EDIT BAHAN BAKU REFACTOR (TAILWIND MURNI) --}}
+    <dialog id="modalEditBahan" aria-labelledby="judulModalEditBahan"
+        class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40">
 
-        <div class="modal-dialog modal-lg modal-dialog-centered"
-            role="document">
-            <div class="modal-content">
+        {{-- HEADER MODAL EDIT --}}
+        <div class="flex items-center justify-between bg-[#6777ef] px-[25px] py-4">
+            <h5 id="judulModalEditBahan" class="text-lg font-semibold text-white">
+                <i class="fas fa-edit mr-2"></i>
+                Edit Bahan Baku
+            </h5>
 
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title text-white"
-                        id="judulModalEditBahan">
-                        <i class="fas fa-edit mr-2"></i>
-                        Edit Bahan Baku
-                    </h5>
+            <button type="button" data-modal-close aria-label="Tutup"
+                class="text-2xl leading-none text-white/80 hover:text-white">&times;</button>
+        </div>
 
-                    <button type="button"
-                            class="close text-white"
-                            data-dismiss="modal"
-                            aria-label="Tutup">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+        {{-- FORM EDIT --}}
+        <form id="formEditBahan" method="POST" action="#">
+            @csrf
+            @method('PUT')
+
+            <input type="hidden" name="edit_bahan_id" id="editBahanId">
+
+            <div class="p-[25px]">
+
+                {{-- KODE BAHAN --}}
+                <div class="mb-[25px]">
+                    <label for="editKodeBahan"
+                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Kode Bahan
+                    </label>
+
+                    <input type="text" name="kode_bahan" id="editKodeBahan" readonly required
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#e9ecef] px-[15px] text-sm text-[#495057] focus:outline-none">
+
+                    <small class="mt-1 block text-xs text-[#6c757d]">
+                        Kode bahan dibuat otomatis oleh sistem.
+                    </small>
                 </div>
 
-                <form id="formEditBahan" method="POST" action="#">
-                    @csrf
-                    @method('PUT')
+                {{-- NAMA BAHAN --}}
+                <div class="mb-[25px]">
+                    <label for="editNamaBahan"
+                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Nama Bahan <span class="text-[#fc544b]">*</span>
+                    </label>
 
-                    <input type="hidden"
-                        name="edit_bahan_id"
-                        id="editBahanId">
+                    <input type="text" name="nama_bahan" id="editNamaBahan" maxlength="255" required
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                </div>
 
-                    <div class="modal-body">
+                {{-- SPESIFIKASI --}}
+                <div class="mb-[25px]">
+                    <label for="editSpesifikasiBahan"
+                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Spesifikasi
+                    </label>
 
-                        <div class="form-group">
-                            <label for="editKodeBahan">Kode Bahan</label>
-                            <input type="text"
-                                name="kode_bahan"
-                                id="editKodeBahan"
-                                class="form-control bg-light"
-                                readonly
-                                required>
-                            <small class="text-muted">
-                                Kode bahan dibuat otomatis oleh sistem.
-                            </small>
-                        </div>
+                    <input type="text" name="spesifikasi" id="editSpesifikasiBahan" maxlength="255"
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                </div>
 
-                        <div class="form-group">
-                            <label for="editNamaBahan">
-                                Nama Bahan <span class="text-danger">*</span>
-                            </label>
-                            <input type="text"
-                                name="nama_bahan"
-                                id="editNamaBahan"
-                                class="form-control"
-                                maxlength="255"
-                                required>
-                        </div>
+                {{-- SATUAN --}}
+                <div class="mb-[25px]">
+                    <label for="editSatuanBahan"
+                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Satuan <span class="text-[#fc544b]">*</span>
+                    </label>
 
-                        <div class="form-group">
-                            <label for="editSpesifikasiBahan">Spesifikasi</label>
-                            <input type="text"
-                                name="spesifikasi"
-                                id="editSpesifikasiBahan"
-                                class="form-control"
-                                maxlength="255">
-                        </div>
+                    <select name="satuan" id="editSatuanBahan" required
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                        <option value="">-- Pilih Satuan --</option>
+                        @foreach (['lembar', 'rim', 'pcs', 'roll', 'meter', 'm2', 'kg', 'liter', 'botol', 'pak'] as $satuan)
+                            <option value="{{ $satuan }}">
+                                {{ ucfirst($satuan) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                        <div class="form-group">
-                            <label for="editSatuanBahan">
-                                Satuan <span class="text-danger">*</span>
-                            </label>
-                            <select name="satuan"
-                                    id="editSatuanBahan"
-                                    class="form-control"
-                                    required>
-                                <option value="">-- Pilih Satuan --</option>
-                                @foreach ([
-                                    'lembar',
-                                    'rim',
-                                    'pcs',
-                                    'roll',
-                                    'meter',
-                                    'm2',
-                                    'kg',
-                                    'liter',
-                                    'botol',
-                                    'pak'
-                                ] as $satuan)
-                                    <option value="{{ $satuan }}">
-                                        {{ ucfirst($satuan) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                {{-- STATUS --}}
+                <div>
+                    <label for="editStatusBahan"
+                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                        Status <span class="text-[#fc544b]">*</span>
+                    </label>
 
-                        <div class="form-group mb-0">
-                            <label for="editStatusBahan">
-                                Status <span class="text-danger">*</span>
-                            </label>
-                            <select name="status"
-                                    id="editStatusBahan"
-                                    class="form-control"
-                                    required>
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Nonaktif</option>
-                            </select>
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer bg-light">
-                        <button type="button"
-                                class="btn btn-secondary"
-                                data-dismiss="modal">
-                            <i class="fas fa-times mr-1"></i>
-                            Batal
-                        </button>
-
-                        <button
-                            type="submit"
-                            id="btnUpdateBahan"
-                            class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
-                        >
-                            <i class="fas fa-save mr-1"></i>
-                            Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
+                    <select name="status" id="editStatusBahan" required
+                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                        <option value="aktif">Aktif</option>
+                        <option value="nonaktif">Nonaktif</option>
+                    </select>
+                </div>
 
             </div>
-        </div>
-    </div>
+
+            {{-- FOOTER MODAL EDIT --}}
+            <div class="flex items-center justify-end gap-2 bg-[#f8f9fa] px-[25px] py-3">
+                <button type="button" data-modal-close
+                    class="inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
+                    <i class="fas fa-times mr-1"></i>
+                    Batal
+                </button>
+
+                <button type="submit" id="btnUpdateBahan"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
+                    <i class="fas fa-save mr-1"></i>
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+
+    </dialog>
 
     {{-- SCRIPT MODAL --}}
     @push('scripts')
@@ -479,7 +459,7 @@
         </script>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const modal = document.getElementById('modalEditBahan');
                 const form = document.getElementById('formEditBahan');
                 const tombolUpdate = document.getElementById('btnUpdateBahan');
@@ -488,9 +468,6 @@
                     return;
                 }
 
-                // Memindahkan modal ke body agar tampil dengan benar.
-                document.body.appendChild(modal);
-
                 const idInput = document.getElementById('editBahanId');
                 const kodeInput = document.getElementById('editKodeBahan');
                 const namaInput = document.getElementById('editNamaBahan');
@@ -498,8 +475,8 @@
                 const satuanInput = document.getElementById('editSatuanBahan');
                 const statusInput = document.getElementById('editStatusBahan');
 
-                document.querySelectorAll('.btn-edit-bahan').forEach(function (tombol) {
-                    tombol.addEventListener('click', function () {
+                document.querySelectorAll('.btn-edit-bahan').forEach(function(tombol) {
+                    tombol.addEventListener('click', function() {
                         idInput.value = this.dataset.id || '';
                         kodeInput.value = this.dataset.kode || '';
                         namaInput.value = this.dataset.nama || '';
@@ -513,16 +490,13 @@
                         tombolUpdate.innerHTML =
                             '<i class="fas fa-save mr-1"></i> Simpan Perubahan';
 
-                        if (window.jQuery && typeof jQuery.fn.modal === 'function') {
-                            jQuery(modal).modal('show');
-                        } else {
-                            console.error('Bootstrap Modal tidak tersedia.');
-                        }
+                        // Membuka modal menggunakan native API dialog
+                        modal.showModal();
                     });
                 });
 
                 // Mencegah form dikirim jika URL update belum tersedia.
-                form.addEventListener('submit', function (event) {
+                form.addEventListener('submit', function(event) {
                     if (!form.action || form.action.endsWith('#')) {
                         event.preventDefault();
                         alert('URL update bahan baku belum tersedia.');
@@ -540,7 +514,7 @@
                 if (oldEditId) {
                     const tombolLama = Array.from(
                         document.querySelectorAll('.btn-edit-bahan')
-                    ).find(function (tombol) {
+                    ).find(function(tombol) {
                         return String(tombol.dataset.id) === String(oldEditId);
                     });
 
@@ -553,13 +527,12 @@
                         statusInput.value = @json(old('status', 'aktif'));
                         form.action = tombolLama.dataset.url || '';
 
-                        if (window.jQuery && typeof jQuery.fn.modal === 'function') {
-                            jQuery(modal).modal('show');
-                        }
+                        // Membuka modal menggunakan native API dialog
+                        modal.showModal();
                     }
                 }
             });
-            </script>
+        </script>
     @endpush
 
 </x-admin-layout-stisla>

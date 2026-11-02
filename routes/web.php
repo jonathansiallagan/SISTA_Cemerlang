@@ -91,7 +91,7 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
         Route::get('/laporan-laba-rugi', [LaporanLabaRugiController::class,'index'])->name('laporan_laba_rugi.index');
 
         // === ROUTE BAHAN BAKU ===
-        Route::resource('bahan-baku', BahanBakuController::class)->names('bahan-baku')->except(['show']);
+        Route::resource('bahan-baku', BahanBakuController::class)->names('bahan-baku')->except(['show', 'create', 'edit']);
 
         // === ROUTE PERSEDIAAN ===
         Route::get('/persediaan', [PersediaanController::class, 'index'])->name('persediaan.index');
