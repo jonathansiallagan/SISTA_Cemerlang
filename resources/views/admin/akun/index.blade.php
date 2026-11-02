@@ -244,20 +244,18 @@
             </div>
 
             <div class="flex items-center justify-end gap-2 bg-[#f8f9fa] px-[25px] py-3">
-                 <button
-                    type="button"
-                    data-modal-close
+                <button type="button" data-modal-close
                     class="inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
                     <i class="fas fa-times mr-2"></i>
                     Batal
                 </button>
 
-                <button
-                    type="submit"
+                <button type="button" id="btnSimpanAkun"
                     class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
-                >
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Akun
+                    data-confirm-form="formTambahAkun" data-confirm-theme="success" data-confirm-title="Simpan Akun"
+                    data-confirm-message="Apakah tipe, kelompok, dan nama akun sudah benar?"
+                    data-confirm-action="Simpan Akun">
+                    <i class="fas fa-save mr-1"></i> Simpan Akun
                 </button>
             </div>
 
@@ -415,15 +413,6 @@
                     perbaruiKode();
                 }
 
-                // Cegah pengiriman formulir berkali-kali.
-                form.addEventListener('submit', function() {
-                    if (tombolSimpan) {
-                        tombolSimpan.disabled = true;
-                        tombolSimpan.innerHTML =
-                            '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
-                    }
-                });
-
                 // Buka modal kembali setelah validasi server gagal.
                 // Kondisi !old('akun_id') ditambahkan: kalau error berasal dari form edit,
                 // modal tambah tidak ikut terbuka (dengan <dialog> keduanya akan bertumpuk).
@@ -545,21 +534,18 @@
             </div>
 
             <div class="flex items-center justify-end gap-2 bg-[#f8f9fa] px-[25px] py-3">
-                <button
-                    type="button"
-                    data-modal-close
-                    class="inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
-                >
+                <button type="button" data-modal-close
+                    class="inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
                     <i class="fas fa-times mr-1"></i>
                     Batal
                 </button>
 
-                <button
-                    type="submit"
-                    id="btnUpdateAkun"
-                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Perubahan
+                <button type="button" id="btnUpdateAkun"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                    data-confirm-form="formEditAkun" data-confirm-theme="primary" data-confirm-title="Update Akun"
+                    data-confirm-message="Simpan perubahan status/nama pada akun ini?"
+                    data-confirm-action="Simpan Perubahan">
+                    <i class="fas fa-save mr-1"></i> Simpan Perubahan
                 </button>
             </div>
         </form>
@@ -598,15 +584,6 @@
                     tombol.addEventListener('click', function() {
                         isiModal(this);
                     });
-                });
-
-                // Cegah pengiriman formulir berkali-kali.
-                form.addEventListener('submit', function() {
-                    const tombol = document.getElementById('btnUpdateAkun');
-
-                    tombol.disabled = true;
-                    tombol.innerHTML =
-                        '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
                 });
 
                 // Buka kembali modal jika validasi gagal.

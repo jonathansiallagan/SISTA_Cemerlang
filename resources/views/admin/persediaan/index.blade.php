@@ -448,14 +448,14 @@
                         Batal
                     </button>
 
-                    <button
-                        type="submit"
-                        id="btnSimpanPembelian"
+                    <button type="button" id="btnSimpanPembelian"
                         {{ $bahanBakus->where('status', 'aktif')->isEmpty() ? 'disabled' : '' }}
                         class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                        <i class="fas fa-save mr-1"></i>
-                        Simpan Pembelian
+                        data-confirm-form="formPembelian" data-confirm-theme="success"
+                        data-confirm-title="Simpan Pembelian"
+                        data-confirm-message="Apakah rincian pembelian dan total harga sudah benar?"
+                        data-confirm-action="Simpan Pembelian">
+                        <i class="fas fa-save mr-1"></i> Simpan Pembelian
                     </button>
                 </div>
 
@@ -733,17 +733,6 @@
 
                     perbaruiNomorInput();
                     hitungTotal();
-                });
-
-                // Cegah submit berulang.
-                form.addEventListener('submit', function() {
-                    if (!form.checkValidity()) {
-                        return;
-                    }
-
-                    btnSimpan.disabled = true;
-                    btnSimpan.innerHTML =
-                        '<i class="fas fa-spinner fa-spin mr-1"></i>Menyimpan...';
                 });
 
                 // Inisialisasi awal.

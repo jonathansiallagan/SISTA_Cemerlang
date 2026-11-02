@@ -435,8 +435,12 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnSimpanPengeluaran"
-                   class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
+                <button type="button"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                    data-confirm-form="formTambahPengeluaran" data-confirm-theme="success"
+                    data-confirm-title="Simpan Pengeluaran"
+                    data-confirm-message="Apakah data pengeluaran dan total harga yang Anda masukkan sudah benar?"
+                    data-confirm-action="Simpan Data">
                     <i class="fas fa-save mr-1"></i>
                     Simpan Pengeluaran
                 </button>
@@ -528,13 +532,6 @@
                     this.value = this.value.charAt(0).toUpperCase() +
                         this.value.slice(1);
                 }
-            });
-
-            // Cegah klik simpan berulang kali.
-            form.addEventListener('submit', function() {
-                btnSimpan.disabled = true;
-                btnSimpan.innerHTML =
-                    '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
             });
 
             updateTotal();
