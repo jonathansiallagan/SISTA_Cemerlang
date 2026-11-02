@@ -46,7 +46,7 @@
         const submitText = document.getElementById('globalConfirmSubmitText');
         const cancelBtn = document.getElementById('globalConfirmCancelBtn');
 
-        let targetFormId = null; // Menyimpan ID form jika mode simpan
+        let targetFormId = null;
 
         const closeModal = () => modal.close();
         cancelBtn.addEventListener('click', closeModal);
@@ -54,7 +54,6 @@
             if (e.target === modal) closeModal();
         });
 
-        // Dengarkan klik pada tombol ber-atribut data-confirm-url ATAU data-confirm-form
         document.body.addEventListener('click', (e) => {
             const trigger = e.target.closest('[data-confirm-url], [data-confirm-form]');
             if (!trigger) return;
@@ -62,8 +61,8 @@
             e.preventDefault();
 
             // Ambil data
-            targetFormId = trigger.getAttribute('data-confirm-form'); // Khusus form
-            const url = trigger.getAttribute('data-confirm-url'); // Khusus aksi URL
+            targetFormId = trigger.getAttribute('data-confirm-form');
+            const url = trigger.getAttribute('data-confirm-url');
             const method = (trigger.getAttribute('data-confirm-method') || 'POST').toUpperCase();
 
             const textTitle = trigger.getAttribute('data-confirm-title') || 'Konfirmasi';
@@ -71,54 +70,79 @@
             const textAction = trigger.getAttribute('data-confirm-action') || 'Ya, Lanjutkan';
             const theme = trigger.getAttribute('data-confirm-theme') || 'primary';
 
-            // Set Form Data di Modal
+            // Ambil kustomisasi ikon jika ada
+            const customIcon = trigger.getAttribute('data-confirm-icon');
+            const customBtnIcon = trigger.getAttribute('data-confirm-btn-icon');
+
             if (!targetFormId) {
                 form.action = url;
                 methodInput.value = method;
             } else {
-                form.action = "javascript:void(0);"; // Jangan submit internal jika ini mode simpan form
+                form.action = "javascript:void(0);";
             }
 
             title.textContent = textTitle;
             message.innerHTML = textMessage;
-            submitText.textContent = textAction;
 
-            // Terapkan Tema
+            // Reset Kelas CSS Dasar
             iconBg.className = 'w-12 h-12 rounded-xl flex items-center justify-center';
-            icon.className = 'text-xl fa-solid';
+            icon.className = 'text-xl fas';
             submitBtn.className =
                 'inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold text-white transition';
 
+            let mainIconClass = '';
+            let btnIconClass = '';
+
+            // Terapkan Tema dan Ikon Bawaan
             if (theme === 'danger') {
                 iconBg.classList.add('bg-red-50');
-                icon.classList.add('text-red-500', 'fa-triangle-exclamation');
+                icon.classList.add('text-red-500');
                 submitBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-                submitBtn.innerHTML =
-                    `<i class="fa-solid fa-trash mr-1"></i> <span>${textAction}</span>`;
+                mainIconClass = 'fa-exclamation-triangle';
+                btnIconClass = 'fa-trash';
             } else if (theme === 'success') {
                 iconBg.classList.add('bg-emerald-50');
-                icon.classList.add('text-emerald-500', 'fa-circle-check');
+                icon.classList.add('text-emerald-500');
                 submitBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
-                submitBtn.innerHTML =
-                `<i class="fa-solid fa-save mr-1"></i> <span>${textAction}</span>`;
+                mainIconClass = 'fa-check-circle';
+                btnIconClass = 'fa-save';
+            } else if (theme === 'warning') {
+                iconBg.classList.add('bg-orange-50');
+                icon.classList.add('text-orange-500');
+                submitBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+                mainIconClass = 'fa-exclamation-circle';
+                btnIconClass = 'fa-exclamation-triangle';
+            } else if (theme === 'logout') {
+                iconBg.classList.add('bg-red-50');
+                icon.classList.add('text-red-500');
+                submitBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                mainIconClass = 'fa-sign-out-alt';
+                btnIconClass = 'fa-sign-out-alt';
             } else {
                 iconBg.classList.add('bg-blue-50');
-                icon.classList.add('text-blue-500', 'fa-circle-info');
+                icon.classList.add('text-blue-500');
                 submitBtn.classList.add('bg-[#6777ef]', 'hover:bg-[#394eea]');
-                submitBtn.innerHTML =
-                    `<i class="fa-solid fa-check mr-1"></i> <span>${textAction}</span>`;
+                mainIconClass = 'fa-info-circle';
+                btnIconClass = 'fa-check';
             }
+
+            // Timpa dengan ikon kustom jika atribut disertakan di tombol
+            if (customIcon) mainIconClass = customIcon;
+            if (customBtnIcon) btnIconClass = customBtnIcon;
+
+            // Render ikon
+            icon.classList.add(...mainIconClass.split(' '));
+            submitBtn.innerHTML =
+                `<i class="fas ${btnIconClass} mr-1"></i> <span>${textAction}</span>`;
 
             modal.showModal();
         });
 
-        // Tangani aksi konfirmasi akhir
         form.addEventListener('submit', (e) => {
             submitBtn.disabled = true;
             submitBtn.innerHTML =
                 '<i class="fas fa-spinner fa-spin mr-1"></i> <span>Memproses...</span>';
 
-            // Jika ini form simpan, cegah modal submit sendiri, lalu eksekusi form aslinya
             if (targetFormId) {
                 e.preventDefault();
                 const realForm = document.getElementById(targetFormId);

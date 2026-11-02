@@ -65,7 +65,7 @@
         @endif
 
         {{-- TABEL PRODUK --}}
-        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
+        <x-card-table title="Daftar Produk" icon="fa-receipt">
 
             {{-- HEADER TABEL --}}
             <x-slot:head>
@@ -716,29 +716,6 @@
 
                     modalEdit.showModal();
                 });
-            });
-
-            // =========================================
-            // MODAL KONFIRMASI HAPUS
-            // =========================================
-            const modalHapus = document.getElementById('modalHapusProduk');
-            const formHapus = document.getElementById('formHapusProduk');
-
-            document.querySelectorAll('.btn-hapus-produk').forEach(function(tombol) {
-                tombol.addEventListener('click', function() {
-                    formHapus.action = this.dataset.url;
-
-                    modalHapus.showModal();
-                });
-            });
-
-            modalHapus.querySelectorAll('[data-modal-close]').forEach(function(tombol) {
-                tombol.addEventListener('click', function() {
-                    modalHapus.close();
-                });
-            });
-            modalHapus.addEventListener('click', function(event) {
-                if (event.target === modalHapus) modalHapus.close();
             });
 
             // =========================================

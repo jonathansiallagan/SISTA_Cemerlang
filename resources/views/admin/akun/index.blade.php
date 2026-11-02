@@ -53,7 +53,7 @@
         @endif
 
         {{-- TABEL BAGAN AKUN --}}
-        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
+        <x-card-table title="Daftar Akun" icon="fa-receipt">
 
             {{-- HEADER TABEL --}}
             <x-slot:head>

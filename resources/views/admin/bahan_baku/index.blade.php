@@ -53,7 +53,7 @@
         @endif
 
         {{-- TABEL BAHAN BAKU --}}
-        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
+        <x-card-table title="Daftar Bahan Baku" icon="fa-receipt">
 
             {{-- HEADER TABEL --}}
             <x-slot:head>
