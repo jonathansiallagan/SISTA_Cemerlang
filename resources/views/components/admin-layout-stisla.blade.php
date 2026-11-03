@@ -110,44 +110,66 @@
                 </button>
 
                 {{-- Menu pengguna --}}
-                <div class="relative flex h-full items-center">
-                    <button id="user-menu-button" type="button" aria-haspopup="true" aria-expanded="false"
-                        class="flex items-center text-white/80 transition-colors hover:text-white">
-                        <img alt="Avatar" src="{{ $avatarUrl ?: asset('stisla/assets/img/avatar/avatar-1.png') }}"
-                            class="mr-1 h-[30px] w-[30px] rounded-full object-cover">
-                        <div class="font-semibold sm:hidden lg:inline-block">
-                            {{ $user->name }}
-                        </div>
-                        <i class="fas fa-caret-down ml-1.5 text-xs"></i>
-                    </button>
+                <details id="user-dropdown" class="group relative flex h-full shrink-0 items-center">
+                    <summary
+                        class="flex cursor-pointer list-none items-center gap-3 rounded-full p-1.5 transition hover:bg-white/10">
 
-                    <div id="user-menu" role="menu"
-                        class="absolute right-0 top-full z-50 hidden min-w-[200px] rounded-[3px] bg-white py-2.5 shadow-[0_2px_6px_#e3e3e3]">
-
-                        <div class="px-5 pb-2 pt-1 text-[10px] font-bold uppercase tracking-[1.5px] text-[#98a6ad]">
-                            {{ $user->role }}
+                        {{-- INFORMASI PROFIL --}}
+                        <div class="hidden text-right sm:block">
+                            <p class="text-xs font-bold leading-4 text-white">
+                                {{ $user->name }}
+                            </p>
+                            <p class="text-[10px] font-semibold text-white/70">
+                                {{ $user->role }}
+                            </p>
                         </div>
 
-                        <a href="{{ route('profile') }}" role="menuitem"
-                            class="flex items-center gap-2.5 px-5 py-2 text-[13px] text-[#6c757d] transition-colors hover:bg-[#f8f9fa] hover:text-[#041C88]">
-                            <i class="far fa-user w-4 text-center"></i> Profil
+                        {{-- AVATAR DENGAN INDIKATOR STATUS --}}
+                        <div class="relative h-[34px] w-[34px] shrink-0">
+                            @if ($avatarUrl)
+                                <img src="{{ $avatarUrl }}" alt="Avatar"
+                                    class="h-full w-full rounded-full border-2 border-white/20 bg-white/10 object-cover">
+                            @else
+                                <div
+                                    class="flex h-full w-full items-center justify-center rounded-full border-2 border-white/20 bg-white/10 text-xs font-bold text-white">
+                                    {{ strtoupper(substr($user->name ?? 'A', 0, 1)) }}
+                                </div>
+                            @endif
+                            {{-- Titik hijau online --}}
+                            <span
+                                class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#041C88] bg-emerald-400"></span>
+                        </div>
+
+                        <i
+                            class="fas fa-chevron-down hidden text-xs text-white/80 transition group-open:rotate-180 sm:block"></i>
+                    </summary>
+
+                    {{-- DROPDOWN MENU --}}
+                    <div
+                        class="absolute right-0 top-[calc(100%-10px)] z-50 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+
+                        <a href="{{ route('profile') }}"
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">
+                            <i class="far fa-user w-5 text-slate-400"></i>
+                            Profil
                         </a>
 
-                        <div class="my-2 border-t border-[#e3eaef]"></div>
+                        <div class="border-t border-slate-100"></div>
 
-                        <form action="{{ route('logout') }}" method="POST">
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="button" role="menuitem"
-                                class="flex w-full items-center gap-2.5 px-5 py-2 text-left text-[13px] text-[#fc544b] transition-colors hover:bg-[#f8f9fa]"
+                                class="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium text-[#fc544b] transition hover:bg-red-50"
                                 data-confirm-url="{{ route('logout') }}" data-confirm-method="POST"
                                 data-confirm-theme="logout" data-confirm-title="Konfirmasi Keluar"
                                 data-confirm-message="Sesi akun Anda akan diakhiri. Anda harus memasukkan username dan kata sandi kembali untuk mengakses sistem."
                                 data-confirm-action="Ya, Keluar">
-                                <i class="fas fa-sign-out-alt w-4 text-center"></i> Keluar
+                                <i class="fas fa-sign-out-alt w-5 text-red-400"></i>
+                                Keluar
                             </button>
                         </form>
                     </div>
-                </div>
+                </details>
             </nav>
         </div>
 

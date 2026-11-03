@@ -31,10 +31,8 @@
 
         <!-- HEADER & TOMBOL KEMBALI -->
         <div class="flex items-center justify-between mb-6">
-            <a
-                href="{{ route(Auth::user()->homeRoute()) }}"
-                class="inline-flex items-center gap-2 rounded-lg border border-[#041C88] bg-[#041C88] px-4 py-2 text-sm text-white shadow-sm transition hover:border-[#5665d8] hover:bg-[#5665d8]"
-            >
+            <a href="{{ route(Auth::user()->homeRoute()) }}"
+                class="inline-flex items-center gap-2 rounded-lg border border-[#041C88] bg-[#041C88] px-4 py-2 text-sm text-white shadow-sm transition hover:border-[#5665d8] hover:bg-[#5665d8]">
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Kembali ke Dashboard</span>
             </a>
@@ -142,10 +140,8 @@
                             </div>
 
                             <div class="pt-4">
-                                <button
-                                    type="submit"
-                                    class="inline-flex items-center gap-2 rounded-lg border border-green-600 bg-green-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:border-green-700 hover:bg-green-700"
-                                >
+                                <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-lg border border-green-600 bg-green-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:border-green-700 hover:bg-green-700">
                                     <i class="fas fa-save"></i>
                                     Simpan Perubahan Profil
                                 </button>
@@ -190,10 +186,8 @@
                             </div>
 
                             <div class="pt-4">
-                                <button
-                                    type="submit"
-                                    class="inline-flex items-center gap-2 rounded-lg bg-gray-800 px-6 py-2 text-sm font-medium text-white transition hover:bg-gray-900"
-                                >
+                                <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-lg bg-gray-800 px-6 py-2 text-sm font-medium text-white transition hover:bg-gray-900">
                                     <i class="fas fa-key"></i>
                                     Update Password
                                 </button>
@@ -259,18 +253,15 @@
                             @enderror
 
                             <div class="pt-6 border-t border-gray-100 mt-8">
-                                <button
-                                type="submit"
-                                class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-                            >
-                                <i class="fas fa-check"></i>
-                                Terapkan Preferensi
-                            </button>
+                                <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
+                                    <i class="fas fa-check"></i>
+                                    Terapkan Preferensi
+                                </button>
                             </div>
                         </div>
                     </form>
                 </div>
-
             </div>
         </div>
 
@@ -393,11 +384,8 @@
 
         <!-- TOMBOL KELUAR DI BAWAH -->
         <div class="mt-6 flex justify-end">
-            <button
-                type="button"
-                onclick="openLogoutModal()"
-                class="flex items-center gap-2 rounded-lg border border-red-600 bg-red-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:border-red-700 hover:bg-red-700"
-            >
+            <button type="button" onclick="openLogoutModal()"
+                class="flex items-center gap-2 rounded-lg border border-red-600 bg-red-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:border-red-700 hover:bg-red-700">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 Keluar dari Sistem
             </button>
@@ -405,7 +393,6 @@
     </div>
 
     <!-- PANGGIL KOMPONEN LOGOUT MODAL -->
-    <x-logout-modal />
 </body>
 
 </html>

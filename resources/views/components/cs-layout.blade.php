@@ -51,25 +51,19 @@
                 class="mx-auto flex min-h-[76px] max-w-screen-2xl flex-wrap items-center justify-between gap-4 px-5 py-3 md:px-8">
 
                 {{-- LOGO --}}
-                <a href="{{ route('cs.dashboard') }}" class="flex shrink-0 items-center gap-3 no-underline">
+                <a href="{{ route('cs.dashboard') }}" class="flex shrink-0 items-center gap-[9px] no-underline">
+                    <img src="{{ asset('images/logo-cemerlang.png') }}" alt="Logo CV Cemerlang"
+                        class="h-[38px] w-[38px] shrink-0 rounded-[11px] border-2 border-blue-600 bg-white object-contain p-[2px]">
 
-                    <div
-                        class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-blue-500 to-cyan-400 p-1 shadow-md shadow-blue-200">
-                        <div class="flex h-full w-full items-center justify-center rounded-lg bg-white">
-                            <img src="{{ asset('images/logo-cemerlang.png') }}" alt="Logo CV Cemerlang"
-                                class="h-full w-full object-contain">
-                        </div>
-                    </div>
-
-                    <div>
-                        <h1 class="m-0 text-lg font-extrabold leading-5 tracking-tight text-blue-700">
+                    <div class="min-w-0 text-left leading-[1.15]">
+                        <div class="text-[19px] font-bold tracking-[-0.3px] text-blue-700">
                             SISTA
-                        </h1>
-
-                        <p class="mt-1 flex items-center gap-1.5 text-[10px] font-medium leading-4 text-slate-500">
-                            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-                            CV Cemerlang
-                        </p>
+                        </div>
+                        <div
+                            class="mt-[5px] flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-slate-500">
+                            <span class="h-[7px] w-[7px] shrink-0 rounded-full bg-emerald-400"></span>
+                            <span>CV Cemerlang</span>
+                        </div>
                     </div>
                 </a>
 
