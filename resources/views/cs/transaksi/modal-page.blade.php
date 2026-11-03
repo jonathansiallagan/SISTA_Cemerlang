@@ -1,19 +1,15 @@
-
 <x-cs-layout :fullwidth="true">
 
     {{-- MODAL TRANSAKSI TAILWIND --}}
     <div id="halaman-modal-transaksi"
-         class="fixed inset-0 z-[1000] flex items-center justify-center bg-gray-900/60 p-3 sm:p-5">
-
+        class="fixed inset-0 z-[1000] flex items-center justify-center bg-gray-900/60 p-3 sm:p-5">
         <div class="flex w-full max-w-[1500px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
-             style="height: calc(100vh - 40px);">
+            style="height: calc(100vh - 40px);">
 
             {{-- HEADER MODAL --}}
             <div class="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5 py-4 sm:px-7">
-
                 <div>
-                    <h2 class="text-xl font-bold text-gray-800"
-                        id="judul-modal-transaksi">
+                    <h2 class="text-xl font-bold text-gray-800" id="judul-modal-transaksi">
                         Transaksi Baru
                     </h2>
 
@@ -22,13 +18,10 @@
                     </p>
                 </div>
 
-                <button type="button"
-                        id="modal-tutup"
-                        aria-label="Tutup"
-                        class="flex h-9 w-9 items-center justify-center rounded-full text-2xl text-gray-500 transition hover:bg-gray-100 hover:text-gray-800">
+                <button type="button" id="modal-tutup" aria-label="Tutup"
+                    class="flex h-9 w-9 items-center justify-center rounded-full text-2xl text-gray-500 transition hover:bg-gray-100 hover:text-gray-800">
                     &times;
                 </button>
-
             </div>
 
             {{-- PESAN ERROR --}}
@@ -41,16 +34,13 @@
 
             {{-- BODY MODAL --}}
             <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6">
-
-                @include('admin.transaksi.form')
-
+                @include('cs.transaksi.form')
             </div>
-
         </div>
     </div>
 
     <script>
-        (function () {
+        (function() {
             function inisialisasiModalTransaksi() {
 
                 const modalElement = document.getElementById(
@@ -128,14 +118,14 @@
                 }
 
                 // Klik area luar modal untuk menutup.
-                modalElement.addEventListener('click', function (event) {
+                modalElement.addEventListener('click', function(event) {
                     if (event.target === modalElement) {
                         tutupModal();
                     }
                 });
 
                 // Tombol Escape untuk menutup modal.
-                document.addEventListener('keydown', function (event) {
+                document.addEventListener('keydown', function(event) {
                     if (event.key === 'Escape' && !modalDitutup) {
                         tutupModal();
                     }
@@ -238,28 +228,28 @@
                         angka(row.querySelector('.modal-jumlah'))
                     );
 
-                    const luas = berbasisLuas
-                        ? angka(tinggi) * angka(lebar) * jumlah
-                        : 0;
+                    const luas = berbasisLuas ?
+                        angka(tinggi) * angka(lebar) * jumlah :
+                        0;
 
                     const status = row.querySelector('.modal-status');
                     const infoLuas = row.querySelector('.modal-luas');
 
                     if (status) {
-                        status.textContent = !select.value
-                            ? 'Pilih produk.'
-                            : berbasisLuas
-                                ? 'Perhitungan berdasarkan luas.'
-                                : 'Perhitungan berdasarkan jumlah barang.';
+                        status.textContent = !select.value ?
+                            'Pilih produk.' :
+                            berbasisLuas ?
+                            'Perhitungan berdasarkan luas.' :
+                            'Perhitungan berdasarkan jumlah barang.';
                     }
 
                     if (infoLuas) {
-                        infoLuas.textContent = berbasisLuas
-                            ? 'Luas total: ' +
-                              luas.toLocaleString('id-ID', {
-                                  maximumFractionDigits: 2
-                              }) + ' m²'
-                            : '';
+                        infoLuas.textContent = berbasisLuas ?
+                            'Luas total: ' +
+                            luas.toLocaleString('id-ID', {
+                                maximumFractionDigits: 2
+                            }) + ' m²' :
+                            '';
                     }
 
                     const harga = angka(
@@ -329,7 +319,7 @@
                 tombolTambah.addEventListener('click', tambahProduk);
 
                 // EVENT PERUBAHAN SELECT
-                daftar.addEventListener('change', function (event) {
+                daftar.addEventListener('change', function(event) {
                     const row = event.target.closest('.modal-produk-row');
 
                     if (row) {
@@ -338,10 +328,10 @@
                 });
 
                 // EVENT INPUT
-                daftar.addEventListener('input', function (event) {
+                daftar.addEventListener('input', function(event) {
                     if (event.target.matches(
-                        '.modal-jumlah, .modal-tinggi, .modal-lebar, .modal-harga, .modal-edit'
-                    )) {
+                            '.modal-jumlah, .modal-tinggi, .modal-lebar, .modal-harga, .modal-edit'
+                        )) {
                         hitungBaris(
                             event.target.closest('.modal-produk-row')
                         );
@@ -349,7 +339,7 @@
                 });
 
                 // HAPUS PRODUK
-                daftar.addEventListener('click', function (event) {
+                daftar.addEventListener('click', function(event) {
                     const tombol = event.target.closest(
                         '.modal-hapus-produk'
                     );
@@ -363,7 +353,7 @@
                 });
 
                 // KONFIRMASI SIMPAN
-                form.addEventListener('submit', function (event) {
+                form.addEventListener('submit', function(event) {
 
                     if (sedangKonfirmasi) {
                         return;
@@ -378,8 +368,8 @@
 
                     if (typeof Swal === 'undefined') {
                         if (window.confirm(
-                            'Yakin ingin menyimpan transaksi ini?'
-                        )) {
+                                'Yakin ingin menyimpan transaksi ini?'
+                            )) {
                             sedangKonfirmasi = true;
                             HTMLFormElement.prototype.submit.call(form);
                         }
@@ -399,7 +389,7 @@
                         reverseButtons: true,
                         confirmButtonColor: '#2563eb',
                         cancelButtonColor: '#6b7280'
-                    }).then(function (result) {
+                    }).then(function(result) {
 
                         if (result.isConfirmed) {
 
@@ -419,7 +409,7 @@
                             sedangKonfirmasi = false;
                         }
 
-                    }).catch(function (error) {
+                    }).catch(function(error) {
                         sedangKonfirmasi = false;
 
                         console.error(
@@ -439,8 +429,9 @@
             if (document.readyState === 'loading') {
                 document.addEventListener(
                     'DOMContentLoaded',
-                    inisialisasiModalTransaksi,
-                    { once: true }
+                    inisialisasiModalTransaksi, {
+                        once: true
+                    }
                 );
             } else {
                 inisialisasiModalTransaksi();

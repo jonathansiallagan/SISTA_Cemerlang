@@ -78,35 +78,33 @@ class TransaksiController extends Controller
     /**
      * Form transaksi baru.
      */
-    
-public function create()
-{
-    $user = $this->user();
 
-    if (!$user->isCustomerService()) {
-        abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
+    public function create()
+    {
+        $user = $this->user();
+
+        if (!$user->isCustomerService()) {
+            abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
+        }
+
+        $produks = Produk::orderBy('nama_produk')->get();
+        $cabangs = Cabang::where('id', $user->cabang_id)->get();
+        $today = now()->format('Ymd');
+
+        $lastTransaksi = Transaksi::whereDate(
+            'created_at',
+            now()->toDateString()
+        )->count();
+
+        $no_referensi = 'INV-' . $today . '-'
+            . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
+
+        return view('cs.transaksi.modal-page', compact(
+            'produks',
+            'cabangs',
+            'no_referensi'
+        ));
     }
-
-    $produks = Produk::orderBy('nama_produk')->get();
-
-    $cabangs = Cabang::where('id', $user->cabang_id)->get();
-
-    $today = now()->format('Ymd');
-
-    $lastTransaksi = Transaksi::whereDate(
-        'created_at',
-        now()->toDateString()
-    )->count();
-
-    $no_referensi = 'INV-' . $today . '-'
-        . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
-
-    return view('admin.transaksi.modal-page', compact(
-        'produks',
-        'cabangs',
-        'no_referensi'
-    ));
-}
 
 
     /**
@@ -183,8 +181,8 @@ public function create()
                 ) {
                     throw new \RuntimeException(
                         'Akun Kas, Pendapatan Penjualan, HPP, atau Persediaan '
-                        . 'belum tersedia atau tidak aktif. '
-                        . 'Periksa kode akun pada menu Akun.'
+                            . 'belum tersedia atau tidak aktif. '
+                            . 'Periksa kode akun pada menu Akun.'
                     );
                 }
 
@@ -266,7 +264,7 @@ public function create()
                         if (!$bahan || $bahan->status !== 'aktif') {
                             throw new \RuntimeException(
                                 "Bahan baku untuk {$produk->nama_produk} "
-                                . 'tidak ditemukan atau tidak aktif.'
+                                    . 'tidak ditemukan atau tidak aktif.'
                             );
                         }
 
@@ -282,9 +280,9 @@ public function create()
                         if ($stokTersedia < $jumlahPemakaian) {
                             throw new \RuntimeException(
                                 "Stok {$bahan->nama_bahan} tidak mencukupi. "
-                                . "Stok tersedia: {$stokTersedia} {$bahan->satuan}, "
-                                . "dibutuhkan: {$jumlahPemakaian} "
-                                . "{$komposisi->satuan_pemakaian}."
+                                    . "Stok tersedia: {$stokTersedia} {$bahan->satuan}, "
+                                    . "dibutuhkan: {$jumlahPemakaian} "
+                                    . "{$komposisi->satuan_pemakaian}."
                             );
                         }
 
@@ -417,7 +415,6 @@ public function create()
             return redirect()
                 ->route('transaksi.index')
                 ->with('success', 'Transaksi, HPP, stok, dan jurnal berhasil disimpan!');
-
         } catch (\Throwable $e) {
             report($e);
 
@@ -425,6 +422,26 @@ public function create()
                 ->with('error', 'Transaksi gagal disimpan: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    public function formModal()
+    {
+        $user = $this->user();
+
+        if (!$user->isCustomerService()) {
+            abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
+        }
+
+        $produks = Produk::orderBy('nama_produk')->get();
+        $cabangs = Cabang::where('id', $user->cabang_id)->get();
+        $today = now()->format('Ymd');
+        $lastTransaksi = Transaksi::whereDate('created_at', now()->toDateString())->count();
+        $no_referensi = 'INV-' . $today . '-' . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
+
+        return view(
+            'cs.transaksi.form',
+            compact('produks', 'cabangs', 'no_referensi')
+        );
     }
 
     /**
@@ -468,40 +485,15 @@ public function create()
             ->orderByDesc('id')
             ->get();
 
+        // Nama file dinamis dengan tanggal & jam
+        $namaFile = 'riwayat-transaksi-' . now()->format('Ymd-His') . '.pdf';
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
-            'admin.transaksi.pdf',
+            'cs.transaksi.pdf', // Path view sudah diperbarui ke folder CS
             compact('transaksis')
         )->setPaper('a4', 'landscape');
 
-        return $pdf->download('riwayat-transaksi.pdf');
-    }
-
-    public function formModal()
-    {
-        $user = $this->user();
-
-        if (!$user->isCustomerService()) {
-            abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
-        }
-
-        $produks = Produk::orderBy('nama_produk')->get();
-
-        $cabangs = Cabang::where('id', $user->cabang_id)->get();
-
-        $today = now()->format('Ymd');
-
-        $lastTransaksi = Transaksi::whereDate(
-            'created_at',
-            now()->toDateString()
-        )->count();
-
-        $no_referensi = 'INV-' . $today . '-'
-            . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
-
-        return view(
-            'admin.transaksi.partials.form',
-            compact('produks', 'cabangs', 'no_referensi')
-        );
+        return $pdf->download($namaFile);
     }
 
     /**
@@ -509,9 +501,12 @@ public function create()
      */
     public function exportExcel(Request $request)
     {
+        // Nama file dinamis dengan tanggal & jam
+        $namaFile = 'riwayat-transaksi-' . now()->format('Ymd-His') . '.xlsx';
+
         return Excel::download(
             new \App\Exports\TransaksiExport($request, $this->user()),
-            'riwayat-transaksi.xlsx'
+            $namaFile
         );
     }
 }
