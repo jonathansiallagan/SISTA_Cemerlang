@@ -136,7 +136,7 @@
             } else {
                 iconBg.classList.add('bg-blue-50');
                 icon.classList.add('text-blue-500');
-                submitBtn.classList.add('bg-[#6777ef]', 'hover:bg-[#394eea]');
+                submitBtn.classList.add('bg-[#041C88]', 'hover:bg-[#394eea]');
                 mainIconClass = 'fa-info-circle';
                 btnIconClass = 'fa-check';
             }

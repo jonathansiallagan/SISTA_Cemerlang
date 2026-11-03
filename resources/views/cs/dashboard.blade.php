@@ -9,7 +9,7 @@
         <div class="w-full max-w-[1060px] overflow-hidden rounded-[20px] border border-white/50 bg-white/95 shadow-2xl backdrop-blur-xl">
 
             {{-- ================= HEADER PANEL ================= --}}
-            <div class="flex items-center justify-between gap-3 bg-gradient-to-r from-[#6777ef] to-[#8191f7] px-8 py-6">
+            <div class="flex items-center justify-between gap-3 bg-gradient-to-r from-[#041C88] to-[#8191f7] px-8 py-6">
 
                 <div class="flex min-w-0 items-center gap-4">
 
@@ -176,7 +176,7 @@
                     {{-- TRANSAKSI BARU --}}
                     <a
                         href="{{ route('transaksi.create') }}"
-                        class="inline-flex items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]"
+                        class="inline-flex items-center rounded-[3px] border border-[#041C88] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]"
                     >
                         <i class="fas fa-plus mr-1"></i>
                         Transaksi Baru

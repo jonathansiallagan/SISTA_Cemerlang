@@ -5,7 +5,7 @@
         <h1 class="text-2xl font-bold text-[#34395e]">{{ $judulDashboard }}</h1>
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
-            <li class="font-semibold text-[#6777ef]">Dashboard</li>
+            <li class="font-semibold text-[#041C88]">Dashboard</li>
             <li class="before:px-2 before:content-['/']">SISTA</li>
         </ol>
     </div>
@@ -77,7 +77,7 @@
             {{-- Omzet --}}
             <div class="flex items-center rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
                 <div
-                    class="m-2.5 flex h-20 w-20 shrink-0 items-center justify-center rounded-[3px] bg-[#6777ef] text-[30px] text-white">
+                    class="m-2.5 flex h-20 w-20 shrink-0 items-center justify-center rounded-[3px] bg-[#041C88] text-[30px] text-white">
                     <i class="fas fa-wallet"></i>
                 </div>
                 <div class="min-w-0 flex-1 py-2.5 pr-5">
@@ -123,10 +123,10 @@
             {{-- Performa Omzet --}}
             <div class="flex min-w-0 flex-col rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)] lg:col-span-8">
                 <div class="flex min-h-[70px] items-center border-b border-[#f9f9f9] px-[25px] py-1">
-                    <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#6777ef]">Performa Omzet</h4>
+                    <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#041C88]">Performa Omzet</h4>
                     <div class="ml-auto">
                         <span
-                            class="rounded-full bg-[#6777ef] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                            class="rounded-full bg-[#041C88] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
                             7 Hari Terakhir
                         </span>
                     </div>
@@ -144,10 +144,10 @@
             {{-- Produk Terlaris --}}
             <div class="flex min-w-0 flex-col rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)] lg:col-span-4">
                 <div class="flex min-h-[70px] items-center border-b border-[#f9f9f9] px-[25px] py-1">
-                    <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#6777ef]">Produk Terlaris</h4>
+                    <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#041C88]">Produk Terlaris</h4>
                     <div class="ml-auto">
                         <span
-                            class="rounded-full bg-[#6777ef] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                            class="rounded-full bg-[#041C88] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
                             Hari Ini
                         </span>
                     </div>
@@ -172,7 +172,7 @@
                                     class="mb-3 flex border-b border-[#f2f2f2] pb-3 last:mb-0 last:border-b-0 last:pb-0">
                                     <div class="mr-3 flex h-10 w-10 shrink-0 items-center justify-center">
                                         <span
-                                            class="rounded-full bg-[#6777ef] px-2.5 py-[3px] text-base font-semibold text-white">
+                                            class="rounded-full bg-[#041C88] px-2.5 py-[3px] text-base font-semibold text-white">
                                             {{ $index + 1 }}
                                         </span>
                                     </div>
@@ -188,7 +188,7 @@
                                         </div>
 
                                         <div class="mt-2 flex items-center">
-                                            <div class="h-2 shrink rounded-[3px] bg-[#6777ef]"
+                                            <div class="h-2 shrink rounded-[3px] bg-[#041C88]"
                                                 style="width: {{ $persenBar }}%"></div>
 
                                             <div
@@ -209,7 +209,7 @@
                         </ul>
 
                         <a href="{{ route('produk.index') }}"
-                            class="mt-3 flex w-full items-center justify-center rounded-[3px] border border-[#6777ef] px-4 py-2 text-[13px] font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
+                            class="mt-3 flex w-full items-center justify-center rounded-[3px] border border-[#041C88] px-4 py-2 text-[13px] font-semibold tracking-[0.5px] text-[#041C88] transition-colors hover:bg-[#041C88] hover:text-white">
                             <i class="fas fa-box-open mr-2"></i>
                             Lihat Katalog Produk
                         </a>
@@ -222,10 +222,10 @@
         {{-- TRANSAKSI TERBARU --}}
         <div class="mb-[30px] rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
             <div class="flex min-h-[70px] items-center border-b border-[#f9f9f9] px-[25px] py-1">
-                <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#6777ef]">Transaksi Terbaru</h4>
+                <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#041C88]">Transaksi Terbaru</h4>
                 <div class="ml-auto">
                     <a href="{{ route('transaksi.index') }}"
-                            class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                            class="inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                             <i class="fas fa-receipt mr-2"></i>
                             {{ number_format($jumlahTransaksi) }} Transaksi
                     </a>
@@ -295,10 +295,10 @@
             {{-- Jurnal Terbaru --}}
             <div class="min-w-0 rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)] lg:col-span-8">
                 <div class="flex min-h-[70px] items-center border-b border-[#f9f9f9] px-[25px] py-1">
-                    <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#6777ef]">Jurnal Terbaru</h4>
+                    <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#041C88]">Jurnal Terbaru</h4>
                     <div class="ml-auto">
                         <span
-                            class="rounded-full bg-[#6777ef] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
+                            class="rounded-full bg-[#041C88] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
                             {{ $jurnalTerbaru->count() }} Catatan
                         </span>
                     </div>
@@ -339,7 +339,7 @@
 
                 <div class="border-t border-black/5 px-[25px] py-4 text-right">
                     <a href="{{ route('jurnal.index') }}"
-                        class="inline-flex items-center rounded-[3px] border border-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
+                        class="inline-flex items-center rounded-[3px] border border-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#041C88] transition-colors hover:bg-[#041C88] hover:text-white">
                             <i class="fas fa-book-open mr-2"></i>
                             Lihat Jurnal Umum
                     </a>
@@ -349,7 +349,7 @@
             {{-- Ringkasan Jurnal --}}
             <div class="min-w-0 rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)] lg:col-span-4">
                 <div class="flex min-h-[70px] items-center border-b border-[#f9f9f9] px-[25px] py-1">
-                    <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#6777ef]">Ringkasan Jurnal</h4>
+                    <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#041C88]">Ringkasan Jurnal</h4>
                 </div>
 
                 <div class="p-[25px]">
@@ -358,14 +358,14 @@
                         <h5 class="text-base font-semibold">Rp {{ number_format($totalDebit ?? 0, 0, ',', '.') }}</h5>
                     </div>
 
-                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#6777ef] px-5 py-4 text-white">
+                    <div class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#041C88] px-5 py-4 text-white">
                         <div class="text-xs">Total Kredit</div>
                         <h5 class="text-base font-semibold">Rp {{ number_format($totalKredit ?? 0, 0, ',', '.') }}
                         </h5>
                     </div>
 
                     <a href="{{ route('buku_besar.index') }}"
-                        class="flex h-[38px] w-full items-center justify-center rounded-[3px] border border-[#6777ef] text-xs font-semibold tracking-[0.5px] text-[#6777ef] transition-colors hover:bg-[#6777ef] hover:text-white">
+                        class="flex h-[38px] w-full items-center justify-center rounded-[3px] border border-[#041C88] text-xs font-semibold tracking-[0.5px] text-[#041C88] transition-colors hover:bg-[#041C88] hover:text-white">
                         <i class="fas fa-book mr-2"></i>
                         Lihat Buku Besar
                     </a>
@@ -396,11 +396,11 @@
                             label: 'Omzet',
                             data: omzetValues,
                             yAxisID: 'y-omzet', // Terhubung ke sumbu Y kiri
-                            borderColor: '#6777ef', // Biru Stisla
+                            borderColor: '#041C88', // Biru Stisla
                             backgroundColor: 'rgba(103, 119, 239, 0.12)',
                             borderWidth: 2,
                             pointRadius: 3,
-                            pointBackgroundColor: '#6777ef',
+                            pointBackgroundColor: '#041C88',
                             fill: true,
                             lineTension: 0.3
                         },

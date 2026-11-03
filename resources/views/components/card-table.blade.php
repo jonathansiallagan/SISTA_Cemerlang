@@ -6,7 +6,7 @@
 
     {{-- Judul Tabel: Biru saat terang, gelap kehitaman saat malam --}}
     <div
-        class="flex min-h-[70px] items-center bg-[#6777ef] dark:bg-[#111827] dark:border-b dark:border-[#374151] px-[25px] py-2">
+        class="flex min-h-[70px] items-center bg-[#041C88] dark:bg-[#111827] dark:border-b dark:border-[#374151] px-[25px] py-2">
         <h4 class="text-base font-semibold leading-7 text-white">
             <i class="fas {{ $icon }} mr-2"></i>
             {{ $title }}

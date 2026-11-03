@@ -18,7 +18,7 @@
         <h1 class="text-2xl font-bold text-[#34395e]">Data Produk &amp; Layanan</h1>
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
-            <li class="font-semibold text-[#6777ef]">Produk &amp; Layanan</li>
+            <li class="font-semibold text-[#041C88]">Produk &amp; Layanan</li>
         </ol>
     </div>
 
@@ -31,7 +31,7 @@
             </p>
 
             <button type="button" data-modal-open="modalTambahProduk"
-                class="mb-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                class="mb-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                 <i class="fas fa-plus mr-1"></i>
                 Tambah Produk
             </button>
@@ -67,12 +67,12 @@
         {{-- TAB FILTER STATUS --}}
         <div class="mb-4 flex items-center gap-2">
             <a href="{{ route('produk.index', ['status' => 'aktif']) }}"
-                class="inline-flex items-center rounded-[3px] px-3 py-1.5 text-xs font-semibold transition-colors {{ ($status ?? 'aktif') === 'aktif' ? 'bg-[#6777ef] text-white shadow' : 'bg-white text-[#6c757d] hover:bg-gray-100' }}">
+                class="inline-flex items-center rounded-[3px] px-3 py-1.5 text-xs font-semibold transition-colors {{ ($status ?? 'aktif') === 'aktif' ? 'bg-[#041C88] text-white shadow' : 'bg-white text-[#6c757d] hover:bg-gray-100' }}">
                 <i class="fas fa-check-circle mr-1"></i> Produk Aktif
             </a>
 
             <a href="{{ route('produk.index', ['status' => 'nonaktif']) }}"
-                class="inline-flex items-center rounded-[3px] px-3 py-1.5 text-xs font-semibold transition-colors {{ ($status ?? 'aktif') === 'nonaktif' ? 'bg-[#6777ef] text-white shadow' : 'bg-white text-[#6c757d] hover:bg-gray-100' }}">
+                class="inline-flex items-center rounded-[3px] px-3 py-1.5 text-xs font-semibold transition-colors {{ ($status ?? 'aktif') === 'nonaktif' ? 'bg-[#041C88] text-white shadow' : 'bg-white text-[#6c757d] hover:bg-gray-100' }}">
                 <i class="fas fa-ban mr-1"></i> Produk Nonaktif
             </a>
         </div>
@@ -112,7 +112,7 @@
                             @if ($produk->status === 'aktif')
                                 {{-- Tombol Edit (Hanya muncul jika aktif) --}}
                                 <button type="button" title="Edit Produk"
-                                    class="btn-edit-produk inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
+                                    class="btn-edit-produk inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
                                     data-id="{{ $produk->id }}" data-url="{{ route('produk.update', $produk->id) }}"
                                     data-nama="{{ $produk->nama_produk }}" data-satuan="{{ $produk->satuan }}"
                                     data-upah="{{ $produk->upah_operator ?? 0 }}"
@@ -191,7 +191,7 @@
     <dialog id="modalTambahProduk" aria-labelledby="judulModalTambahProduk"
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-hidden rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop:bg-black/50 open:flex open:flex-col">
 
-        <div class="flex shrink-0 items-start justify-between bg-[#6777ef] px-6 py-4 text-white">
+        <div class="flex shrink-0 items-start justify-between bg-[#041C88] px-6 py-4 text-white">
             <div>
                 <h5 id="judulModalTambahProduk" class="text-lg font-semibold text-white">
                     <i class="fas fa-box mr-2"></i>
@@ -212,7 +212,7 @@
 
             <div class="min-h-0 flex-1 overflow-y-auto p-6">
 
-                <h6 class="mb-4 text-sm font-bold text-[#6777ef]">
+                <h6 class="mb-4 text-sm font-bold text-[#041C88]">
                     Informasi Produk
                 </h6>
 
@@ -269,7 +269,7 @@
 
                 <div class="mb-4 flex items-center justify-between">
                     <div>
-                        <h6 class="mb-1 text-sm font-bold text-[#6777ef]">
+                        <h6 class="mb-1 text-sm font-bold text-[#041C88]">
                             Komposisi Bahan Baku
                         </h6>
                         <small class="text-[#6c757d]">
@@ -278,7 +278,7 @@
                     </div>
 
                     <button type="button" id="modalTambahBarisBahan"
-                        class="inline-flex shrink-0 items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]">
+                        class="inline-flex shrink-0 items-center rounded-[3px] border border-[#041C88] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]">
                         <i class="fas fa-plus mr-1"></i>
                         Tambah Bahan
                     </button>
@@ -356,7 +356,7 @@
                 @endif
 
                 <div class="rounded-[3px] border border-[#e3eaef] bg-[#fefefe] px-5 py-4 text-[#6c757d]">
-                    <i class="fas fa-info-circle mr-1 text-[#6777ef]"></i>
+                    <i class="fas fa-info-circle mr-1 text-[#041C88]"></i>
                     Jumlah pemakaian adalah kebutuhan bahan untuk satu satuan produk.
                 </div>
             </div>
@@ -384,7 +384,7 @@
     <dialog id="modalEditProduk" aria-labelledby="judulModalEditProduk"
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-hidden rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop:bg-black/50 open:flex open:flex-col">
 
-        <div class="flex shrink-0 items-start justify-between bg-[#6777ef] px-6 py-4 text-white">
+        <div class="flex shrink-0 items-start justify-between bg-[#041C88] px-6 py-4 text-white">
             <div>
                 <h5 id="judulModalEditProduk" class="text-lg font-semibold text-white">
                     <i class="fas fa-edit mr-2"></i>
@@ -417,7 +417,7 @@
                     </div>
                 @endif
 
-                <h6 class="mb-4 text-sm font-bold text-[#6777ef]">
+                <h6 class="mb-4 text-sm font-bold text-[#041C88]">
                     Informasi Produk
                 </h6>
 
@@ -463,7 +463,7 @@
                 {{-- KOMPOSISI BAHAN BAKU --}}
                 <div class="mb-4 flex items-center justify-between">
                     <div>
-                        <h6 class="mb-1 text-sm font-bold text-[#6777ef]">
+                        <h6 class="mb-1 text-sm font-bold text-[#041C88]">
                             Komposisi Bahan Baku
                         </h6>
                         <small class="text-[#6c757d]">
@@ -472,7 +472,7 @@
                     </div>
 
                     <button type="button" id="editTambahBarisBahan"
-                        class="inline-flex items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]">
+                        class="inline-flex items-center rounded-[3px] border border-[#041C88] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]">
                         <i class="fas fa-plus mr-1"></i> Tambah Bahan
                     </button>
                 </div>
@@ -534,7 +534,7 @@
                 </template>
 
                 <div class="rounded-[3px] border border-[#e3eaef] bg-[#fefefe] px-5 py-4 text-[#6c757d]">
-                    <i class="fas fa-info-circle mr-1 text-[#6777ef]"></i>
+                    <i class="fas fa-info-circle mr-1 text-[#041C88]"></i>
                     Jumlah pemakaian adalah kebutuhan bahan untuk satu satuan produk.
                 </div>
             </div>
@@ -547,7 +547,7 @@
                 </button>
 
                 <button type="button" id="btnUpdateProduk"
-                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-60"
+                    class="inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-60"
                     data-confirm-form="formEditProduk" data-confirm-theme="primary"
                     data-confirm-title="Update Produk"
                     data-confirm-message="Yakin ingin menyimpan perubahan pada produk ini?"

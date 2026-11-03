@@ -6,10 +6,10 @@
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
             <li>
-                <a href="{{ route('pengeluaran.index') }}" class="hover:text-[#6777ef]">Pengeluaran</a>
+                <a href="{{ route('pengeluaran.index') }}" class="hover:text-[#041C88]">Pengeluaran</a>
             </li>
             <li
-                class="font-semibold text-[#6777ef] before:px-2 before:font-normal before:text-[#6c757d] before:content-['/']">
+                class="font-semibold text-[#041C88] before:px-2 before:font-normal before:text-[#6c757d] before:content-['/']">
                 Riwayat Pengeluaran
             </li>
         </ol>
@@ -23,7 +23,7 @@
             </p>
 
             <button type="button" data-modal-open="modalTambahPengeluaran"
-                class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                class="inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                 <i class="fas fa-plus mr-1"></i>
                 Tambah Pengeluaran
             </button>
@@ -104,7 +104,7 @@
                 <div>
                     <div class="flex flex-wrap items-center">
                         <button type="submit"
-                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                             <i class="fas fa-filter mr-1"></i>
                             Filter
                         </button>
@@ -140,7 +140,7 @@
                         {{ $loop->iteration }}
                     </td>
 
-                    <td class="px-[15px] py-3 font-bold text-[#6777ef]">
+                    <td class="px-[15px] py-3 font-bold text-[#041C88]">
                         {{ $pengeluaran->no_referensi }}
                     </td>
 
@@ -191,7 +191,7 @@
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-hidden rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop:bg-black/50 open:flex open:flex-col">
 
         {{-- HEADER MODAL --}}
-        <div class="flex shrink-0 items-start justify-between bg-[#6777ef] px-6 py-4 text-white">
+        <div class="flex shrink-0 items-start justify-between bg-[#041C88] px-6 py-4 text-white">
             <div>
                 <h5 id="judulModalPengeluaran" class="text-lg font-semibold text-white">
                     <i class="fas fa-receipt mr-2"></i>
@@ -219,7 +219,7 @@
 
                 {{-- INFORMASI DASAR --}}
                 <div class="mb-6 border-b border-[#e3eaef] pb-2">
-                    <h6 class="mb-1 text-sm font-bold text-[#6777ef]">
+                    <h6 class="mb-1 text-sm font-bold text-[#041C88]">
                         <i class="fas fa-info-circle mr-1"></i>
                         Informasi Pengeluaran
                     </h6>
@@ -314,7 +314,7 @@
 
                 {{-- DETAIL PENGELUARAN --}}
                 <div class="mb-6 mt-2 border-b border-[#e3eaef] pb-2">
-                    <h6 class="mb-1 text-sm font-bold text-[#6777ef]">
+                    <h6 class="mb-1 text-sm font-bold text-[#041C88]">
                         <i class="fas fa-list-alt mr-1"></i>
                         Detail Pengeluaran
                     </h6>
@@ -404,9 +404,9 @@
                 </div>
 
                 {{-- TOTAL OTOMATIS --}}
-                <div class="rounded-[3px] border border-[#6777ef] bg-[#f6f8fb] p-[25px]">
+                <div class="rounded-[3px] border border-[#041C88] bg-[#f6f8fb] p-[25px]">
                     <label for="modal_total_pengeluaran" class="mb-2 inline-block font-bold text-[#191d21]">
-                        <i class="fas fa-calculator mr-1 text-[#6777ef]"></i>
+                        <i class="fas fa-calculator mr-1 text-[#041C88]"></i>
                         Total Pengeluaran
                     </label>
 
@@ -417,7 +417,7 @@
                         </span>
 
                         <input type="text" id="modal_total_pengeluaran" value="0" readonly
-                            class="h-[52px] min-w-0 flex-1 rounded-r-[3px] border border-[#e4e6fc] bg-white px-[15px] text-[22px] font-bold text-[#6777ef] focus:outline-none">
+                            class="h-[52px] min-w-0 flex-1 rounded-r-[3px] border border-[#e4e6fc] bg-white px-[15px] text-[22px] font-bold text-[#041C88] focus:outline-none">
                     </div>
 
                     <small class="mt-1 block text-[#6c757d]">

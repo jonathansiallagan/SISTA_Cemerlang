@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold text-[#34395e]">Data Bahan Baku</h1>
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
-            <li class="font-semibold text-[#6777ef]">Persediaan</li>
+            <li class="font-semibold text-[#041C88]">Persediaan</li>
             <li class="before:px-2 before:content-['/']">Bahan Baku</li>
         </ol>
     </div>
@@ -20,7 +20,7 @@
             </p>
 
             <button type="button" data-modal-open="modalTambahBahan"
-                class="mb-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                class="mb-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                 <i class="fas fa-plus mr-1"></i>
                 Tambah Bahan Baku
             </button>
@@ -74,7 +74,7 @@
                     </td>
 
                     <td class="px-[15px] py-3 align-middle">
-                        <strong class="font-bold text-[#6777ef]">
+                        <strong class="font-bold text-[#041C88]">
                             {{ $bahan->kode_bahan }}
                         </strong>
                     </td>
@@ -107,7 +107,7 @@
 
                     <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
                         <button type="button" title="Edit Bahan Baku"
-                            class="btn-edit-bahan inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
+                            class="btn-edit-bahan inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
                             data-id="{{ $bahan->id }}" data-kode="{{ $bahan->kode_bahan }}"
                             data-nama="{{ $bahan->nama_bahan }}" data-spesifikasi="{{ $bahan->spesifikasi }}"
                             data-satuan="{{ $bahan->satuan }}" data-status="{{ $bahan->status }}"
@@ -144,7 +144,7 @@
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40">
 
         {{-- HEADER MODAL --}}
-        <div class="flex items-center justify-between bg-[#6777ef] px-[25px] py-4">
+        <div class="flex items-center justify-between bg-[#041C88] px-[25px] py-4">
             <h5 id="judulModalTambahBahan" class="text-lg font-semibold text-white">
                 <i class="fas fa-boxes mr-2"></i>
                 Tambah Bahan Baku
@@ -297,7 +297,7 @@
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40">
 
         {{-- HEADER MODAL EDIT --}}
-        <div class="flex items-center justify-between bg-[#6777ef] px-[25px] py-4">
+        <div class="flex items-center justify-between bg-[#041C88] px-[25px] py-4">
             <h5 id="judulModalEditBahan" class="text-lg font-semibold text-white">
                 <i class="fas fa-edit mr-2"></i>
                 Edit Bahan Baku

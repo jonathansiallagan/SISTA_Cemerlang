@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold text-[#34395e]">Laporan Laba Rugi</h1>
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
-            <li class="font-semibold text-[#6777ef]">Laporan Laba Rugi</li>
+            <li class="font-semibold text-[#041C88]">Laporan Laba Rugi</li>
         </ol>
     </div>
 
@@ -83,7 +83,7 @@
                 {{-- TOMBOL FILTER DAN RESET --}}
                 <div class="flex flex-wrap items-center gap-2">
                     <button type="submit"
-                        class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                        class="inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                         <i class="fas fa-filter mr-1"></i>
                         Tampilkan
                     </button>
@@ -103,7 +103,7 @@
             class="mb-4 overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
 
             {{-- JUDUL TABEL --}}
-            <div class="flex min-h-[70px] items-center justify-center bg-[#6777ef] px-[25px] py-2">
+            <div class="flex min-h-[70px] items-center justify-center bg-[#041C88] px-[25px] py-2">
                 <h6 class="text-base font-bold leading-7 text-white">
                     LAPORAN LABA RUGI
                 </h6>
@@ -263,7 +263,7 @@
                         </tr>
 
                         {{-- LABA / RUGI BERSIH --}}
-                        <tr class="{{ $labaBersih >= 0 ? 'bg-[#6777ef]/15' : 'bg-[#fc544b]/15' }}">
+                        <tr class="{{ $labaBersih >= 0 ? 'bg-[#041C88]/15' : 'bg-[#fc544b]/15' }}">
                             <td colspan="3" class="px-[15px] py-3 text-right font-bold">
                                 {{ $labaBersih >= 0 ? 'LABA BERSIH' : 'RUGI BERSIH' }}
                             </td>

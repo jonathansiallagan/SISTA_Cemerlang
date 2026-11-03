@@ -6,10 +6,10 @@
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
             <li>
-                <a href="{{ route('transaksi.index') }}" class="hover:text-[#6777ef]">Transaksi</a>
+                <a href="{{ route('transaksi.index') }}" class="hover:text-[#041C88]">Transaksi</a>
             </li>
             <li
-                class="font-semibold text-[#6777ef] before:px-2 before:font-normal before:text-[#6c757d] before:content-['/']">
+                class="font-semibold text-[#041C88] before:px-2 before:font-normal before:text-[#6c757d] before:content-['/']">
                 Riwayat Transaksi
             </li>
         </ol>
@@ -100,7 +100,7 @@
                 {{-- TOMBOL --}}
                 <div class="flex items-center gap-2">
                     <button type="submit"
-                        class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                        class="inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                         <i class="fas fa-filter mr-1"></i> Filter
                     </button>
 
@@ -146,7 +146,7 @@
 
                             {{-- NO REFERENSI --}}
                             <td rowspan="{{ $jumlahBaris }}"
-                                class="whitespace-nowrap px-[15px] py-3 align-middle font-bold text-[#6777ef]">
+                                class="whitespace-nowrap px-[15px] py-3 align-middle font-bold text-[#041C88]">
                                 {{ $trx->no_referensi }}
                             </td>
 
@@ -209,7 +209,7 @@
                             {{ $loop->parent->iteration }}
                         </td>
 
-                        <td class="whitespace-nowrap px-[15px] py-3 align-middle font-bold text-[#6777ef]">
+                        <td class="whitespace-nowrap px-[15px] py-3 align-middle font-bold text-[#041C88]">
                             {{ $trx->no_referensi }}
                         </td>
 

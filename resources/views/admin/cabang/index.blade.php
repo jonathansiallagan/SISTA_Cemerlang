@@ -15,7 +15,7 @@
         <h1 class="text-2xl font-bold text-[#34395e]">Data Cabang</h1>
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
-            <li class="font-semibold text-[#6777ef]">Data Cabang</li>
+            <li class="font-semibold text-[#041C88]">Data Cabang</li>
         </ol>
     </div>
 
@@ -28,7 +28,7 @@
             </p>
 
             <button type="button" data-modal-open="modalTambahCabang"
-                class="mb-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                class="mb-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                 <i class="fas fa-plus mr-1"></i>
                 Tambah Cabang
             </button>
@@ -114,7 +114,7 @@
                             data-id="{{ $cabang->id }}" data-nama="{{ $cabang->nama }}"
                             data-no-hp="{{ $cabang->no_hp }}" data-alamat="{{ $cabang->alamat }}"
                             data-status="{{ $statusCabang }}" data-url="{{ route('cabang.update', $cabang->id) }}"
-                            class="btn-edit-cabang inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
+                            class="btn-edit-cabang inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]">
                             <i class="fas fa-edit" aria-hidden="true"></i>
                         </button>
                     </td>
@@ -138,7 +138,7 @@
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40">
 
         {{-- HEADER MODAL --}}
-        <div class="flex items-center justify-between bg-[#6777ef] px-[25px] py-4">
+        <div class="flex items-center justify-between bg-[#041C88] px-[25px] py-4">
             <h5 id="judulModalTambahCabang" class="text-lg font-semibold text-white">
                 <i class="fas fa-store mr-2"></i>
                 Tambah Cabang Baru
@@ -252,7 +252,7 @@
         class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40">
 
         {{-- HEADER MODAL --}}
-        <div class="flex items-center justify-between bg-[#6777ef] px-[25px] py-4">
+        <div class="flex items-center justify-between bg-[#041C88] px-[25px] py-4">
             <h5 id="judulModalEditCabang" class="text-lg font-semibold text-white">
                 <i class="fas fa-edit mr-2"></i>
                 Edit Data Cabang

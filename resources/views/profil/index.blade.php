@@ -33,7 +33,7 @@
         <div class="flex items-center justify-between mb-6">
             <a
                 href="{{ route(Auth::user()->homeRoute()) }}"
-                class="inline-flex items-center gap-2 rounded-lg border border-[#6777ef] bg-[#6777ef] px-4 py-2 text-sm text-white shadow-sm transition hover:border-[#5665d8] hover:bg-[#5665d8]"
+                class="inline-flex items-center gap-2 rounded-lg border border-[#041C88] bg-[#041C88] px-4 py-2 text-sm text-white shadow-sm transition hover:border-[#5665d8] hover:bg-[#5665d8]"
             >
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Kembali ke Dashboard</span>

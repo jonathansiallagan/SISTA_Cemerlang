@@ -5,7 +5,7 @@
         <h1 class="text-2xl font-bold text-[#34395e]">Buku Besar</h1>
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
-            <li class="font-semibold text-[#6777ef]">Buku Besar</li>
+            <li class="font-semibold text-[#041C88]">Buku Besar</li>
         </ol>
     </div>
 
@@ -111,7 +111,7 @@
                 <div class="md:col-span-2 lg:col-span-3">
                     <div class="flex flex-wrap items-center">
                         <button type="submit"
-                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                             <i class="fas fa-filter mr-1"></i>
                             Tampilkan
                         </button>
@@ -141,7 +141,7 @@
 
             {{-- RINGKASAN BUKU BESAR --}}
             <div class="mt-4 overflow-hidden rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-                <div class="flex min-h-[70px] items-center bg-[#6777ef] px-[25px] py-2">
+                <div class="flex min-h-[70px] items-center bg-[#041C88] px-[25px] py-2">
                     <h4 class="text-base font-semibold leading-7 text-white">
                         <i class="fas fa-chart-bar mr-2"></i>
                         Ringkasan Buku Besar

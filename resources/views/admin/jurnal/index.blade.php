@@ -13,7 +13,7 @@
         <h1 class="text-2xl font-bold text-[#34395e]">Jurnal Umum</h1>
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
-            <li class="font-semibold text-[#6777ef]">Jurnal Umum</li>
+            <li class="font-semibold text-[#041C88]">Jurnal Umum</li>
         </ol>
     </div>
 
@@ -70,7 +70,7 @@
                 <div class="{{ $kolom }}">
                     <div class="flex flex-wrap items-center">
                         <button type="submit"
-                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                             <i class="fas fa-filter mr-1"></i>
                             Filter
                         </button>
@@ -161,7 +161,7 @@
                                 </td>
 
                                 <td rowspan="{{ $jumlahBaris }}"
-                                    class="px-[15px] py-3 align-middle font-bold text-[#6777ef]">
+                                    class="px-[15px] py-3 align-middle font-bold text-[#041C88]">
                                     {{ $jurnal->no_referensi }}
                                 </td>
                             @endif

@@ -38,7 +38,7 @@
         <h1 class="text-2xl font-bold text-[#34395e]">Data Pengguna</h1>
 
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
-            <li class="font-semibold text-[#6777ef]">Manajemen Pengguna</li>
+            <li class="font-semibold text-[#041C88]">Manajemen Pengguna</li>
             <li class="before:px-2 before:content-['/']">Data Pengguna</li>
         </ol>
     </div>
@@ -52,7 +52,7 @@
             </p>
 
             <button type="button" data-modal-open="modalTambahUser"
-                class="mb-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                class="mb-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                 <i class="fas fa-plus mr-1"></i>
                 Tambah User
             </button>
@@ -102,7 +102,7 @@
                 @php
                     $role = strtolower($user->role ?? '');
                     $kelasBadge = match ($role) {
-                        'admin pusat' => 'bg-[#6777ef]',
+                        'admin pusat' => 'bg-[#041C88]',
                         'admin cabang' => 'bg-[#3abaf4]',
                         default => 'bg-[#cdd3d8]',
                     };
@@ -137,7 +137,7 @@
 
                             {{-- Tombol edit: membuka modal edit, data diisi oleh JavaScript --}}
                             <button type="button" title="Edit Pengguna" aria-label="Edit pengguna {{ $user->name }}"
-                                class="btn-edit-user inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
+                                class="btn-edit-user inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
                                 data-id="{{ $user->id }}" data-url="{{ route('user.update', $user->id) }}"
                                 data-name="{{ $user->name }}" data-email="{{ $user->email }}"
                                 data-username="{{ $user->username }}" data-role="{{ $user->role }}"
@@ -182,7 +182,7 @@
     <dialog id="modalTambahUser" aria-labelledby="judulModalTambahUser" class="{{ $kelasDialog }}">
 
         {{-- HEADER MODAL --}}
-        <div class="flex items-center justify-between bg-[#6777ef] px-[25px] py-4">
+        <div class="flex items-center justify-between bg-[#041C88] px-[25px] py-4">
             <h5 id="judulModalTambahUser" class="text-lg font-semibold text-white">
                 <i class="fas fa-user-plus mr-2"></i>
                 Tambah Pengguna Baru
@@ -352,7 +352,7 @@
     {{-- ====================================================================== --}}
     <dialog id="modalEditUser" aria-labelledby="judulModalEditUser" class="{{ $kelasDialog }}">
 
-        <div class="flex items-center justify-between bg-[#6777ef] px-[25px] py-4">
+        <div class="flex items-center justify-between bg-[#041C88] px-[25px] py-4">
             <h5 id="judulModalEditUser" class="text-lg font-semibold text-white">
                 <i class="fas fa-user-edit mr-2"></i>
                 Edit Pengguna

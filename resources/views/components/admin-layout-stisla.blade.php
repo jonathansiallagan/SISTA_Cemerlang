@@ -68,7 +68,7 @@
         <div class="relative z-50 flex h-[70px] shrink-0">
 
             {{-- 1. LOGO (kiri atas) --}}
-            <div class="flex h-[70px] w-[var(--sidebar-w)] shrink-0 items-center bg-[#6777ef]">
+            <div class="flex h-[70px] w-[var(--sidebar-w)] shrink-0 items-center bg-[#041C88]">
 
                 {{-- Logo lengkap (desktop, sidebar terbuka) --}}
                 <a href="{{ url('/') }}"
@@ -101,7 +101,7 @@
             </div>
 
             {{-- 2. NAVBAR (kanan atas) --}}
-            <nav class="flex min-w-0 flex-1 items-center justify-between bg-[#6777ef] px-4 lg:px-[30px]">
+            <nav class="flex min-w-0 flex-1 items-center justify-between bg-[#041C88] px-4 lg:px-[30px]">
 
                 {{-- Tombol buka/tutup sidebar --}}
                 <button id="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar"
@@ -129,7 +129,7 @@
                         </div>
 
                         <a href="{{ route('profile') }}" role="menuitem"
-                            class="flex items-center gap-2.5 px-5 py-2 text-[13px] text-[#6c757d] transition-colors hover:bg-[#f8f9fa] hover:text-[#6777ef]">
+                            class="flex items-center gap-2.5 px-5 py-2 text-[13px] text-[#6c757d] transition-colors hover:bg-[#f8f9fa] hover:text-[#041C88]">
                             <i class="far fa-user w-4 text-center"></i> Profil
                         </a>
 
@@ -187,8 +187,8 @@
                                     @class([
                                         'flex h-[46px] items-center gap-3 px-6 text-[13px] font-semibold transition-colors',
                                         'lg:group-data-[mini=true]/layout:justify-center lg:group-data-[mini=true]/layout:px-0',
-                                        'bg-[#6777ef]/10 text-[#6777ef]' => $isActive,
-                                        'text-[#78828a] hover:bg-[#6777ef]/5 hover:text-[#6777ef]' => !$isActive,
+                                        'bg-[#041C88]/10 text-[#041C88]' => $isActive,
+                                        'text-[#78828a] hover:bg-[#041C88]/5 hover:text-[#041C88]' => !$isActive,
                                     ])>
                                     <i class="fas {{ $item['icon'] }} w-5 shrink-0 text-center text-sm"></i>
                                     <span

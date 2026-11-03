@@ -4,7 +4,7 @@
     <div class="w-full">
 
         {{-- ================= HEADER HALAMAN ================= --}}
-        <div class="-mx-5 -mt-8 mb-8 border-t-2 border-[#6777ef] bg-white px-8 py-6 md:-mx-8">
+        <div class="-mx-5 -mt-8 mb-8 border-t-2 border-[#041C88] bg-white px-8 py-6 md:-mx-8">
 
             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
 
@@ -13,7 +13,7 @@
                 </h1>
 
                 <div class="flex items-center gap-2 text-xs text-gray-500">
-                    <span class="font-medium text-[#6777ef]">Transaksi</span>
+                    <span class="font-medium text-[#041C88]">Transaksi</span>
                     <span>/</span>
                     <span>Riwayat Transaksi</span>
                 </div>
@@ -119,7 +119,7 @@
                                    id="tanggal_mulai"
                                    name="tanggal_mulai"
                                    value="{{ request('tanggal_mulai') }}"
-                                   class="w-full rounded-md border border-[#dce0ff] bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-[#6777ef] focus:ring-2 focus:ring-blue-100">
+                                   class="w-full rounded-md border border-[#dce0ff] bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-[#041C88] focus:ring-2 focus:ring-blue-100">
 
                         </div>
 
@@ -136,7 +136,7 @@
                                    id="tanggal_akhir"
                                    name="tanggal_akhir"
                                    value="{{ request('tanggal_akhir') }}"
-                                   class="w-full rounded-md border border-[#dce0ff] bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-[#6777ef] focus:ring-2 focus:ring-blue-100">
+                                   class="w-full rounded-md border border-[#dce0ff] bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-[#041C88] focus:ring-2 focus:ring-blue-100">
 
                         </div>
 
@@ -153,7 +153,7 @@
 
                                 <select id="cabang_id"
                                         name="cabang_id"
-                                        class="w-full rounded-md border border-[#dce0ff] bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-[#6777ef] focus:ring-2 focus:ring-blue-100">
+                                        class="w-full rounded-md border border-[#dce0ff] bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-[#041C88] focus:ring-2 focus:ring-blue-100">
 
                                     <option value="">Semua Cabang</option>
 
@@ -177,7 +177,7 @@
                         <div class="flex items-center gap-2">
 
                             <button type="submit"
-                                    class="inline-flex items-center rounded-md bg-[#6777ef] px-3 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-[#5665d8]">
+                                    class="inline-flex items-center rounded-md bg-[#041C88] px-3 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-[#5665d8]">
 
                                 <i class="fas fa-filter mr-2"></i>
                                 Filter
@@ -205,7 +205,7 @@
             <div class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
 
                 {{-- HEADER TABEL --}}
-                <div class="flex items-center gap-3 bg-[#6777ef] px-7 py-6 text-white">
+                <div class="flex items-center gap-3 bg-[#041C88] px-7 py-6 text-white">
 
                     <i class="fas fa-table"></i>
 
@@ -300,7 +300,7 @@
 
                                             {{-- NO REFERENSI --}}
                                             <td rowspan="{{ $jumlahBaris }}"
-                                                class="whitespace-nowrap border border-gray-300 px-4 py-4 align-middle font-semibold text-[#6777ef]">
+                                                class="whitespace-nowrap border border-gray-300 px-4 py-4 align-middle font-semibold text-[#041C88]">
 
                                                 {{ $trx->no_referensi }}
 
@@ -406,7 +406,7 @@
                                             {{ $nomorTransaksi }}
                                         </td>
 
-                                        <td class="whitespace-nowrap border border-gray-300 px-4 py-4 font-semibold text-[#6777ef]">
+                                        <td class="whitespace-nowrap border border-gray-300 px-4 py-4 font-semibold text-[#041C88]">
                                             {{ $trx->no_referensi }}
                                         </td>
 

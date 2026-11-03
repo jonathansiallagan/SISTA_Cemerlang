@@ -12,7 +12,7 @@
     <x-card-table title="{{ $akun->kode_akun }} - {{ $akun->nama_akun }}" icon="fa-book">
         
         {{-- KUSTOMISASI HEADER: Menambahkan Periode dan Tipe Akun di bawah Judul Standar --}}
-        <div class="bg-[#6777ef] px-[25px] pb-3 text-white border-t border-white/20">
+        <div class="bg-[#041C88] px-[25px] pb-3 text-white border-t border-white/20">
             <div class="flex flex-wrap items-center justify-between text-[13px]">
                 <div class="mb-2 md:mb-0">
                     <span class="opacity-80">Periode:</span> 
@@ -68,7 +68,7 @@
                 </td>
 
                 <td class="px-[15px] py-3 align-middle">
-                    <span class="font-bold text-[#6777ef]">
+                    <span class="font-bold text-[#041C88]">
                         {{ $detail->jurnal->no_referensi }}
                     </span>
                 </td>
@@ -115,7 +115,7 @@
                 {{ $rp($item['totalKredit']) }}
             </td>
 
-            <td class="px-[15px] py-3 text-right font-bold align-middle whitespace-nowrap text-[#6777ef]">
+            <td class="px-[15px] py-3 text-right font-bold align-middle whitespace-nowrap text-[#041C88]">
                 {{ $rp($item['saldoAkhir']) }}
                 <span class="text-[11px] font-normal text-[#6c757d]">({{ $item['sisiAkhir'] }})</span>
             </td>

@@ -8,7 +8,7 @@
         <ol class="ml-auto flex items-center text-[13px] text-[#6c757d]">
             <li>Persediaan</li>
             <li
-                class="font-semibold text-[#6777ef] before:px-2 before:font-normal before:text-[#6c757d] before:content-['/']">
+                class="font-semibold text-[#041C88] before:px-2 before:font-normal before:text-[#6c757d] before:content-['/']">
                 Persediaan Bahan Baku
             </li>
         </ol>
@@ -23,7 +23,7 @@
             </p>
 
             <button type="button" data-modal-open="modalTambahPembelian"
-                class="mb-2 inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                class="mb-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                 <i class="fas fa-plus mr-1"></i>
                 Tambah Pembelian
             </button>
@@ -55,7 +55,7 @@
             {{-- Jenis Bahan Baku --}}
             <div class="flex items-center rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
                 <div
-                    class="m-2.5 flex h-20 w-20 shrink-0 items-center justify-center rounded-[3px] bg-[#6777ef] text-[30px] text-white">
+                    class="m-2.5 flex h-20 w-20 shrink-0 items-center justify-center rounded-[3px] bg-[#041C88] text-[30px] text-white">
                     <i class="fas fa-boxes"></i>
                 </div>
                 <div class="min-w-0 flex-1 py-2.5 pr-5">
@@ -125,7 +125,7 @@
                     </td>
 
                     <td class="px-[15px] py-3 align-middle">
-                        <strong class="font-bold text-[#6777ef]">
+                        <strong class="font-bold text-[#041C88]">
                             {{ $bahan->kode_bahan }}
                         </strong>
                     </td>
@@ -194,7 +194,7 @@
         <div class="flex max-h-[85vh] flex-col">
 
             {{-- HEADER MODAL --}}
-            <div class="flex shrink-0 items-center justify-between bg-[#6777ef] px-[25px] py-4">
+            <div class="flex shrink-0 items-center justify-between bg-[#041C88] px-[25px] py-4">
                 <h5 id="judulModalPembelian" class="text-lg font-semibold text-white">
                     <i class="fas fa-shopping-cart mr-2"></i>
                     Tambah Pembelian Bahan Baku
@@ -241,7 +241,7 @@
                     {{-- INFORMASI PEMBELIAN --}}
                     <div class="mb-[30px] rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
                         <div class="flex min-h-[70px] items-center border-b border-[#f9f9f9] px-[25px] py-1">
-                            <h6 class="text-base font-semibold leading-7 text-[#6777ef]">
+                            <h6 class="text-base font-semibold leading-7 text-[#041C88]">
                                 <i class="fas fa-info-circle mr-2"></i>
                                 Informasi Pembelian
                             </h6>
@@ -301,13 +301,13 @@
                     <div class="rounded-[3px] bg-white shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
                         <div
                             class="flex min-h-[70px] flex-wrap items-center justify-between border-b border-[#f9f9f9] px-[25px] py-1">
-                            <h6 class="text-base font-semibold leading-7 text-[#6777ef]">
+                            <h6 class="text-base font-semibold leading-7 text-[#041C88]">
                                 Detail Bahan yang Dibeli
                             </h6>
 
                             <button type="button" id="btnTambahBaris"
                                 {{ $bahanBakus->where('status', 'aktif')->isEmpty() ? 'disabled' : '' }}
-                                class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65">
+                                class="inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65">
                                 <i class="fas fa-plus mr-1"></i>
                                 Tambah Baris
                             </button>
@@ -425,7 +425,7 @@
                                     <div class="flex items-center justify-between">
                                         <strong class="font-bold">Total Pembelian</strong>
 
-                                        <h5 class="text-base font-semibold text-[#6777ef]" id="totalPembelian">
+                                        <h5 class="text-base font-semibold text-[#041C88]" id="totalPembelian">
                                             Rp 0,00
                                         </h5>
                                     </div>
