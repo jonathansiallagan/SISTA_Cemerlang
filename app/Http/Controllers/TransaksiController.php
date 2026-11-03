@@ -423,27 +423,7 @@ class TransaksiController extends Controller
                 ->withInput();
         }
     }
-
-    public function formModal()
-    {
-        $user = $this->user();
-
-        if (!$user->isCustomerService()) {
-            abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
-        }
-
-        $produks = Produk::orderBy('nama_produk')->get();
-        $cabangs = Cabang::where('id', $user->cabang_id)->get();
-        $today = now()->format('Ymd');
-        $lastTransaksi = Transaksi::whereDate('created_at', now()->toDateString())->count();
-        $no_referensi = 'INV-' . $today . '-' . str_pad($lastTransaksi + 1, 4, '0', STR_PAD_LEFT);
-
-        return view(
-            'cs.transaksi.form',
-            compact('produks', 'cabangs', 'no_referensi')
-        );
-    }
-
+    
     /**
      * Ekspor PDF.
      */
