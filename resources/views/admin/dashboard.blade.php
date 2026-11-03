@@ -413,7 +413,6 @@
                             borderWidth: 2,
                             pointRadius: 3,
                             pointBackgroundColor: '#ffa426',
-                            borderDash: [5, 5], // Garis putus-putus agar beda
                             fill: false,
                             lineTension: 0.3
                         }

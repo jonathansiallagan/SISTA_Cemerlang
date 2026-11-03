@@ -74,10 +74,14 @@ class ProdukController extends Controller
     /**
      * Menampilkan daftar produk beserta komposisi bahan bakunya.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        $status = $request->query('status', 'aktif');
+
         $produks = $this->queryProduk()
+            ->where('status', $status)
             ->with('komposisi')
+            ->withCount('detailTransaksis')
             ->orderBy('nama_produk')
             ->get();
 
@@ -87,7 +91,8 @@ class ProdukController extends Controller
 
         return view('admin.produk.index', compact(
             'produks',
-            'bahanBakus'
+            'bahanBakus',
+            'status'
         ));
     }
 
@@ -156,14 +161,37 @@ class ProdukController extends Controller
      */
     public function destroy($id): RedirectResponse
     {
-        // Produk hanya bisa dihapus oleh pengguna dari cabang pemiliknya.
         $produk = $this->queryProduk()->findOrFail($id);
+
+        if ($produk->detailTransaksis()->exists()) {
+            return back()->with(
+                'error',
+                'Produk sudah dipakai dalam transaksi dan tidak bisa dihapus. Nonaktifkan saja.'
+            );
+        }
 
         $produk->delete();
 
         return redirect()
             ->route('produk.index')
-            ->with('success', 'Data produk berhasil dihapus secara aman!');
+            ->with('success', 'Data produk berhasil dihapus.');
+    }
+
+    /**
+     * Mengaktifkan atau menonaktifkan produk.
+     */
+    public function toggleStatus($id): RedirectResponse
+    {
+        $produk = $this->queryProduk()->findOrFail($id);
+
+        $produk->status = $produk->status === 'aktif' ? 'nonaktif' : 'aktif';
+        $produk->save();
+
+        $pesan = $produk->status === 'aktif'
+            ? 'Produk berhasil diaktifkan kembali.'
+            : 'Produk berhasil dinonaktifkan.';
+
+        return back()->with('success', $pesan);
     }
 
     /**
@@ -186,7 +214,6 @@ class ProdukController extends Controller
                 'max:255',
                 Rule::unique('produks', 'nama_produk')
                     ->where('cabang_id', $cabangId)
-                    ->whereNull('deleted_at')
                     ->ignore($produk?->id),
             ],
 
@@ -263,7 +290,7 @@ class ProdukController extends Controller
         $satuan = array_values($validated['satuan_pemakaian']);
 
         return collect(array_values($validated['bahan_baku_id']))
-            ->map(fn ($bahanBakuId, $i) => [
+            ->map(fn($bahanBakuId, $i) => [
                 'bahan_baku_id' => $bahanBakuId,
                 'jumlah_pemakaian' => $jumlah[$i],
                 'satuan_pemakaian' => $satuan[$i],

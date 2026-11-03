@@ -64,6 +64,19 @@
             </div>
         @endif
 
+        {{-- TAB FILTER STATUS --}}
+        <div class="mb-4 flex items-center gap-2">
+            <a href="{{ route('produk.index', ['status' => 'aktif']) }}"
+                class="inline-flex items-center rounded-[3px] px-3 py-1.5 text-xs font-semibold transition-colors {{ ($status ?? 'aktif') === 'aktif' ? 'bg-[#6777ef] text-white shadow' : 'bg-white text-[#6c757d] hover:bg-gray-100' }}">
+                <i class="fas fa-check-circle mr-1"></i> Produk Aktif
+            </a>
+
+            <a href="{{ route('produk.index', ['status' => 'nonaktif']) }}"
+                class="inline-flex items-center rounded-[3px] px-3 py-1.5 text-xs font-semibold transition-colors {{ ($status ?? 'aktif') === 'nonaktif' ? 'bg-[#6777ef] text-white shadow' : 'bg-white text-[#6c757d] hover:bg-gray-100' }}">
+                <i class="fas fa-ban mr-1"></i> Produk Nonaktif
+            </a>
+        </div>
+
         {{-- TABEL PRODUK --}}
         <x-card-table title="Daftar Produk" icon="fa-receipt">
 
@@ -95,37 +108,62 @@
 
                     {{-- AKSI --}}
                     <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
-                        <button type="button" title="Edit Produk"
-                            class="btn-edit-produk inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
-                            data-id="{{ $produk->id }}" data-url="{{ route('produk.update', $produk->id) }}"
-                            data-nama="{{ $produk->nama_produk }}" data-satuan="{{ $produk->satuan }}"
-                            data-upah="{{ $produk->upah_operator ?? 0 }}"
-                            data-komposisi="{{ $produk->komposisi->map(
-                                    fn($item) => [
-                                        'bahan_baku_id' => $item->bahan_baku_id,
-                                        'jumlah_pemakaian' => $item->jumlah_pemakaian,
-                                        'satuan_pemakaian' => $item->satuan_pemakaian,
-                                    ],
-                                )->values()->toJson(JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG) }}">
-                            <i class="fas fa-edit"></i>
-                        </button>
+                        <div class="flex justify-center gap-1">
+                            @if ($produk->status === 'aktif')
+                                {{-- Tombol Edit (Hanya muncul jika aktif) --}}
+                                <button type="button" title="Edit Produk"
+                                    class="btn-edit-produk inline-flex items-center rounded-[3px] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
+                                    data-id="{{ $produk->id }}" data-url="{{ route('produk.update', $produk->id) }}"
+                                    data-nama="{{ $produk->nama_produk }}" data-satuan="{{ $produk->satuan }}"
+                                    data-upah="{{ $produk->upah_operator ?? 0 }}"
+                                    data-komposisi="{{ $produk->komposisi->map(
+                                            fn($item) => [
+                                                'bahan_baku_id' => $item->bahan_baku_id,
+                                                'jumlah_pemakaian' => $item->jumlah_pemakaian,
+                                                'satuan_pemakaian' => $item->satuan_pemakaian,
+                                            ],
+                                        )->values()->toJson(JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG) }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
 
-                        <form action="{{ route('produk.destroy', $produk->id) }}" method="POST" class="inline"
-                            onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
-                            @csrf
-                            @method('DELETE')
-
-                            {{-- Tombol hapus --}}
-                            <button type="button"
-                                class="btn-hapus-produk inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]"
-                                data-confirm-url="{{ route('produk.destroy', $produk->id) }}"
-                                data-confirm-method="DELETE" data-confirm-theme="danger"
-                                data-confirm-title="Hapus Produk"
-                                data-confirm-message="Apakah Anda yakin ingin menghapus <strong>{{ $produk->nama_produk }}</strong>? Data ini tidak dapat dikembalikan."
-                                data-confirm-action="Hapus Data">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                                @if ($produk->detail_transaksis_count === 0)
+                                    {{-- Tombol Hapus (Hanya muncul jika belum pernah dipakai di transaksi) --}}
+                                    <button type="button" title="Hapus Produk"
+                                        class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160c]"
+                                        data-confirm-url="{{ route('produk.destroy', $produk->id) }}"
+                                        data-confirm-method="DELETE" data-confirm-theme="danger"
+                                        data-confirm-title="Hapus Produk"
+                                        data-confirm-message="Hapus produk <strong>{{ $produk->nama_produk }}</strong> secara permanen?"
+                                        data-confirm-action="Ya, Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                @else
+                                    {{-- Tombol Nonaktifkan (Hanya muncul jika belum pernah dipakai di transaksi) --}}
+                                    <button type="button" title="Nonaktifkan Produk"
+                                        class="inline-flex items-center rounded-[3px] bg-[#ffa426] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#ff9900]"
+                                        data-confirm-url="{{ route('produk.toggle-status', $produk->id) }}"
+                                        data-confirm-method="PATCH" data-confirm-theme="warning"
+                                        data-confirm-icon="fa-ban" data-confirm-btn-icon="fa-ban"
+                                        data-confirm-title="Nonaktifkan Produk"
+                                        data-confirm-message="Apakah Anda yakin ingin menonaktifkan <strong>{{ $produk->nama_produk }}</strong>? Produk tidak akan muncul di form transaksi baru."
+                                        data-confirm-action="Ya, Nonaktifkan">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                @endif
+                            @else
+                                {{-- Tombol Aktifkan Kembali (Jika berada di tab Nonaktif) --}}
+                                <button type="button" title="Aktifkan Produk"
+                                    class="inline-flex items-center rounded-[3px] bg-[#54ca68] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#45b658]"
+                                    data-confirm-url="{{ route('produk.toggle-status', $produk->id) }}"
+                                    data-confirm-method="PATCH" data-confirm-theme="success"
+                                    data-confirm-icon="fa-check-circle" data-confirm-btn-icon="fa-check"
+                                    data-confirm-title="Aktifkan Produk"
+                                    data-confirm-message="Aktifkan kembali produk <strong>{{ $produk->nama_produk }}</strong> ke dalam sistem?"
+                                    data-confirm-action="Ya, Aktifkan">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            @endif
+                        </div>
                     </td>
                 </tr>
             @empty
@@ -183,8 +221,9 @@
                         class="mb-2 inline-block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                         Nama Produk / Layanan <span class="text-[#fc544b]">*</span>
                     </label>
-                    <input type="text" id="modal_nama_produk" name="nama_produk" value="{{ old('nama_produk') }}"
-                        maxlength="255" placeholder="Contoh: Spanduk Flexi" required autofocus
+                    <input type="text" id="modal_nama_produk" name="nama_produk"
+                        value="{{ old('nama_produk') }}" maxlength="255" placeholder="Contoh: Spanduk Flexi"
+                        required autofocus
                         class="h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none @error('nama_produk') border-[#fc544b] @else border-[#e4e6fc] @enderror">
                     @error('nama_produk')
                         <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>

@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('produks', function (Blueprint $table) {
             $table->id();
             $table->string('nama_produk');
-            $table->string('satuan'); // Contoh: pcs, lembar, m2
+            $table->string('satuan');
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->decimal('harga_jual', 15, 2);
             $table->decimal('hpp', 15, 2);
             $table->timestamps();

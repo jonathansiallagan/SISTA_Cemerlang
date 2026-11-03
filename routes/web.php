@@ -78,6 +78,7 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
         Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
         Route::put('/produk/{id}', [ProdukController::class, 'update'])->name('produk.update');
         Route::delete('/produk/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy');
+        Route::patch('/produk/{id}/toggle-status', [ProdukController::class, 'toggleStatus'])->name('produk.toggle-status');
 
         // === ROUTE JURNAL UMUM ===
         Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
