@@ -4,11 +4,22 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Produk;
+use App\Models\Cabang;
+use App\Models\User;
 
 class ProdukSeeder extends Seeder
 {
     public function run(): void
     {
+        // Ambil data cabang dan user pertama dari database sebagai relasi default
+        $cabang = Cabang::first();
+        $user = User::first();
+
+        if (!$cabang || !$user) {
+            $this->command->warn('Harap jalankan CabangSeeder dan UserSeeder terlebih dahulu.');
+            return;
+        }
+
         $produks = [
             [
                 'nama_produk' => 'Spanduk Flexi',
@@ -55,11 +66,15 @@ class ProdukSeeder extends Seeder
         foreach ($produks as $produk) {
             Produk::updateOrCreate(
                 [
+                    // Pencarian unik berdasarkan nama produk DAN cabang
                     'nama_produk' => $produk['nama_produk'],
+                    'cabang_id' => $cabang->id,
                 ],
                 [
                     'satuan' => $produk['satuan'],
                     'upah_operator' => $produk['upah_operator'],
+                    'user_id' => $user->id,
+                    'status' => 'aktif', // Status default
                 ]
             );
         }

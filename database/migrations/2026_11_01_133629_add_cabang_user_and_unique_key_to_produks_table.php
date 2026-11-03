@@ -23,23 +23,14 @@ return new class extends Migration
                 ->after('cabang_id')
                 ->constrained('users')
                 ->restrictOnDelete();
-
-            // Composite Unique Key
-            $table->unique(
-                ['cabang_id', 'nama_produk'],
-                'produk_cabang_nama_unique'
-            );
         });
     }
 
     public function down(): void
     {
         Schema::table('produks', function (Blueprint $table) {
-            $table->dropUnique('produk_cabang_nama_unique');
-
             $table->dropForeign(['user_id']);
             $table->dropForeign(['cabang_id']);
-
             $table->dropColumn(['user_id', 'cabang_id']);
         });
     }
