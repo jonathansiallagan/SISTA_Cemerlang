@@ -17,16 +17,21 @@
         $kelasBantuan = 'mt-1 block text-xs text-[#6c757d]';
 
         // Tombol Batal: merah
-        $kelasBtnBatal = 'inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700';
+        $kelasBtnBatal =
+            'inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700';
 
         // Tombol Simpan: hijau
-        $kelasBtnUtama = 'inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600';
+        $kelasBtnUtama =
+            'inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600';
 
-        $kelasDialog = 'm-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40';
+        $kelasDialog =
+            'm-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-[800px] overflow-y-auto rounded-[3px] bg-white p-0 text-[13px] text-[#6c757d] shadow-[0_4px_25px_rgba(0,0,0,0.2)] backdrop:bg-black/40';
 
-        $kelasField = fn($bag, string $field) => $kelasInput . ' ' . ($bag->has($field) ? $kelasInputError : $kelasInputNormal);
+        $kelasField = fn($bag, string $field) => $kelasInput .
+            ' ' .
+            ($bag->has($field) ? $kelasInputError : $kelasInputNormal);
     @endphp
-    
+
     {{-- HEADER HALAMAN --}}
     <div
         class="mb-[30px] flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[3px] bg-white px-[30px] py-5 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
@@ -140,11 +145,13 @@
                                 <i class="fas fa-edit"></i>
                             </button>
 
-                            {{-- Tombol hapus: membuka modal konfirmasi (form hapus ada di modal) --}}
-                            <button type="button" title="Hapus Pengguna"
-                                aria-label="Hapus pengguna {{ $user->name }}"
-                                class="btn-hapus-user inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]"
-                                data-url="{{ route('user.destroy', $user->id) }}">
+                            {{-- Tombol hapus --}}
+                            <button type="button"
+                                class="btn-hapus-produk inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]"
+                                data-confirm-url="{{ route('user.destroy', $user->id) }}" data-confirm-method="DELETE"
+                                data-confirm-theme="danger" data-confirm-title="Hapus Pengguna"
+                                data-confirm-message="Apakah Anda yakin ingin menghapus <strong>{{ $user->name }}</strong>? Data ini tidak dapat dikembalikan."
+                                data-confirm-action="Hapus Data">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -329,9 +336,12 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnSimpanUser" class="{{ $kelasBtnUtama }}">
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Pengguna
+                <button type="button" id="btnSimpanUser" class="{{ $kelasBtnUtama }}"
+                    data-confirm-form="formTambahUser" data-confirm-theme="success"
+                    data-confirm-title="Simpan Pengguna"
+                    data-confirm-message="Apakah data hak akses pengguna sudah benar?"
+                    data-confirm-action="Simpan Pengguna">
+                    <i class="fas fa-save mr-1"></i> Simpan Pengguna
                 </button>
             </div>
         </form>
@@ -468,13 +478,13 @@
                     Batal
                 </button>
 
-                <button
-                    type="submit"
-                    id="btnUpdateBahan"
+                <button type="button" id="btnUpdateUser"
                     class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
-                >
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Perubahan
+                    data-confirm-form="formEditUser" data-confirm-theme="primary"
+                    data-confirm-title="Update Pengguna"
+                    data-confirm-message="Yakin ingin menyimpan perubahan pada akun ini?"
+                    data-confirm-action="Simpan Perubahan">
+                    <i class="fas fa-save mr-1"></i> Simpan Perubahan
                 </button>
             </div>
         </form>
@@ -649,35 +659,6 @@
             }
 
             // =========================================
-            // MENCEGAH PENGIRIMAN FORM BERULANG
-            // =========================================
-
-            function kunciPengiriman(form, tombol, teksProses) {
-                if (!form || !tombol) return;
-
-                const isiAwal = tombol.innerHTML;
-
-                form.addEventListener('submit', function(event) {
-                    if (event.defaultPrevented) return;
-
-                    tombol.disabled = true;
-
-                    tombol.innerHTML =
-                        '<i class="fas fa-spinner animate-spin mr-1"></i> ' +
-                        teksProses;
-                });
-
-                // Memulihkan tombol jika halaman dibuka kembali
-                // menggunakan tombol Back browser.
-                window.addEventListener('pageshow', function(event) {
-                    if (event.persisted) {
-                        tombol.disabled = false;
-                        tombol.innerHTML = isiAwal;
-                    }
-                });
-            }
-
-            // =========================================
             // KLIK BUKA DAN TUTUP MODAL
             // =========================================
 
@@ -803,38 +784,7 @@
             ].forEach(function(item) {
                 const form = item[0];
                 const pesan = item[1];
-
-                form.addEventListener('submit', function(event) {
-                    const action = form.getAttribute('action');
-
-                    if (!action || action === '#') {
-                        event.preventDefault();
-                        console.error(pesan);
-                    }
-                });
             });
-
-            // =========================================
-            // KUNCI TOMBOL KETIKA FORM DIKIRIM
-            // =========================================
-
-            kunciPengiriman(
-                formTambah,
-                document.getElementById('btnSimpanUser'),
-                'Menyimpan...'
-            );
-
-            kunciPengiriman(
-                formEdit,
-                document.getElementById('btnUpdateUser'),
-                'Memperbarui...'
-            );
-
-            kunciPengiriman(
-                formHapus,
-                document.getElementById('btnKonfirmasiHapus'),
-                'Menghapus...'
-            );
 
             // =========================================
             // MEMBUKA KEMBALI MODAL JIKA VALIDASI GAGAL

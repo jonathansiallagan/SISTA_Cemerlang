@@ -166,12 +166,13 @@
                         {{-- LOGOUT --}}
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
-                            <button type="submit"
-                                class="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-red-600 transition hover:bg-red-50">
-
-                                <i class="fa-solid fa-right-from-bracket w-5"></i>
-                                Keluar
+                            <button type="button" role="menuitem"
+                                class="flex w-full items-center gap-2.5 px-5 py-2 text-left text-[13px] text-[#fc544b] transition-colors hover:bg-[#f8f9fa]"
+                                data-confirm-url="{{ route('logout') }}" data-confirm-method="POST"
+                                data-confirm-theme="danger" data-confirm-title="Konfirmasi Keluar"
+                                data-confirm-message="Sesi akun Anda akan diakhiri. Anda harus memasukkan username dan kata sandi kembali untuk mengakses sistem."
+                                data-confirm-action="Ya, Keluar">
+                                <i class="fas fa-sign-out-alt w-4 text-center"></i> Keluar
                             </button>
                         </form>
                     </div>
@@ -211,8 +212,9 @@
         </footer>
     </div>
 
-    {{-- SCRIPT TAMBAHAN HALAMAN --}}
     @stack('scripts')
+
+    <x-modal-konfirmasi />
 
 </body>
 

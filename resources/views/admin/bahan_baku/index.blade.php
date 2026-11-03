@@ -53,7 +53,7 @@
         @endif
 
         {{-- TABEL BAHAN BAKU --}}
-        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
+        <x-card-table title="Daftar Bahan Baku" icon="fa-receipt">
 
             {{-- HEADER TABEL --}}
             <x-slot:head>
@@ -280,10 +280,12 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnSimpanBahan"
-                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Bahan Baku
+                <button type="button" id="btnSimpanBahan"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                    data-confirm-form="formTambahBahan" data-confirm-theme="success"
+                    data-confirm-title="Simpan Bahan Baku" data-confirm-message="Apakah data bahan baku sudah sesuai?"
+                    data-confirm-action="Simpan Data">
+                    <i class="fas fa-save mr-1"></i> Simpan Bahan Baku
                 </button>
             </div>
 
@@ -393,10 +395,13 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnUpdateBahan"
-                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Perubahan
+                <button type="button" id="btnUpdateBahan"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                    data-confirm-form="formEditBahan" data-confirm-theme="primary"
+                    data-confirm-title="Update Bahan Baku"
+                    data-confirm-message="Simpan perubahan untuk bahan baku ini?"
+                    data-confirm-action="Simpan Perubahan">
+                    <i class="fas fa-save mr-1"></i> Simpan Perubahan
                 </button>
             </div>
         </form>
@@ -442,15 +447,6 @@
                     return;
                 }
 
-                // Cegah pengiriman formulir berkali-kali.
-                form.addEventListener('submit', function() {
-                    if (tombolSimpan) {
-                        tombolSimpan.disabled = true;
-                        tombolSimpan.innerHTML =
-                            '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
-                    }
-                });
-
                 // Tampilkan kembali modal jika validasi gagal.
                 @if ($errors->any())
                     if (!modal.open) modal.showModal();
@@ -493,19 +489,6 @@
                         // Membuka modal menggunakan native API dialog
                         modal.showModal();
                     });
-                });
-
-                // Mencegah form dikirim jika URL update belum tersedia.
-                form.addEventListener('submit', function(event) {
-                    if (!form.action || form.action.endsWith('#')) {
-                        event.preventDefault();
-                        alert('URL update bahan baku belum tersedia.');
-                        return;
-                    }
-
-                    tombolUpdate.disabled = true;
-                    tombolUpdate.innerHTML =
-                        '<i class="fas fa-spinner fa-spin mr-1"></i> Memperbarui...';
                 });
 
                 // Buka kembali modal Edit jika validasi update gagal.

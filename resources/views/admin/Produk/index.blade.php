@@ -65,7 +65,7 @@
         @endif
 
         {{-- TABEL PRODUK --}}
-        <x-card-table title="Data Riwayat Pengeluaran" icon="fa-receipt">
+        <x-card-table title="Daftar Produk" icon="fa-receipt">
 
             {{-- HEADER TABEL --}}
             <x-slot:head>
@@ -115,9 +115,14 @@
                             @csrf
                             @method('DELETE')
 
-                            <button type="button" title="Hapus Produk"
+                            {{-- Tombol hapus --}}
+                            <button type="button"
                                 class="btn-hapus-produk inline-flex items-center rounded-[3px] bg-[#fc544b] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#fb160a]"
-                                data-url="{{ route('produk.destroy', $produk->id) }}">
+                                data-confirm-url="{{ route('produk.destroy', $produk->id) }}"
+                                data-confirm-method="DELETE" data-confirm-theme="danger"
+                                data-confirm-title="Hapus Produk"
+                                data-confirm-message="Apakah Anda yakin ingin menghapus <strong>{{ $produk->nama_produk }}</strong>? Data ini tidak dapat dikembalikan."
+                                data-confirm-action="Hapus Data">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
@@ -233,11 +238,8 @@
                         </small>
                     </div>
 
-                    <button
-                        type="button"
-                        id="modalTambahBarisBahan"
-                        class="inline-flex shrink-0 items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]"
-                    >
+                    <button type="button" id="modalTambahBarisBahan"
+                        class="inline-flex shrink-0 items-center rounded-[3px] border border-[#6777ef] bg-[#6777ef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-[#5665d8] hover:bg-[#5665d8]">
                         <i class="fas fa-plus mr-1"></i>
                         Tambah Bahan
                     </button>
@@ -257,10 +259,8 @@
                                 <strong class="modal-nomor-bahan font-bold text-[#34395e]">
                                     Bahan Baku {{ $i + 1 }}
                                 </strong>
-                                <button
-                                    type="button"
-                                    class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
-                                >
+                                <button type="button"
+                                    class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
                                     <i class="fas fa-trash mr-1"></i>
                                     Hapus
                                 </button>
@@ -323,15 +323,18 @@
             </div>
 
             <div class="flex shrink-0 items-center justify-end gap-2 border-t border-[#e3eaef] bg-[#f6f8fb] px-6 py-4">
-                <button
-                    type="button"
-                    data-modal-close
+                <button type="button" data-modal-close
                     class="inline-flex items-center gap-2 rounded-[3px] border border-red-600 bg-red-600 px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
                     <i class="fas fa-times"></i>
                     Batal
                 </button>
-                <button type="submit" id="modalSimpanProduk"
+
+                <button type="button" id="modalSimpanProduk"
                     class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                    data-confirm-form="formTambahProduk" data-confirm-theme="success"
+                    data-confirm-title="Simpan Produk"
+                    data-confirm-message="Apakah data produk dan komposisi bahan baku sudah benar?"
+                    data-confirm-action="Simpan Data">
                     <i class="fas fa-save mr-1"></i> Simpan Produk
                 </button>
             </div>
@@ -446,10 +449,8 @@
                             <strong class="edit-nomor-bahan font-bold text-[#34395e]">
                                 Bahan Baku 1
                             </strong>
-                            <button
-                                type="button"
-                                class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700"
-                            >
+                            <button type="button"
+                                class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
                                 <i class="fas fa-trash mr-1"></i>
                                 Hapus
                             </button>
@@ -505,46 +506,17 @@
                     <i class="fas fa-times mr-1"></i>
                     Batal
                 </button>
-                <button type="submit" id="btnUpdateProduk"
-                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-60">
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Perubahan
+
+                <button type="button" id="btnUpdateProduk"
+                    class="inline-flex items-center rounded-[3px] bg-[#6777ef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-60"
+                    data-confirm-form="formEditProduk" data-confirm-theme="primary"
+                    data-confirm-title="Update Produk"
+                    data-confirm-message="Yakin ingin menyimpan perubahan pada produk ini?"
+                    data-confirm-action="Simpan Perubahan">
+                    <i class="fas fa-save mr-1"></i> Simpan Perubahan
                 </button>
             </div>
         </form>
-    </dialog>
-
-    {{-- MODAL KONFIRMASI HAPUS --}}
-    <dialog id="modalHapusProduk"
-        class="m-auto max-w-[400px] rounded-[3px] bg-white p-0 shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop:bg-black/50 open:flex open:flex-col">
-        <div class="p-6 text-center">
-            {{-- Ikon Peringatan --}}
-            <div
-                class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#fc544b]/10 text-[#fc544b]">
-                <i class="fas fa-exclamation-triangle text-2xl"></i>
-            </div>
-
-            <h5 class="mb-2 text-lg font-bold text-[#34395e]">Konfirmasi Hapus</h5>
-            <p class="mb-6 text-sm text-[#6c757d]">
-                Apakah Anda yakin ingin menghapus produk ini? <br>Data akan diarsipkan dan tidak muncul lagi di sistem.
-            </p>
-
-            <form id="formHapusProduk" method="POST" action="">
-                @csrf
-                @method('DELETE')
-
-                <div class="flex justify-center gap-3">
-                    <button type="button" data-modal-close
-                        class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-4 py-2 text-sm font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
-                        Batal
-                    </button>
-                    <button type="submit" id="btnKonfirmasiHapus"
-                        class="inline-flex items-center rounded-[3px] bg-[#fc544b] px-4 py-2 text-sm font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#fb160a] disabled:cursor-not-allowed disabled:opacity-60">
-                        Ya, Hapus Produk
-                    </button>
-                </div>
-            </form>
-        </div>
     </dialog>
 
     @php
@@ -584,15 +556,6 @@
                     if (nomor) {
                         nomor.textContent = 'Bahan Baku ' + (index + 1);
                     }
-                });
-            }
-
-            function kunciTombolSimpan(form, tombol) {
-                if (!form || !tombol) return;
-
-                form.addEventListener('submit', function() {
-                    tombol.disabled = true;
-                    tombol.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
                 });
             }
 
@@ -654,11 +617,6 @@
                     perbaruiNomor(daftarTambah, '.modal-bahan-item', '.modal-nomor-bahan');
                 });
             }
-
-            kunciTombolSimpan(
-                document.getElementById('formTambahProduk'),
-                document.getElementById('modalSimpanProduk')
-            );
 
             // =========================================
             // MODAL EDIT PRODUK
@@ -758,33 +716,6 @@
 
                     modalEdit.showModal();
                 });
-            });
-
-            kunciTombolSimpan(formEdit, document.getElementById('btnUpdateProduk'));
-
-            // =========================================
-            // MODAL KONFIRMASI HAPUS
-            // =========================================
-            const modalHapus = document.getElementById('modalHapusProduk');
-            const formHapus = document.getElementById('formHapusProduk');
-
-            document.querySelectorAll('.btn-hapus-produk').forEach(function(tombol) {
-                tombol.addEventListener('click', function() {
-                    formHapus.action = this.dataset.url;
-
-                    modalHapus.showModal();
-                });
-            });
-
-            kunciTombolSimpan(formHapus, document.getElementById('btnKonfirmasiHapus'));
-
-            modalHapus.querySelectorAll('[data-modal-close]').forEach(function(tombol) {
-                tombol.addEventListener('click', function() {
-                    modalHapus.close();
-                });
-            });
-            modalHapus.addEventListener('click', function(event) {
-                if (event.target === modalHapus) modalHapus.close();
             });
 
             // =========================================

@@ -235,10 +235,12 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnSimpanCabang"
-                   class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Cabang
+                <button type="button" id="btnSimpanCabang"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                    data-confirm-form="formTambahCabang" data-confirm-theme="success"
+                    data-confirm-title="Simpan Cabang" data-confirm-message="Tambahkan cabang baru ke dalam sistem?"
+                    data-confirm-action="Simpan Cabang">
+                    <i class="fas fa-save mr-1"></i> Simpan Cabang
                 </button>
             </div>
 
@@ -354,10 +356,12 @@
                     Batal
                 </button>
 
-                <button type="submit" id="btnUpdateCabang"
-                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600">
-                    <i class="fas fa-save mr-1"></i>
-                    Simpan Perubahan
+                <button type="button" id="btnUpdateCabang"
+                    class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600"
+                    data-confirm-form="formEditCabang" data-confirm-theme="primary"
+                    data-confirm-title="Update Cabang" data-confirm-message="Simpan perubahan data cabang ini?"
+                    data-confirm-action="Simpan Perubahan">
+                    <i class="fas fa-save mr-1"></i> Simpan Perubahan
                 </button>
             </div>
 
@@ -403,28 +407,6 @@
                 kolomEdit.status.value = data.status || 'aktif';
 
                 formEdit.setAttribute('action', data.url || '#');
-            }
-
-            // Cegah form terkirim berkali-kali, dan pulihkan tombol bila
-            // halaman ditampilkan kembali dari cache (tombol Back browser).
-            function kunciPengiriman(form, tombol, teksProses) {
-                if (!tombol) return;
-
-                const isiAwal = tombol.innerHTML;
-
-                form.addEventListener('submit', function(event) {
-                    if (event.defaultPrevented) return;
-
-                    tombol.disabled = true;
-                    tombol.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> ' + teksProses;
-                });
-
-                window.addEventListener('pageshow', function(event) {
-                    if (event.persisted) {
-                        tombol.disabled = false;
-                        tombol.innerHTML = isiAwal;
-                    }
-                });
             }
 
             // =========================================
@@ -484,23 +466,6 @@
                     event.target.close();
                 }
             });
-
-            // =========================================
-            // PENGIRIMAN FORM
-            // =========================================
-
-            // Jangan kirim form edit jika URL update belum terisi.
-            formEdit.addEventListener('submit', function(event) {
-                const action = formEdit.getAttribute('action');
-
-                if (!action || action === '#') {
-                    event.preventDefault();
-                    console.error('URL update cabang belum ditentukan.');
-                }
-            });
-
-            kunciPengiriman(formTambah, document.getElementById('btnSimpanCabang'), 'Menyimpan...');
-            kunciPengiriman(formEdit, document.getElementById('btnUpdateCabang'), 'Memperbarui...');
 
             // =========================================
             // BUKA KEMBALI MODAL JIKA VALIDASI GAGAL
