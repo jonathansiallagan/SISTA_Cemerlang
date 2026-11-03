@@ -58,6 +58,21 @@
             const trigger = e.target.closest('[data-confirm-url], [data-confirm-form]');
             if (!trigger) return;
 
+            targetFormId = trigger.getAttribute('data-confirm-form');
+
+            if (targetFormId) {
+                const realForm = document.getElementById(targetFormId);
+
+                // Jika form ditemukan, cek validasinya
+                if (realForm) {
+                    if (!realForm.checkValidity()) {
+                        // Jika tidak valid, tampilkan pesan peringatan browser & batalkan modal
+                        realForm.reportValidity();
+                        return;
+                    }
+                }
+            }
+
             e.preventDefault();
 
             // Ambil data
