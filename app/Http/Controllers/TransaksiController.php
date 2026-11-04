@@ -57,21 +57,21 @@ class TransaksiController extends Controller
 
         // Terapkan filter tanggal menggunakan standar batas waktu (00:00:00 - 23:59:59)
         // Filter tanggal mulai jika diisi
-if ($request->filled('tanggal_mulai')) {
-    $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
-}
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
+        }
 
-// Filter tanggal akhir jika diisi
-if ($request->filled('tanggal_akhir')) {
-    $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
-}
+        // Filter tanggal akhir jika diisi
+        if ($request->filled('tanggal_akhir')) {
+            $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
+        }
 
         $transaksis = $query
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
             ->get();
 
-            
+
 
         $cabangs = $user->isCustomerService()
             ? Cabang::where('id', $user->cabang_id)->get()
@@ -99,7 +99,12 @@ if ($request->filled('tanggal_akhir')) {
             abort(403, 'Hanya Customer Service yang dapat membuat transaksi.');
         }
 
-        $produks = Produk::orderBy('nama_produk')->get();
+        // [PERBAIKAN] Hanya panggil produk yang terdaftar di cabang user login ini
+        $produks = Produk::where('cabang_id', $user->cabang_id)
+            ->where('status', 'aktif') // Opsional, agar CS hanya bisa memilih produk yang aktif
+            ->orderBy('nama_produk')
+            ->get();
+
         $cabangs = Cabang::where('id', $user->cabang_id)->get();
         $today = now()->format('Ymd');
 
@@ -117,7 +122,6 @@ if ($request->filled('tanggal_akhir')) {
             'no_referensi'
         ));
     }
-
 
     /**
      * Simpan transaksi, hitung HPP, kurangi stok, dan buat jurnal.
@@ -137,7 +141,12 @@ if ($request->filled('tanggal_akhir')) {
             'nomor_hp' => 'nullable|string|max:20',
 
             'produk_id' => 'required|array|min:1',
-            'produk_id.*' => 'required|integer|exists:produks,id',
+            'produk_id.*' => [
+                'required',
+                'integer',
+                \Illuminate\Validation\Rule::exists('produks', 'id')
+                    ->where('cabang_id', $user->cabang_id),
+            ],
 
             'jumlah' => 'required|array|min:1',
             'jumlah.*' => 'required|integer|min:1',
@@ -435,7 +444,7 @@ if ($request->filled('tanggal_akhir')) {
                 ->withInput();
         }
     }
-    
+
     /**
      * Ekspor PDF.
      */
