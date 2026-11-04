@@ -15,7 +15,6 @@ class JurnalController extends Controller
 {
     /**
      * Memastikan hanya Admin Pusat dan Admin Cabang
-     * yang dapat mengakses Jurnal Umum.
      */
     private function authorizeJurnal(): void
     {
@@ -36,15 +35,11 @@ class JurnalController extends Controller
 
     /**
      * Daftar jurnal.
-     * Admin Pusat melihat semua cabang.
-     * Admin Cabang hanya melihat jurnal cabangnya sendiri.
      */
-    
     public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Hanya Admin Pusat dan Admin Cabang yang boleh mengakses.
         abort_unless(
             $user && in_array(
                 $user->role,
@@ -58,49 +53,33 @@ class JurnalController extends Controller
             abort(403, 'Akun belum terhubung dengan cabang.');
         }
 
+        // Validasi dan Default Bulan Berjalan
         $request->validate([
             'start_date' => ['nullable', 'date'],
-            'end_date' => [
-                'nullable',
-                'date',
-                'after_or_equal:start_date',
-            ],
-            'cabang_id' => [
-                'nullable',
-                'integer',
-                'exists:cabangs,id',
-            ],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'cabang_id' => ['nullable', 'integer', 'exists:cabangs,id'],
         ]);
 
-        // Default periode bulan berjalan.
-        $startDate = $request->input(
-            'start_date',
-            now()->startOfMonth()->toDateString()
-        );
+        $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
+        $endDate   = $request->input('end_date', now()->endOfMonth()->toDateString());
 
-        $endDate = $request->input(
-            'end_date',
-            now()->endOfMonth()->toDateString()
-        );
-
+        // Penggunaan whereBetween dengan batasan jam (Best Practice #3)
         $query = Jurnal::with([
             'user',
             'cabang',
             'detailJurnals.akun',
             'transaksi.detailTransaksis.produk',
         ])
-            ->whereBetween('tanggal', [$startDate, $endDate]);
+            ->whereBetween('tanggal', [
+                \Carbon\Carbon::parse($startDate)->startOfDay(),
+                \Carbon\Carbon::parse($endDate)->endOfDay()
+            ]);
 
-        // Admin Cabang hanya melihat jurnal cabangnya sendiri.
         if ($user->role === 'Admin Cabang') {
             $query->where('cabang_id', $user->cabang_id);
         }
 
-        // Admin Pusat dapat memilih satu cabang atau semua cabang.
-        if (
-            $user->role === 'Admin Pusat'
-            && $request->filled('cabang_id')
-        ) {
+        if ($user->role === 'Admin Pusat' && $request->filled('cabang_id')) {
             $query->where('cabang_id', $request->input('cabang_id'));
         }
 
@@ -109,11 +88,8 @@ class JurnalController extends Controller
             ->latest('id')
             ->get();
 
-        // Data dropdown hanya dikirim untuk Admin Pusat.
         $cabangs = $user->role === 'Admin Pusat'
-            ? Cabang::where('status', 'aktif')
-                ->orderBy('nama')
-                ->get()
+            ? Cabang::where('status', 'aktif')->orderBy('nama')->get()
             : collect();
 
         return view('admin.jurnal.index', compact(

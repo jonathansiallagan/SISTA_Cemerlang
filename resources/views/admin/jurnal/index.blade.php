@@ -155,9 +155,10 @@
                                     class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
                                     {{ $nomorJurnal }}
                                 </td>
+                                
                                 <td rowspan="{{ $jumlahBaris }}"
                                     class="whitespace-nowrap px-[15px] py-3 align-middle">
-                                    {{ \Carbon\Carbon::parse($jurnal->tanggal)->format('d M Y') }}
+                                    {{ \Carbon\Carbon::parse($jurnal->tanggal)->translatedFormat('d F Y') }}
                                 </td>
 
                                 <td rowspan="{{ $jumlahBaris }}"
