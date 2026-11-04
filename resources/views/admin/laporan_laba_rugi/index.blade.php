@@ -115,9 +115,9 @@
                 <p class="text-[#6c757d]">
                     Periode:
                     <span class="font-bold text-[#191d21]">
-                        {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }}
+                        {{ \Carbon\Carbon::parse($start_date)->translatedFormat('d F Y') }}
                         s/d
-                        {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
+                        {{ \Carbon\Carbon::parse($end_date)->translatedFormat('d F Y') }}
                     </span>
                 </p>
             </div>
@@ -400,9 +400,7 @@
                                 data.cell.styles.fontStyle = 'bold';
                             } else if (/^(LABA BERSIH|RUGI BERSIH)$/.test(teks)) {
                                 data.cell.styles.fillColor =
-                                    teks === 'LABA BERSIH' ?
-                                    [37, 99, 235] :
-                                    [225, 29, 72];
+                                    teks === 'LABA BERSIH' ? [37, 99, 235] : [225, 29, 72];
 
                                 data.cell.styles.textColor = [255, 255, 255];
                                 data.cell.styles.fontStyle = 'bold';

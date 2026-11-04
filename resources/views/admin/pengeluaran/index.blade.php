@@ -145,7 +145,7 @@
                     </td>
 
                     <td class="whitespace-nowrap px-[15px] py-3">
-                        {{ $pengeluaran->tanggal->format('d M Y') }}
+                        {{ \Carbon\Carbon::parse($pengeluaran->tanggal)->translatedFormat('d F Y') }}
                     </td>
 
                     <td class="px-[15px] py-3">

@@ -4,21 +4,22 @@
     $sn = $akun->saldo_normal;
 
     // Format rupiah
-    $rp = fn ($n) => 'Rp ' . number_format((float) $n, 0, ',', '.');
+    $rp = fn($n) => 'Rp ' . number_format((float) $n, 0, ',', '.');
 @endphp
 
 <div class="mb-[30px]">
     {{-- MENGGUNAKAN KOMPONEN CARD-TABLE YANG SUDAH DIBUAT SEBELUMNYA --}}
     <x-card-table title="{{ $akun->kode_akun }} - {{ $akun->nama_akun }}" icon="fa-book">
-        
+
         {{-- KUSTOMISASI HEADER: Menambahkan Periode dan Tipe Akun di bawah Judul Standar --}}
         <div class="bg-[#041C88] px-[25px] pb-3 text-white border-t border-white/20">
             <div class="flex flex-wrap items-center justify-between text-[13px]">
                 <div class="mb-2 md:mb-0">
-                    <span class="opacity-80">Periode:</span> 
-                    <span class="font-semibold">{{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}</span>
+                    <span class="opacity-80">Periode:</span>
+                    <span class="font-semibold">{{ \Carbon\Carbon::parse($start_date)->translatedFormat('d F Y') }} s/d
+                        {{ \Carbon\Carbon::parse($end_date)->translatedFormat('d F Y') }}</span>
                 </div>
-                
+
                 <div class="flex flex-wrap gap-4">
                     <div>
                         <span class="opacity-80 block text-[11px]">Tipe Akun</span>
@@ -64,7 +65,7 @@
                 </td>
 
                 <td class="px-[15px] py-3 align-middle whitespace-nowrap">
-                    {{ \Carbon\Carbon::parse($detail->jurnal->tanggal)->format('d M Y') }}
+                    {{ \Carbon\Carbon::parse($detail->jurnal->tanggal)->translatedFormat('d F Y') }}
                 </td>
 
                 <td class="px-[15px] py-3 align-middle">

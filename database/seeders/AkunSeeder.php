@@ -15,6 +15,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Kas',
                 'tipe_akun' => 'Aset',
                 'kelompok_akun' => 'Aset',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -22,6 +23,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Bank',
                 'tipe_akun' => 'Aset',
                 'kelompok_akun' => 'Aset',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -29,6 +31,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Persediaan',
                 'tipe_akun' => 'Aset',
                 'kelompok_akun' => 'Aset',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -36,6 +39,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Pendapatan Penjualan',
                 'tipe_akun' => 'Pendapatan',
                 'kelompok_akun' => 'Pendapatan Usaha',
+                'saldo_normal' => 'Kredit',
                 'status' => 'aktif',
             ],
             [
@@ -43,6 +47,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Harga Pokok Produksi',
                 'tipe_akun' => 'Beban/Biaya',
                 'kelompok_akun' => 'HPP',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -50,6 +55,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Beban Gaji/Upah',
                 'tipe_akun' => 'Beban/Biaya',
                 'kelompok_akun' => 'Beban Operasional',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -57,6 +63,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Beban Listrik dan Air',
                 'tipe_akun' => 'Beban/Biaya',
                 'kelompok_akun' => 'Beban Operasional',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -64,6 +71,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Beban Transportasi',
                 'tipe_akun' => 'Beban/Biaya',
                 'kelompok_akun' => 'Beban Operasional',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -71,6 +79,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Beban Promosi',
                 'tipe_akun' => 'Beban/Biaya',
                 'kelompok_akun' => 'Beban Operasional',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -78,6 +87,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Beban Administrasi',
                 'tipe_akun' => 'Beban/Biaya',
                 'kelompok_akun' => 'Beban Operasional',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
             [
@@ -85,6 +95,7 @@ class AkunSeeder extends Seeder
                 'nama_akun' => 'Beban Pemeliharaan',
                 'tipe_akun' => 'Beban/Biaya',
                 'kelompok_akun' => 'Beban Operasional',
+                'saldo_normal' => 'Debit',
                 'status' => 'aktif',
             ],
         ];

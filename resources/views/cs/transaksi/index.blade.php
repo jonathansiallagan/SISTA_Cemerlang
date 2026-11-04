@@ -86,24 +86,22 @@
 
                         {{-- TANGGAL MULAI --}}
                         <div>
-                            <label for="tanggal_mulai"
-                                class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                            <label for="start_date"
+                                class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                                 Tanggal Mulai
                             </label>
-                            <input type="date" id="tanggal_mulai" name="tanggal_mulai"
-                                value="{{ request('tanggal_mulai') }}"
-                                class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-xs text-gray-800 dark:text-gray-100 outline-none transition focus:border-[#041C88] dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30">
+                            <input type="date" id="start_date" name="start_date" value="{{ $startDate }}"
+                                class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
                         </div>
 
                         {{-- TANGGAL AKHIR --}}
                         <div>
-                            <label for="tanggal_akhir"
-                                class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                            <label for="end_date"
+                                class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                                 Tanggal Akhir
                             </label>
-                            <input type="date" id="tanggal_akhir" name="tanggal_akhir"
-                                value="{{ request('tanggal_akhir') }}"
-                                class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-xs text-gray-800 dark:text-gray-100 outline-none transition focus:border-[#041C88] dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30">
+                            <input type="date" id="end_date" name="end_date" value="{{ $endDate }}"
+                                class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
                         </div>
 
                         {{-- FILTER CABANG ADMIN PUSAT --}}

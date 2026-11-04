@@ -62,19 +62,19 @@
 
                 {{-- TANGGAL MULAI --}}
                 <div>
-                    <label for="tanggal_mulai" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                    <label for="start_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                         Tanggal Mulai
                     </label>
-                    <input type="date" id="tanggal_mulai" name="tanggal_mulai" value="{{ request('tanggal_mulai') }}"
+                    <input type="date" id="start_date" name="start_date" value="{{ $startDate }}"
                         class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
                 </div>
 
                 {{-- TANGGAL AKHIR --}}
                 <div>
-                    <label for="tanggal_akhir" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
+                    <label for="end_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                         Tanggal Akhir
                     </label>
-                    <input type="date" id="tanggal_akhir" name="tanggal_akhir" value="{{ request('tanggal_akhir') }}"
+                    <input type="date" id="end_date" name="end_date" value="{{ $endDate }}"
                         class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
                 </div>
 

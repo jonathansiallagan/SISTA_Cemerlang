@@ -24,6 +24,16 @@ class TransaksiController extends Controller
     {
         $user = $this->user();
 
+        // Validasi input tanggal
+        $request->validate([
+            'start_date' => ['nullable', 'date'],
+            'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        // Default menampilkan transaksi HARI INI
+        $startDate = $request->input('start_date', now()->toDateString());
+        $endDate   = $request->input('end_date', now()->toDateString());
+
         $query = Transaksi::with([
             'user',
             'cabang',
@@ -38,20 +48,17 @@ class TransaksiController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
                 $q->where('no_referensi', 'like', "%{$search}%")
                     ->orWhere('nama_pelanggan', 'like', "%{$search}%");
             });
         }
 
-        if ($request->filled('tanggal_mulai')) {
-            $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
-        }
-
-        if ($request->filled('tanggal_akhir')) {
-            $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
-        }
+        // Terapkan filter tanggal menggunakan standar batas waktu (00:00:00 - 23:59:59)
+        $query->whereBetween('tanggal', [
+            \Carbon\Carbon::parse($startDate)->startOfDay(),
+            \Carbon\Carbon::parse($endDate)->endOfDay()
+        ]);
 
         $transaksis = $query
             ->orderByDesc('tanggal')
@@ -62,16 +69,13 @@ class TransaksiController extends Controller
             ? Cabang::where('id', $user->cabang_id)->get()
             : Cabang::orderBy('nama')->get();
 
-        if ($user->isCustomerService()) {
-            return view('cs.transaksi.index', compact(
-                'transaksis',
-                'cabangs'
-            ));
-        }
+        $view = $user->isCustomerService() ? 'cs.transaksi.index' : 'admin.transaksi.index';
 
-        return view('admin.transaksi.index', compact(
+        return view($view, compact(
             'transaksis',
-            'cabangs'
+            'cabangs',
+            'startDate',
+            'endDate'
         ));
     }
 
@@ -431,6 +435,15 @@ class TransaksiController extends Controller
     {
         $user = $this->user();
 
+        // Pastikan validasi dan default ekspor sama dengan method index
+        $request->validate([
+            'start_date' => ['nullable', 'date'],
+            'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        $startDate = $request->input('start_date', now()->toDateString());
+        $endDate   = $request->input('end_date', now()->toDateString());
+
         $query = Transaksi::with([
             'user',
             'cabang',
@@ -445,32 +458,27 @@ class TransaksiController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
                 $q->where('no_referensi', 'like', "%{$search}%")
                     ->orWhere('nama_pelanggan', 'like', "%{$search}%");
             });
         }
 
-        if ($request->filled('tanggal_mulai')) {
-            $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
-        }
-
-        if ($request->filled('tanggal_akhir')) {
-            $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
-        }
+        $query->whereBetween('tanggal', [
+            \Carbon\Carbon::parse($startDate)->startOfDay(),
+            \Carbon\Carbon::parse($endDate)->endOfDay()
+        ]);
 
         $transaksis = $query
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
             ->get();
 
-        // Nama file dinamis dengan tanggal & jam
         $namaFile = 'riwayat-transaksi-' . now()->format('Ymd-His') . '.pdf';
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
-            'cs.transaksi.pdf', // Path view sudah diperbarui ke folder CS
-            compact('transaksis')
+            'cs.transaksi.pdf',
+            compact('transaksis', 'startDate', 'endDate')
         )->setPaper('a4', 'landscape');
 
         return $pdf->download($namaFile);
