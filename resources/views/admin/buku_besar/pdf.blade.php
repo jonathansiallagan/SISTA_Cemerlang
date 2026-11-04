@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Laporan Buku Besar</title>
@@ -34,7 +35,8 @@
             margin-bottom: 15px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #999;
             padding: 5px;
         }
@@ -59,7 +61,8 @@
     <h2>LAPORAN BUKU BESAR</h2>
 
     <p class="periode">
-        Periode: {{ $start_date }} s/d {{ $end_date }}
+        Periode: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('d F Y') }} s/d
+        {{ \Carbon\Carbon::parse($end_date)->translatedFormat('d F Y') }}
     </p>
 
     @forelse ($laporan as $item)
@@ -95,7 +98,7 @@
                 @foreach ($item['baris'] as $detail)
                     <tr>
                         <td>
-                            {{ $detail->jurnal?->tanggal }}
+                            {{ \Carbon\Carbon::parse($detail->jurnal?->tanggal)->translatedFormat('d F Y') }}
                         </td>
 
                         <td>
@@ -159,4 +162,5 @@
         </tr>
     </table>
 </body>
+
 </html>
