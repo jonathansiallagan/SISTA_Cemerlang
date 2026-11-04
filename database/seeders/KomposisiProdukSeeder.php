@@ -13,6 +13,9 @@ class KomposisiProdukSeeder extends Seeder
     public function run(): void
     {
         $komposisi = [
+            // ==========================================
+            // PRODUK UMUM (Ada di semua cabang)
+            // ==========================================
             'Spanduk Flexi' => [
                 ['Flexi Banner', 1, 'm2'],
                 ['Tinta Printing', 0.03, 'liter'],
@@ -51,6 +54,62 @@ class KomposisiProdukSeeder extends Seeder
 
             'Sablon Kaos' => [
                 ['Tinta Sablon', 0.05, 'liter'],
+            ],
+
+            // ==========================================
+            // PRODUK UNIK CABANG 1 (Pusat)
+            // ==========================================
+            'Brosur Premium' => [
+                ['Kertas Art Paper', 1, 'lembar'],
+                ['Tinta Printer', 0.005, 'liter'],
+            ],
+            'Plakat Akrilik' => [
+                ['Akrilik', 0.05, 'm2'],
+            ],
+            'ID Card PVC' => [
+                ['Kertas Art Paper', 0.2, 'lembar'],
+                ['Tinta Printer', 0.001, 'liter'],
+            ],
+            'Kalender Dinding' => [
+                ['Kertas Art Paper', 5, 'lembar'],
+                ['Tinta Printer', 0.02, 'liter'],
+            ],
+
+            // ==========================================
+            // PRODUK UNIK CABANG 2 (Pekanbaru)
+            // ==========================================
+            'Sablon Kaos' => [
+                ['Tinta Sablon', 0.05, 'liter'],
+            ],
+            'Mug Custom' => [
+                ['Tinta Sablon', 0.01, 'liter'],
+            ],
+            'Pin Peniti' => [
+                ['Kertas Art Paper', 0.1, 'lembar'],
+            ],
+            'Gantungan Kunci' => [
+                ['Akrilik', 0.01, 'm2'],
+            ],
+
+            // ==========================================
+            // PRODUK UNIK CABANG 3 (Kerinci)
+            // ==========================================
+            'Yasin Hardcover' => [
+                ['Kertas Isi Yasin', 100, 'lembar'],
+                ['Sampul Yasin', 1, 'pcs'],
+                ['Toner Printer', 15, 'gram'],
+            ],
+            'Buku Nota' => [
+                ['Kertas HVS F4', 0.1, 'rim'],
+                ['Tinta Printer', 0.02, 'liter'],
+            ],
+            'Sertifikat' => [
+                ['Kertas Art Paper', 1, 'lembar'],
+                ['Tinta Printer', 0.002, 'liter'],
+            ],
+            'Kop Surat' => [
+                ['Kertas A4', 1, 'rim'],
+                ['Tinta Printer', 0.05, 'liter'],
             ],
         ];
 
