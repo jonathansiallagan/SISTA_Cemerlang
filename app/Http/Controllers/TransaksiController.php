@@ -427,7 +427,7 @@ class TransaksiController extends Controller
                 ->withInput();
         }
     }
-
+    
     /**
      * Ekspor PDF.
      */
