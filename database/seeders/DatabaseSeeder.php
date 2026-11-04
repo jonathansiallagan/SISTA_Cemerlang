@@ -15,59 +15,96 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Buat Data Cabang Dummy
-        $cabang = Cabang::create([
-            'nama' => 'Cabang Utama',
+        // Simpan ke variabel berbeda agar ID-nya bisa diambil secara akurat
+
+        $pusat = Cabang::create([
+            'nama' => 'Kantor Pusat',
             'alamat' => 'Jl. Sudirman No. 123',
             'no_hp' => '081234567890',
             'status' => 'aktif',
         ]);
 
-        $cabang = Cabang::create([
-            'nama' => 'Pekanbaru',
+        $cabangPekanbaru = Cabang::create([
+            'nama' => 'Cabang Pekanbaru',
             'alamat' => 'Ruko Cemerlang, Jl. Riau No. 456',
             'no_hp' => '081234567891',
             'status' => 'aktif',
         ]);
 
-        $cabang = Cabang::create([
-            'nama' => 'Kerinci',
+        $cabangKerinci = Cabang::create([
+            'nama' => 'Cabang Kerinci',
             'alamat' => 'Jl. Merdeka No. 789',
-            'no_hp' => '081234567891',
+            'no_hp' => '081234567892', // nomor dibedakan sedikit
             'status' => 'aktif',
         ]);
 
-        // 2. Buat Data User Dummy
-        // A. Admin Pusat
+        // Siapkan default password untuk semua user agar lebih rapi
+        $defaultPassword = Hash::make('password');
+
+
+        // 2. Buat Data User Dummy (1 Admin & 1 CS untuk setiap cabang)
+
+        // --- A. AKUN KANTOR PUSAT ---
         User::create([
-            'name' => 'Administrator',
+            'name' => 'Admin Pusat Utama',
             'email' => 'admin@contoh.com',
-            'username' => 'admin',
-            'password' => Hash::make('password'),
+            'username' => 'adminpusat',
+            'password' => $defaultPassword,
             'role' => 'Admin Pusat',
-            'cabang_id' => $cabang->id,
+            'cabang_id' => $pusat->id,
         ]);
 
-        // B. Admin Cabang
         User::create([
-            'name' => 'Admin Cabang',
-            'email' => 'admin.cabang@contoh.php',
-            'username' => 'admin_cabang',
-            'password' => Hash::make('password'),
-            'role' => 'Admin Cabang',
-            'cabang_id' => $cabang->id,
-        ]);
-
-        // C. Customer Service
-        User::create([
-            'name' => 'Customer Service',
-            'email' => 'cs@contoh.com',
-            'username' => 'customer_service',
-            'password' => Hash::make('password'),
+            'name' => 'CS Pusat',
+            'email' => 'cs.pusat@contoh.com',
+            'username' => 'cspusat',
+            'password' => $defaultPassword,
             'role' => 'Customer Service',
-            'cabang_id' => $cabang->id,
+            'cabang_id' => $pusat->id,
         ]);
 
-        // Seeder Akun
+
+        // --- B. AKUN CABANG PEKANBARU ---
+        User::create([
+            'name' => 'Admin Pekanbaru',
+            'email' => 'admin.pku@contoh.com',
+            'username' => 'adminpku',
+            'password' => $defaultPassword,
+            'role' => 'Admin Cabang',
+            'cabang_id' => $cabangPekanbaru->id,
+        ]);
+
+        User::create([
+            'name' => 'CS Pekanbaru',
+            'email' => 'cs.pku@contoh.com',
+            'username' => 'cspku',
+            'password' => $defaultPassword,
+            'role' => 'Customer Service',
+            'cabang_id' => $cabangPekanbaru->id,
+        ]);
+
+
+        // --- C. AKUN CABANG KERINCI ---
+        User::create([
+            'name' => 'Admin Kerinci',
+            'email' => 'admin.kerinci@contoh.com',
+            'username' => 'adminkerinci',
+            'password' => $defaultPassword,
+            'role' => 'Admin Cabang',
+            'cabang_id' => $cabangKerinci->id,
+        ]);
+
+        User::create([
+            'name' => 'CS Kerinci',
+            'email' => 'cs.kerinci@contoh.com',
+            'username' => 'cskerinci',
+            'password' => $defaultPassword,
+            'role' => 'Customer Service',
+            'cabang_id' => $cabangKerinci->id,
+        ]);
+
+
+        // 3. Seeder Lainnya
         $this->call([
             AkunSeeder::class,
             BahanBakuSeeder::class,
@@ -76,6 +113,5 @@ class DatabaseSeeder extends Seeder
             TransaksiSeeder::class,
             PengeluaranSeeder::class,
         ]);
-    
     }
 }
