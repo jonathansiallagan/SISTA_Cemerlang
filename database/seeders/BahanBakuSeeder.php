@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\BahanBaku; // Tambahkan namespace model
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class BahanBakuSeeder extends Seeder
 {
@@ -192,12 +192,11 @@ class BahanBakuSeeder extends Seeder
             ],
         ];
 
+        // Murni menggunakan Model Eloquent agar standar dengan seeder lainnya
         foreach ($bahanBakus as $bahan) {
-            DB::table('bahan_baku')->updateOrInsert(
+            BahanBaku::updateOrCreate(
                 ['kode_bahan' => $bahan['kode_bahan']],
-                array_merge($bahan, [
-                    'updated_at' => now(),
-                ])
+                $bahan
             );
         }
     }

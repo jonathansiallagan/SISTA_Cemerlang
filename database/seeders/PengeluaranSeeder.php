@@ -11,99 +11,80 @@ class PengeluaranSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Ambil ID relasi Master
-        $cabangIds = DB::table('cabangs')->pluck('id')->all();
-        $userIds = DB::table('users')->pluck('id')->all();
+        $cabangs = DB::table('cabangs')->get();
 
-        if (empty($cabangIds) || empty($userIds)) {
-            $this->command->error('Data cabang dan user harus ada terlebih dahulu.');
+        if ($cabangs->isEmpty()) {
+            $this->command->error('Data cabang harus ada terlebih dahulu.');
             return;
         }
 
-        // 2. Ambil ID Akun untuk Kas dan Beban
         $akunKas = DB::table('akuns')->where('nama_akun', 'like', '%Kas%')->first();
-        // Mengambil semua akun beban operasional berdasarkan Seeder Akun Anda
-        $akunBebans = DB::table('akuns')
-            ->where('nama_akun', 'like', '%Beban%')
-            ->orWhere('nama_akun', 'like', '%Biaya%')
-            ->get();
+        $akunBebans = DB::table('akuns')->where('nama_akun', 'like', '%Beban%')->orWhere('nama_akun', 'like', '%Biaya%')->get();
 
         if (!$akunKas || $akunBebans->isEmpty()) {
             throw new RuntimeException('Data Master Akun Kas atau Beban tidak ditemukan.');
         }
 
         $jumlahDibuat = 0;
+        $counterGlobal = 1;
         $satuans = ['Unit', 'Bulan', 'Lembar', 'Paket', 'Liter'];
 
-        for ($i = 1; $i <= 5; $i++) {
-            $waktu = Carbon::now()->subDays($i * 2);
-            $tanggal = $waktu->toDateString();
-            $noReferensi = 'PNG-' . $waktu->format('Ymd') . '-' . str_pad($i, 3, '0', STR_PAD_LEFT);
+        // Loop setiap cabang
+        foreach ($cabangs as $cabang) {
+            $userIds = DB::table('users')->where('cabang_id', $cabang->id)->pluck('id')->all();
 
-            $cabangIdTerpilih = $cabangIds[array_rand($cabangIds)];
-            $userIdTerpilih = $userIds[array_rand($userIds)];
+            if (empty($userIds)) continue;
 
-            // Pilih satu akun beban secara acak dari database
-            $akunBebanTerpilih = $akunBebans->random();
+            // Buat 10 Pengeluaran untuk cabang ini
+            for ($i = 1; $i <= 10; $i++) {
+                $waktu = Carbon::now()->subDays(rand(1, 30)); // Waktu acak sebulan terakhir
+                $tanggal = $waktu->toDateString();
 
-            // Kalkulasi detail pengeluaran sesuai kolom baru (qty, harga, total_pengeluaran)
-            $qty = rand(1, 5);
-            $harga = rand(5, 50) * 10000; // Contoh: 50.000 hingga 500.000
-            $totalPengeluaran = $qty * $harga;
-            $satuanTerpilih = $satuans[array_rand($satuans)];
+                // Format unik: PNG-C{ID Cabang}-TANGGAL-URUTAN
+                $noReferensi = 'PNG-C' . $cabang->id . '-' . $waktu->format('Ymd') . '-' . str_pad($counterGlobal, 3, '0', STR_PAD_LEFT);
+                $userIdTerpilih = $userIds[array_rand($userIds)];
+                $akunBebanTerpilih = $akunBebans->random();
 
-            // 3. INSERT HEADER PENGELUARAN (Sesuai kolom asli di file Model/Migrasi)
-            DB::table('pengeluarans')->insert([
-                'no_referensi' => $noReferensi,
-                'tanggal' => $tanggal,
-                'cabang_id' => $cabangIdTerpilih,
-                'akun_id' => $akunBebanTerpilih->id,
-                'keterangan' => 'Pembayaran ' . $akunBebanTerpilih->nama_akun . ' simulasi',
-                'qty' => $qty,
-                'satuan' => $satuanTerpilih,
-                'harga' => $harga,
-                'total_pengeluaran' => $totalPengeluaran,
-                'user_id' => $userIdTerpilih,
-                'created_at' => $waktu,
-                'updated_at' => $waktu,
-            ]);
+                $qty = rand(1, 5);
+                $harga = rand(5, 50) * 10000;
+                $totalPengeluaran = $qty * $harga;
+                $satuanTerpilih = $satuans[array_rand($satuans)];
 
-            // 4. INSERT HEADER JURNAL
-            $jurnalId = DB::table('jurnals')->insertGetId([
-                'no_referensi' => $noReferensi,
-                'tanggal' => $tanggal,
-                'keterangan' => 'Pencatatan ' . $akunBebanTerpilih->nama_akun,
-                'cabang_id' => $cabangIdTerpilih,
-                'user_id' => $userIdTerpilih,
-                'created_at' => $waktu,
-                'updated_at' => $waktu,
-            ]);
-
-            // 5. INSERT DETAIL JURNAL (DEBIT: Beban, KREDIT: Kas) menggunakan nominal total_pengeluaran
-            DB::table('detail_jurnals')->insert([
-                [
-                    'jurnal_id' => $jurnalId,
+                DB::table('pengeluarans')->insert([
+                    'no_referensi' => $noReferensi,
+                    'tanggal' => $tanggal,
+                    'cabang_id' => $cabang->id,
                     'akun_id' => $akunBebanTerpilih->id,
-                    'keterangan' => 'Beban - ' . $noReferensi,
-                    'debit' => $totalPengeluaran,
-                    'kredit' => 0,
+                    'keterangan' => 'Pembayaran ' . $akunBebanTerpilih->nama_akun . ' (Simulasi)',
+                    'qty' => $qty,
+                    'satuan' => $satuanTerpilih,
+                    'harga' => $harga,
+                    'total_pengeluaran' => $totalPengeluaran,
+                    'user_id' => $userIdTerpilih,
                     'created_at' => $waktu,
                     'updated_at' => $waktu,
-                ],
-                [
-                    'jurnal_id' => $jurnalId,
-                    'akun_id' => $akunKas->id,
-                    'keterangan' => 'Pembayaran Beban - ' . $noReferensi,
-                    'debit' => 0,
-                    'kredit' => $totalPengeluaran,
-                    'created_at' => $waktu,
-                    'updated_at' => $waktu,
-                ]
-            ]);
+                ]);
 
-            $jumlahDibuat++;
+                $jurnalId = DB::table('jurnals')->insertGetId([
+                    'no_referensi' => $noReferensi,
+                    'tanggal' => $tanggal,
+                    'keterangan' => 'Pencatatan ' . $akunBebanTerpilih->nama_akun,
+                    'cabang_id' => $cabang->id,
+                    'user_id' => $userIdTerpilih,
+                    'created_at' => $waktu,
+                    'updated_at' => $waktu,
+                ]);
+
+                DB::table('detail_jurnals')->insert([
+                    ['jurnal_id' => $jurnalId, 'akun_id' => $akunBebanTerpilih->id, 'keterangan' => 'Beban', 'debit' => $totalPengeluaran, 'kredit' => 0, 'created_at' => $waktu, 'updated_at' => $waktu],
+                    ['jurnal_id' => $jurnalId, 'akun_id' => $akunKas->id, 'keterangan' => 'Kas', 'debit' => 0, 'kredit' => $totalPengeluaran, 'created_at' => $waktu, 'updated_at' => $waktu]
+                ]);
+
+                $jumlahDibuat++;
+                $counterGlobal++;
+            }
         }
 
-        $this->command->info("Seeder selesai. {$jumlahDibuat} data pengeluaran & jurnal berhasil dibuat tanpa error.");
+        $this->command->info("Seeder selesai. {$jumlahDibuat} data pengeluaran berhasil dibuat per-cabang.");
     }
 }

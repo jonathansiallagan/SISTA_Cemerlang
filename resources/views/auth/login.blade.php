@@ -75,6 +75,7 @@
                     </label>
                     <input type="text" name="username" id="username" value="{{ old('username') }}"
                         autocomplete="username" required autofocus
+                        placeholder="admin"
                         class="block h-[46px] w-full rounded-xl border border-slate-300 bg-white px-[14px] text-[#172554] transition duration-200 focus:border-[#d60000] focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,255,255,0.2)]">
                 </div>
 
@@ -84,6 +85,7 @@
                     </label>
                     <div class="relative">
                         <input type="password" id="password" name="password" autocomplete="current-password" required
+                            placeholder="password"
                             class="block h-[46px] w-full rounded-xl border border-slate-300 bg-white pl-[14px] pr-11 text-[#172554] transition duration-200 focus:border-[#d60000] focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,255,255,0.2)]">
 
                         <!-- Tombol toggle mata -->

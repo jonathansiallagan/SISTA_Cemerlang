@@ -6,25 +6,34 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('produks', function (Blueprint $table) {
             $table->id();
+
+            // Relasi digabungkan dari file revisi
+            $table->foreignId('cabang_id')
+                ->nullable()
+                ->constrained('cabangs')
+                ->restrictOnDelete();
+
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->restrictOnDelete();
+
+            // Kolom dasar
             $table->string('nama_produk');
             $table->string('satuan');
+
+            // Kolom upah ditambahkan, harga_jual dan hpp dihilangkan
+            $table->decimal('upah_operator', 12, 2)->default(0);
+
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-            $table->decimal('harga_jual', 15, 2);
-            $table->decimal('hpp', 15, 2);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('produks');

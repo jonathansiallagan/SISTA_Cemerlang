@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('detail_transaksis', function (Blueprint $table) {
@@ -22,14 +19,12 @@ return new class extends Migration
             $table->decimal('harga_satuan', 15, 2);
             $table->decimal('hpp_satuan', 15, 2);
             $table->decimal('subtotal', 15, 2);
+            $table->decimal('jasa_edit', 15, 2)->default(0); // Kolom tambahan dimasukkan di sini
             $table->decimal('total_hpp', 15, 2);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('detail_transaksis');
