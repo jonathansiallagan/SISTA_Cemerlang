@@ -92,7 +92,6 @@ class AkunController extends Controller
         $kodeTerakhir = $query
             ->pluck('kode_akun')
             ->map(function ($kode) {
-                // Format kode akun: angka tipe + tanda "-" + angka kelompok.
                 return (int) substr($kode, 2);
             })
             ->filter()
@@ -141,7 +140,7 @@ class AkunController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_akun' => ['required', 'string', 'max:255'],
+            'nama_akun' => ['required', 'string', 'max:255', 'unique:akuns,nama_akun'],
             'tipe_akun' => [
                 'required',
                 Rule::in([
@@ -155,6 +154,7 @@ class AkunController extends Controller
             'kelompok_akun' => ['required', 'string'],
         ], [
             'nama_akun.required' => 'Nama akun wajib diisi.',
+            'nama_akun.unique' => 'Nama akun sudah digunakan, harap gunakan nama lain.',
             'tipe_akun.required' => 'Tipe akun wajib dipilih.',
             'kelompok_akun.required' => 'Kelompok akun wajib dipilih.',
         ]);
@@ -171,7 +171,6 @@ class AkunController extends Controller
         }
 
         DB::transaction(function () use ($validated) {
-            // Hitung ulang kode di server sebelum menyimpan.
             $kode = $this->kodeBerikutnya(
                 $validated['tipe_akun'],
                 $validated['kelompok_akun']
@@ -181,11 +180,17 @@ class AkunController extends Controller
                 throw new \RuntimeException('Kode akun tidak dapat dibuat.');
             }
 
+            // Tentukan saldo_normal secara otomatis
+            $saldoNormal = in_array($validated['tipe_akun'], ['Kewajiban', 'Ekuitas', 'Pendapatan'], true)
+                ? 'Kredit'
+                : 'Debit';
+
             Akun::create([
                 'kode_akun' => $kode,
                 'nama_akun' => $validated['nama_akun'],
                 'tipe_akun' => $validated['tipe_akun'],
                 'kelompok_akun' => $validated['kelompok_akun'],
+                'saldo_normal' => $saldoNormal,
                 'status' => 'aktif',
             ]);
         });
@@ -194,23 +199,27 @@ class AkunController extends Controller
             ->route('akun.index')
             ->with('success', 'Akun berhasil ditambahkan!');
     }
-    
+
     public function update(Request $request, $id)
     {
         $akun = Akun::findOrFail($id);
 
         $validated = $request->validate([
-            'nama_akun' => ['required', 'string', 'max:255'],
+            'nama_akun' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('akuns', 'nama_akun')->ignore($akun->id),
+            ],
             'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
         ], [
             'nama_akun.required' => 'Nama akun wajib diisi.',
+            'nama_akun.unique' => 'Nama akun sudah digunakan, harap gunakan nama lain.',
             'nama_akun.max' => 'Nama akun maksimal 255 karakter.',
             'status.required' => 'Status akun wajib dipilih.',
             'status.in' => 'Status akun tidak valid.',
         ]);
 
-        // Hanya nama dan status yang boleh diperbarui.
-        // Kode, tipe, dan kelompok akun tetap seperti semula.
         $akun->update([
             'nama_akun' => $validated['nama_akun'],
             'status' => $validated['status'],
@@ -220,5 +229,4 @@ class AkunController extends Controller
             ->route('akun.index')
             ->with('success', 'Akun berhasil diperbarui!');
     }
-
 }
