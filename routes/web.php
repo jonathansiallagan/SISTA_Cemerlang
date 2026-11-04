@@ -38,10 +38,14 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
     // Rute Dashboard Admin (Untuk Pusat & Cabang)
-    Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin', [AdminDashboardController::class, 'index'])
+    ->middleware('role:Admin Pusat,Admin Cabang')
+    ->name('admin.dashboard');
     
     // Rute Dashboard CS
-    Route::get('/cs', [CsDashboardController::class, 'index'])->name('cs.dashboard');
+    Route::get('/cs', [CsDashboardController::class, 'index'])
+    ->middleware('role:Customer Service')
+    ->name('cs.dashboard');
 
     // Halaman Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

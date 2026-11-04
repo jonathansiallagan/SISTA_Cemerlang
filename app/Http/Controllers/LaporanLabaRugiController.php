@@ -7,6 +7,7 @@ use App\Models\Cabang;
 use App\Models\DetailJurnal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Support\PerhitunganSista;
 
 class LaporanLabaRugiController extends Controller
 {
@@ -83,8 +84,8 @@ class LaporanLabaRugiController extends Controller
             ->select('detail_jurnals.*')
             ->join('jurnals', 'detail_jurnals.jurnal_id', '=', 'jurnals.id')
             ->whereBetween('jurnals.tanggal', [
-                \Carbon\Carbon::parse($start_date)->startOfDay(),
-                \Carbon\Carbon::parse($end_date)->endOfDay()
+                $start_date,
+                $end_date
             ])
             ->whereIn('detail_jurnals.akun_id', $akuns->pluck('id'))
             ->when($cabangId !== null, function ($query) use ($cabangId) {

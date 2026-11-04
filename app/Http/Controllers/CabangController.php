@@ -18,11 +18,6 @@ class CabangController extends Controller
 
     public function store(Request $request)
     {
-        // Hilangkan spasi di awal dan akhir nama.
-        $request->merge([
-            'nama' => trim($request->nama ?? ''),
-        ]);
-
         $validated = $request->validate([
             'nama' => [
                 'required',
@@ -58,11 +53,6 @@ class CabangController extends Controller
     public function update(Request $request, $id)
     {
         $cabang = Cabang::findOrFail($id);
-
-        // Hilangkan spasi di awal dan akhir nama.
-        $request->merge([
-            'nama' => trim($request->nama ?? ''),
-        ]);
 
         $validated = $request->validate([
             'nama' => [

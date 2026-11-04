@@ -60,10 +60,16 @@ class JurnalController extends Controller
             'cabang_id' => ['nullable', 'integer', 'exists:cabangs,id'],
         ]);
 
-        $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
-        $endDate   = $request->input('end_date', now()->endOfMonth()->toDateString());
+        // Validasi dan default bulan berjalan
+        $startDate = $request->input(
+            'start_date'
+        ) ?? now()->startOfMonth()->toDateString();
 
-        // Penggunaan whereBetween dengan batasan jam (Best Practice #3)
+        $endDate = $request->input(
+            'end_date'
+        ) ?? now()->endOfMonth()->toDateString();
+
+        // Filter berdasarkan tanggal DATE
         $query = Jurnal::with([
             'user',
             'cabang',
@@ -71,8 +77,8 @@ class JurnalController extends Controller
             'transaksi.detailTransaksis.produk',
         ])
             ->whereBetween('tanggal', [
-                \Carbon\Carbon::parse($startDate)->startOfDay(),
-                \Carbon\Carbon::parse($endDate)->endOfDay()
+                $startDate,
+                $endDate
             ]);
 
         if ($user->role === 'Admin Cabang') {

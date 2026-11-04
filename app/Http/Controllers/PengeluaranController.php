@@ -91,9 +91,10 @@ class PengeluaranController extends Controller
 
         // 3. Query dengan rentang waktu yang presisi
         $query = Pengeluaran::with(['cabang', 'user', 'akun'])
-            ->whereBetween('tanggal', [$startDate, $endDate])
-            ->latest('tanggal')
-            ->latest('id');
+        ->whereDate('tanggal', '>=', $startDate)
+        ->whereDate('tanggal', '<=', $endDate)
+        ->latest('tanggal')
+        ->latest('id');
 
         if ($user->role === 'Admin Cabang') {
             $query->where('cabang_id', $user->cabang_id);

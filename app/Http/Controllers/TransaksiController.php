@@ -14,6 +14,7 @@ use App\Models\KomposisiProduk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Support\PerhitunganSista;
 
 class TransaksiController extends Controller
 {
@@ -55,15 +56,22 @@ class TransaksiController extends Controller
         }
 
         // Terapkan filter tanggal menggunakan standar batas waktu (00:00:00 - 23:59:59)
-        $query->whereBetween('tanggal', [
-            \Carbon\Carbon::parse($startDate)->startOfDay(),
-            \Carbon\Carbon::parse($endDate)->endOfDay()
-        ]);
+        // Filter tanggal mulai jika diisi
+if ($request->filled('tanggal_mulai')) {
+    $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
+}
+
+// Filter tanggal akhir jika diisi
+if ($request->filled('tanggal_akhir')) {
+    $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
+}
 
         $transaksis = $query
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
             ->get();
+
+            
 
         $cabangs = $user->isCustomerService()
             ? Cabang::where('id', $user->cabang_id)->get()

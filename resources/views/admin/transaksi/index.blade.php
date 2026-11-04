@@ -131,6 +131,7 @@
             {{-- ISI TABEL --}}
             @forelse ($transaksis as $trx)
                 @php
+                    $nomorTransaksi = $loop->iteration;
                     $details = $trx->detailTransaksis;
                     $jumlahBaris = $details->count();
                 @endphp
@@ -141,7 +142,7 @@
                             {{-- NOMOR URUT --}}
                             <td rowspan="{{ $jumlahBaris }}"
                                 class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
-                                {{ $loop->parent->iteration }}
+                                {{ $nomorTransaksi }}
                             </td>
 
                             {{-- NO REFERENSI --}}
@@ -206,7 +207,7 @@
                 @empty
                     <tr class="border-b border-[#e3eaef]">
                         <td class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
-                            {{ $loop->parent->iteration }}
+                            {{ $nomorTransaksi }}
                         </td>
 
                         <td class="whitespace-nowrap px-[15px] py-3 align-middle font-bold text-[#041C88]">
