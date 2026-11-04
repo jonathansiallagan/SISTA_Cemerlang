@@ -78,60 +78,41 @@ class PengeluaranController extends Controller
     {
         $user = Auth::user();
 
+        // 1. Validasi Tanggal (Best Practice #5)
         $request->validate([
             'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'cabang_id' => ['nullable', 'integer', 'exists:cabangs,id'],
+            'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+            'cabang_id'  => ['nullable', 'integer', 'exists:cabangs,id'],
         ]);
 
-        // Default periode: bulan berjalan.
-        $startDate = $request->input(
-            'start_date',
-            now()->startOfMonth()->toDateString()
-        );
+        // 2. Default Periode Laporan: Awal hingga Akhir Bulan Berjalan (Best Practice #4)
+        $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
+        $endDate   = $request->input('end_date', now()->endOfMonth()->toDateString());
 
-        $endDate = $request->input(
-            'end_date',
-            now()->endOfMonth()->toDateString()
-        );
-
+        // 3. Query dengan rentang waktu yang presisi
         $query = Pengeluaran::with(['cabang', 'user', 'akun'])
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->latest('tanggal')
             ->latest('id');
 
-        // Admin Cabang hanya bisa melihat pengeluaran cabangnya sendiri.
         if ($user->role === 'Admin Cabang') {
             $query->where('cabang_id', $user->cabang_id);
         }
 
-        // Hanya Admin Pusat yang dapat memfilter cabang.
-        if (
-            $user->role === 'Admin Pusat'
-            && $request->filled('cabang_id')
-        ) {
+        if ($user->role === 'Admin Pusat' && $request->filled('cabang_id')) {
             $query->where('cabang_id', $request->input('cabang_id'));
         }
 
         $pengeluarans = $query->get();
 
-        // Dropdown cabang hanya dibutuhkan Admin Pusat.
         $cabangs = $user->role === 'Admin Pusat'
             ? Cabang::where('status', 'aktif')->orderBy('nama')->get()
             : collect();
 
-        // Dropdown akun beban untuk modal tambah pengeluaran.
         $akuns = Akun::where('status', 'aktif')
             ->where('tipe_akun', 'Beban/Biaya')
             ->where('kelompok_akun', 'Beban Operasional')
-            ->whereIn('kode_akun', [
-                '5-2100',
-                '5-2200',
-                '5-2300',
-                '5-2400',
-                '5-2500',
-                '5-2600',
-            ])
+            ->whereIn('kode_akun', ['5-2100', '5-2200', '5-2300', '5-2400', '5-2500', '5-2600'])
             ->orderBy('kode_akun')
             ->get();
 
@@ -260,7 +241,7 @@ class PengeluaranController extends Controller
                 ->lockForUpdate()
                 ->get()
                 ->map(
-                    fn ($item) => (int) substr(
+                    fn($item) => (int) substr(
                         $item->no_referensi,
                         -4
                     )
