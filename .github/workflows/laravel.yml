@@ -1,5 +1,5 @@
 
-name: Laravel CI
+name: Laravel CI & Docker Publish
 
 on:
   push:
@@ -49,8 +49,7 @@ jobs:
           php artisan key:generate
 
       - name: Configure Database
-        run: |
-          php artisan config:clear
+        run: php artisan config:clear
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
@@ -78,3 +77,44 @@ jobs:
           DB_DATABASE: db_percetakan
           DB_USERNAME: laravel
           DB_PASSWORD: secret
+
+  docker-publish:
+    needs: laravel-tests
+    runs-on: ubuntu-latest
+
+    # Publish hanya setelah push/merge ke main,
+    # bukan ketika Pull Request.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Docker Image Name
+        id: image
+        run: |
+          echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.name }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=Laravel Sistem Akuntansi Percetakan
