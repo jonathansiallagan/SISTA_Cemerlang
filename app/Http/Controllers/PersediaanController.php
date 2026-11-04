@@ -9,15 +9,35 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Support\PerhitunganSista;
+use Illuminate\Support\Facades\Auth;
 
 class PersediaanController extends Controller
 {
+    /**
+     * Mengambil ID cabang pengguna yang sedang login.
+     */
+    private function cabangId(): int
+    {
+        $cabangId = Auth::user()?->cabang_id;
+
+        abort_if(
+            !$cabangId,
+            403,
+            'Akun pengguna belum terhubung dengan cabang.'
+        );
+
+        return (int) $cabangId;
+    }
+
     /**
      * Menampilkan daftar persediaan bahan baku.
      */
     public function index()
     {
-        $bahanBakus = BahanBaku::orderBy('nama_bahan')->get();
+        // [PERBAIKAN] Filter bahan baku khusus milik cabang pengguna
+        $bahanBakus = BahanBaku::where('cabang_id', $this->cabangId())
+            ->orderBy('nama_bahan')
+            ->get();
 
         $totalJenisBahan = $bahanBakus->count();
 
@@ -28,7 +48,7 @@ class PersediaanController extends Controller
         $totalStok = $bahanBakus->sum('stok');
 
         $totalNilaiPersediaan = $bahanBakus->sum(
-            fn ($bahan) => (float) $bahan->stok
+            fn($bahan) => (float) $bahan->stok
                 * (float) $bahan->harga_rata_rata
         );
 
@@ -46,6 +66,8 @@ class PersediaanController extends Controller
      */
     public function store(Request $request)
     {
+        $cabangId = $this->cabangId();
+
         $validated = $request->validate([
             'tanggal_pembelian' => [
                 'required',
@@ -74,7 +96,9 @@ class PersediaanController extends Controller
                 'required',
                 'integer',
                 'distinct',
-                'exists:bahan_baku,id',
+                // [PERBAIKAN] Validasi: ID harus ada dan milik cabang ini
+                \Illuminate\Validation\Rule::exists('bahan_baku', 'id')
+                    ->where('cabang_id', $cabangId),
             ],
 
             'items.*.jumlah' => [
@@ -90,34 +114,25 @@ class PersediaanController extends Controller
             ],
         ], [
             'tanggal_pembelian.required' =>
-                'Tanggal pembelian wajib diisi.',
-
+            'Tanggal pembelian wajib diisi.',
             'items.required' =>
-                'Tambahkan minimal satu bahan baku.',
-
+            'Tambahkan minimal satu bahan baku.',
             'items.min' =>
-                'Tambahkan minimal satu bahan baku.',
-
+            'Tambahkan minimal satu bahan baku.',
             'items.*.bahan_baku_id.required' =>
-                'Pilih bahan baku.',
-
+            'Pilih bahan baku.',
             'items.*.bahan_baku_id.distinct' =>
-                'Bahan yang sama tidak boleh dimasukkan dua kali. Gabungkan jumlahnya dalam satu baris.',
-
+            'Bahan yang sama tidak boleh dimasukkan dua kali. Gabungkan jumlahnya dalam satu baris.',
             'items.*.bahan_baku_id.exists' =>
-                'Bahan baku yang dipilih tidak ditemukan.',
-
+            'Bahan baku yang dipilih tidak ditemukan atau bukan milik cabang ini.',
             'items.*.jumlah.required' =>
-                'Jumlah pembelian wajib diisi.',
-
+            'Jumlah pembelian wajib diisi.',
             'items.*.jumlah.gt' =>
-                'Jumlah pembelian harus lebih dari nol.',
-
+            'Jumlah pembelian harus lebih dari nol.',
             'items.*.harga_satuan.required' =>
-                'Harga satuan wajib diisi.',
-
+            'Harga satuan wajib diisi.',
             'items.*.harga_satuan.gte' =>
-                'Harga beli tidak boleh negatif.',
+            'Harga beli tidak boleh negatif.',
         ]);
 
         // Hitung total pembelian di sisi server.
@@ -131,36 +146,38 @@ class PersediaanController extends Controller
             );
         }
 
-        DB::transaction(function () use ($validated, $totalHarga) {
+        DB::transaction(function () use ($validated, $totalHarga, $cabangId) {
             $pembelian = PembelianBahan::create([
+                // [PERBAIKAN] Simpan ID cabang ke dalam tabel transaksi pembelian
+                'cabang_id' => $cabangId,
                 'no_pembelian' => 'PB-'
                     . now()->format('YmdHis')
                     . '-'
                     . strtoupper(Str::random(4)),
 
                 'tanggal_pembelian' =>
-                    $validated['tanggal_pembelian'],
+                $validated['tanggal_pembelian'],
 
                 'nama_pemasok' =>
-                    $validated['nama_pemasok'] ?? null,
+                $validated['nama_pemasok'] ?? null,
 
                 'keterangan' =>
-                    $validated['keterangan'] ?? null,
+                $validated['keterangan'] ?? null,
 
                 'total_harga' => $totalHarga,
             ]);
 
             foreach ($validated['items'] as $item) {
-                $bahan = BahanBaku::whereKey(
-                    $item['bahan_baku_id']
-                )
+                // [PERBAIKAN] Pastikan bahan yang dikunci untuk update adalah milik cabang ini
+                $bahan = BahanBaku::where('cabang_id', $cabangId)
+                    ->whereKey($item['bahan_baku_id'])
                     ->lockForUpdate()
                     ->first();
 
                 if (!$bahan || $bahan->status !== 'aktif') {
                     throw ValidationException::withMessages([
                         'items' =>
-                            'Bahan baku tidak ditemukan atau sudah nonaktif.',
+                        'Bahan baku tidak ditemukan atau sudah nonaktif.',
                     ]);
                 }
 
@@ -197,7 +214,7 @@ class PersediaanController extends Controller
                 $bahan->update([
                     'stok' => $stokBaru,
                     'harga_rata_rata' =>
-                        round($hargaRataRataBaru, 2),
+                    round($hargaRataRataBaru, 2),
                 ]);
             }
         });

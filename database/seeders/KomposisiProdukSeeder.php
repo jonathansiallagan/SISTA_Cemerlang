@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-
 use App\Models\Produk;
 use App\Models\BahanBaku;
 use App\Models\KomposisiProduk;
+use App\Models\Cabang;
 
 class KomposisiProdukSeeder extends Seeder
 {
@@ -54,42 +54,40 @@ class KomposisiProdukSeeder extends Seeder
             ],
         ];
 
-        foreach ($komposisi as $namaProduk => $bahanList) {
-            $produk = Produk::where(
-                'nama_produk',
-                $namaProduk
-            )->first();
+        $cabangs = Cabang::pluck('id');
 
-            if (!$produk) {
-                $this->command?->warn(
-                    "Produk {$namaProduk} tidak ditemukan."
-                );
-                continue;
-            }
+        foreach ($cabangs as $cabangId) {
+            foreach ($komposisi as $namaProduk => $bahanList) {
 
-            foreach ($bahanList as [$namaBahan, $jumlah, $satuan]) {
-                $bahan = BahanBaku::where(
-                    'nama_bahan',
-                    $namaBahan
-                )->first();
+                $produk = Produk::where('nama_produk', $namaProduk)
+                    ->where('cabang_id', $cabangId)
+                    ->first();
 
-                if (!$bahan) {
-                    $this->command?->warn(
-                        "Bahan {$namaBahan} tidak ditemukan."
-                    );
+                if (!$produk) {
                     continue;
                 }
 
-                KomposisiProduk::updateOrCreate(
-                    [
-                        'produk_id' => $produk->id,
-                        'bahan_baku_id' => $bahan->id,
-                    ],
-                    [
-                        'jumlah_pemakaian' => $jumlah,
-                        'satuan_pemakaian' => $satuan,
-                    ]
-                );
+                foreach ($bahanList as [$namaBahan, $jumlah, $satuan]) {
+
+                    $bahan = BahanBaku::where('nama_bahan', $namaBahan)
+                        ->where('cabang_id', $cabangId)
+                        ->first();
+
+                    if (!$bahan) {
+                        continue;
+                    }
+
+                    KomposisiProduk::updateOrCreate(
+                        [
+                            'produk_id' => $produk->id,
+                            'bahan_baku_id' => $bahan->id,
+                        ],
+                        [
+                            'jumlah_pemakaian' => $jumlah,
+                            'satuan_pemakaian' => $satuan,
+                        ]
+                    );
+                }
             }
         }
     }

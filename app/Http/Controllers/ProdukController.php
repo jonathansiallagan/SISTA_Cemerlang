@@ -85,7 +85,8 @@ class ProdukController extends Controller
             ->orderBy('nama_produk')
             ->get();
 
-        $bahanBakus = BahanBaku::where('status', 'aktif')
+        $bahanBakus = BahanBaku::where('cabang_id', $this->cabangId())
+            ->where('status', 'aktif')
             ->orderBy('nama_bahan')
             ->get();
 
