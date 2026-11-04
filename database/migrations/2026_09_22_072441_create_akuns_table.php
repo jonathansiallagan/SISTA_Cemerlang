@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('akuns', function (Blueprint $table) {
             $table->id();
             $table->string('kode_akun')->unique();
-            $table->string('nama_akun');
+            $table->string('nama_akun')->unique();
             $table->string('tipe_akun');
+            $table->string('kelompok_akun');
+            $table->enum('saldo_normal', ['Debit', 'Kredit'])->default('Debit');
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
         });
