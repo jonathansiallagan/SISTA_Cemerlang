@@ -68,6 +68,16 @@ jobs:
           DB_USERNAME: laravel
           DB_PASSWORD: secret
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Frontend Dependencies & Build Vite
+        run: |
+          npm ci
+          npm run build
+
       - name: Run Laravel Tests
         run: php artisan test
         env:
