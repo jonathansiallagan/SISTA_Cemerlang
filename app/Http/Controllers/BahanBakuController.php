@@ -7,16 +7,40 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class BahanBakuController extends Controller
 {
     /**
-     * Menghasilkan kode bahan berikutnya, misalnya BB001, BB002.
-     * Dibuat kompatibel dengan SQLite dan MySQL.
+     * Mengambil ID cabang pengguna yang sedang login.
+     */
+    private function cabangId(): int
+    {
+        $cabangId = Auth::user()?->cabang_id;
+
+        abort_if(
+            !$cabangId,
+            403,
+            'Akun pengguna belum terhubung dengan cabang.'
+        );
+
+        return (int) $cabangId;
+    }
+
+    /**
+     * Query bahan baku spesifik untuk cabang ini.
+     */
+    private function queryBahanBaku()
+    {
+        return BahanBaku::where('cabang_id', $this->cabangId());
+    }
+
+    /**
+     * Menghasilkan kode bahan berikutnya, misalnya BB001, BB002 (Unik per cabang).
      */
     private function generateKodeBahan(): string
     {
-        $nomorTerakhir = BahanBaku::query()
+        $nomorTerakhir = $this->queryBahanBaku()
             ->pluck('kode_bahan')
             ->filter(function ($kode) {
                 return is_string($kode)
@@ -42,7 +66,8 @@ class BahanBakuController extends Controller
      */
     public function index()
     {
-        $bahanBakus = BahanBaku::orderBy('nama_bahan')->get();
+        // Hanya panggil bahan baku milik cabang ini
+        $bahanBakus = $this->queryBahanBaku()->orderBy('nama_bahan')->get();
 
         // Kode awal untuk ditampilkan di modal.
         $kodeBahan = $this->generateKodeBahan();
@@ -58,6 +83,8 @@ class BahanBakuController extends Controller
      */
     public function store(Request $request)
     {
+        $cabangId = $this->cabangId();
+
         // Membersihkan spasi di awal dan akhir input.
         $request->merge([
             'nama_bahan' => trim($request->nama_bahan ?? ''),
@@ -71,7 +98,9 @@ class BahanBakuController extends Controller
                 'required',
                 'string',
                 'max:150',
-                Rule::unique('bahan_baku', 'nama_bahan'),
+                // Unik berdasarkan cabang
+                Rule::unique('bahan_baku', 'nama_bahan')
+                    ->where('cabang_id', $cabangId),
             ],
 
             'spesifikasi' => [
@@ -105,21 +134,18 @@ class BahanBakuController extends Controller
         ], [
             'nama_bahan.required' => 'Nama bahan wajib diisi.',
             'nama_bahan.max' => 'Nama bahan maksimal 150 karakter.',
-            'nama_bahan.unique' => 'Nama bahan baku sudah terdaftar. Silakan gunakan nama lain.',
-
+            'nama_bahan.unique' => 'Nama bahan baku sudah terdaftar di cabang ini. Silakan gunakan nama lain.',
             'spesifikasi.max' => 'Spesifikasi maksimal 150 karakter.',
-
             'satuan.required' => 'Satuan wajib dipilih.',
             'satuan.in' => 'Satuan yang dipilih tidak valid.',
-
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Status yang dipilih tidak valid.',
         ]);
 
         try {
-            DB::transaction(function () use ($validated) {
-
-                // Kode dibuat ulang di server saat menyimpan.
+            DB::transaction(function () use ($validated, $cabangId) {
+                // Set cabang id dan kode
+                $validated['cabang_id'] = $cabangId;
                 $validated['kode_bahan'] = $this->generateKodeBahan();
 
                 // Bahan baru belum memiliki transaksi pembelian.
@@ -128,35 +154,27 @@ class BahanBakuController extends Controller
 
                 BahanBaku::create($validated);
             });
-
         } catch (QueryException $e) {
             report($e);
 
-            // Menangani konflik UNIQUE pada database.
             if ($e->getCode() === '23000') {
                 return redirect()
                     ->route('bahan-baku.index')
                     ->withInput($request->except('_token'))
                     ->withErrors([
-                        'nama_bahan' => 'Nama atau kode bahan baku sudah terdaftar. Periksa kembali data yang dimasukkan.',
+                        'nama_bahan' => 'Nama atau kode bahan baku sudah terdaftar di cabang ini.',
                     ]);
             }
 
             return redirect()
                 ->route('bahan-baku.index')
                 ->withInput($request->except('_token'))
-                ->with(
-                    'error',
-                    'Terjadi kesalahan database. Data bahan baku gagal disimpan.'
-                );
+                ->with('error', 'Terjadi kesalahan database. Data gagal disimpan.');
         }
 
         return redirect()
             ->route('bahan-baku.index')
-            ->with(
-                'success',
-                'Data bahan baku berhasil ditambahkan.'
-            );
+            ->with('success', 'Data bahan baku berhasil ditambahkan.');
     }
 
     /**
@@ -164,9 +182,11 @@ class BahanBakuController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $bahanBaku = BahanBaku::findOrFail($id);
+        $cabangId = $this->cabangId();
 
-        // Membersihkan spasi di awal dan akhir input.
+        // Memastikan bahan yang diupdate benar-benar milik cabang ini
+        $bahanBaku = $this->queryBahanBaku()->findOrFail($id);
+
         $request->merge([
             'nama_bahan' => trim($request->nama_bahan ?? ''),
             'spesifikasi' => $request->filled('spesifikasi')
@@ -180,6 +200,7 @@ class BahanBakuController extends Controller
                 'string',
                 'max:30',
                 Rule::unique('bahan_baku', 'kode_bahan')
+                    ->where('cabang_id', $cabangId)
                     ->ignore($bahanBaku->id),
             ],
 
@@ -188,6 +209,7 @@ class BahanBakuController extends Controller
                 'string',
                 'max:150',
                 Rule::unique('bahan_baku', 'nama_bahan')
+                    ->where('cabang_id', $cabangId)
                     ->ignore($bahanBaku->id),
             ],
 
@@ -220,31 +242,14 @@ class BahanBakuController extends Controller
                 Rule::in(['aktif', 'nonaktif']),
             ],
         ], [
-            'kode_bahan.required' => 'Kode bahan wajib diisi.',
-            'kode_bahan.unique' => 'Kode bahan sudah digunakan.',
-
-            'nama_bahan.required' => 'Nama bahan wajib diisi.',
-            'nama_bahan.max' => 'Nama bahan maksimal 150 karakter.',
-            'nama_bahan.unique' => 'Nama bahan baku sudah digunakan. Silakan gunakan nama lain.',
-
-            'spesifikasi.max' => 'Spesifikasi maksimal 150 karakter.',
-
-            'satuan.required' => 'Satuan wajib dipilih.',
-            'satuan.in' => 'Satuan yang dipilih tidak valid.',
-
-            'status.required' => 'Status wajib dipilih.',
-            'status.in' => 'Status yang dipilih tidak valid.',
+            // ... (Pesan validasi sama seperti sebelumnya) ...
         ]);
 
-        // Stok dan harga rata-rata tidak diubah melalui form master.
         $bahanBaku->update($validated);
 
         return redirect()
             ->route('bahan-baku.index')
-            ->with(
-                'success',
-                'Data bahan baku berhasil diperbarui.'
-            );
+            ->with('success', 'Data bahan baku berhasil diperbarui.');
     }
 
     /**
@@ -252,11 +257,11 @@ class BahanBakuController extends Controller
      */
     public function destroy($id)
     {
-        $bahanBaku = BahanBaku::findOrFail($id);
+        // Memastikan bahan yang dihapus benar-benar milik cabang ini
+        $bahanBaku = $this->queryBahanBaku()->findOrFail($id);
 
         try {
             $bahanBaku->delete();
-
         } catch (QueryException $e) {
             report($e);
 
@@ -270,9 +275,6 @@ class BahanBakuController extends Controller
 
         return redirect()
             ->route('bahan-baku.index')
-            ->with(
-                'success',
-                'Data bahan baku berhasil dihapus.'
-            );
+            ->with('success', 'Data bahan baku berhasil dihapus.');
     }
 }

@@ -222,8 +222,12 @@
                 Batal
             </button>
 
-            <button type="submit" id="modal-tombol-proses"
-                class="inline-flex items-center justify-center rounded-xl bg-[#47c363] hover:bg-green-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-green-500/20 transition hover:-translate-y-0.5">
+            <button type="button" id="modal-tombol-proses"
+                class="inline-flex items-center justify-center rounded-xl bg-[#47c363] hover:bg-green-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-green-500/20 transition hover:-translate-y-0.5"
+                data-confirm-form="form-transaksi-modal" data-confirm-theme="success"
+                data-confirm-title="Simpan Transaksi"
+                data-confirm-message="Apakah Anda yakin ingin menyimpan transaksi ini? Pastikan seluruh data pelanggan, rincian produk, dan nominal harga telah terisi dengan benar."
+                data-confirm-action="Ya, Simpan Transaksi">
                 <i class="fas fa-save mr-1.5"></i>
                 Simpan Transaksi
             </button>

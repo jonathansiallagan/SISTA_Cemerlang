@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BahanBaku extends Model
 {
     protected $table = 'bahan_baku';
 
     protected $fillable = [
+        'cabang_id', // Tambahan
         'kode_bahan',
         'nama_bahan',
         'spesifikasi',
@@ -27,10 +29,15 @@ class BahanBaku extends Model
         ];
     }
 
+    public function cabang(): BelongsTo
+    {
+        return $this->belongsTo(Cabang::class);
+    }
+
     public function detailPembelian(): HasMany
     {
         return $this->hasMany(
-            \App\Models\DetailPembelianBahan::class,
+            DetailPembelianBahan::class,
             'bahan_baku_id'
         );
     }

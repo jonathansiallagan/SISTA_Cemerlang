@@ -14,6 +14,7 @@ use App\Models\Produk;
 use App\Models\Transaksi;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
 
@@ -107,12 +108,12 @@ class TransaksiControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | AKSES DAN DAFTAR TRANSAKSI
-     |------------------------------------------------------------------ */
+        AKSES DAN DAFTAR TRANSAKSI
+    ------------------------------------------------------------------ */
 
     public function test_guest_is_redirected_to_login_from_transaction_page(): void
     {
-        auth()->logout();
+        Auth::logout();
 
         $this->get(route('transaksi.index'))
             ->assertRedirect(route('login'));
@@ -616,12 +617,12 @@ class TransaksiControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | STORE TRANSAKSI: VALIDASI INPUT
-     |------------------------------------------------------------------ */
+        STORE TRANSAKSI: VALIDASI INPUT
+    ------------------------------------------------------------------ */
 
     public function test_guest_cannot_store_transaction(): void
     {
-        auth()->logout();
+        Auth::logout();
 
         $this->post(route('transaksi.store'), [])
             ->assertRedirect(route('login'));
@@ -1000,7 +1001,7 @@ class TransaksiControllerTest extends TestCase
         $transaksis = collect($response->viewData('transaksis'));
 
         return $transaksis
-            ->map(fn ($transaksi) => data_get($transaksi, 'no_referensi'))
+            ->map(fn($transaksi) => data_get($transaksi, 'no_referensi'))
             ->all();
     }
 
@@ -1052,6 +1053,7 @@ class TransaksiControllerTest extends TestCase
         $nomor = ++$this->nomorBahan;
 
         return BahanBaku::create(array_merge([
+            'cabang_id' => $this->cabangUtama->id,
             'kode_bahan' => 'BB-TRX-' . str_pad((string) $nomor, 3, '0', STR_PAD_LEFT),
             'nama_bahan' => 'Bahan Transaksi Uji ' . $nomor,
             'spesifikasi' => 'Spesifikasi bahan transaksi uji',

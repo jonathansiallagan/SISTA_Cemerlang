@@ -299,7 +299,7 @@
                                     Bahan Baku {{ $i + 1 }}
                                 </strong>
                                 <button type="button"
-                                    class="edit-hapus-bahan inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
+                                    class="modal-hapus-bahan inline-flex items-center rounded-[3px] border border-red-600 bg-red-600 px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-red-700 hover:bg-red-700">
                                     <i class="fas fa-trash mr-1"></i>
                                     Hapus
                                 </button>

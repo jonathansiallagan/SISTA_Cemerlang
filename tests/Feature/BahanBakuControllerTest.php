@@ -3,10 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\BahanBaku;
+use App\Models\Cabang;
 use App\Models\DetailPembelianBahan;
 use App\Models\PembelianBahan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -17,30 +19,32 @@ class BahanBakuControllerTest extends TestCase
     private int $nomorBahan = 0;
 
     protected User $adminPusat;
+    protected Cabang $cabangUtama;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Semua route Bahan Baku berada dalam middleware auth dan
-        // role:Admin Pusat,Admin Cabang.
+        $this->cabangUtama = Cabang::factory()->create();
+
         $this->adminPusat = User::factory()->create([
             'name' => 'Admin Pengujian',
             'email' => 'admin-bahan@example.test',
             'username' => 'admin-bahan',
             'role' => 'Admin Pusat',
+            'cabang_id' => $this->cabangUtama->id,
         ]);
 
         $this->actingAs($this->adminPusat);
     }
 
     /* -----------------------------------------------------------------
-     | AKSES DAN INDEX
-     |------------------------------------------------------------------ */
+        AKSES DAN INDEX
+    ------------------------------------------------------------------ */
 
     public function test_guest_is_redirected_to_login(): void
     {
-        auth()->logout();
+        Auth::logout();
 
         $response = $this->get(route('bahan-baku.index'));
 
@@ -63,6 +67,7 @@ class BahanBakuControllerTest extends TestCase
             'role' => 'Admin Cabang',
             'email' => 'admin-cabang-bahan@example.test',
             'username' => 'admin-cabang-bahan',
+            'cabang_id' => $this->cabangUtama->id
         ]);
 
         $response = $this->actingAs($adminCabang)
@@ -78,6 +83,7 @@ class BahanBakuControllerTest extends TestCase
             'role' => 'Customer Service',
             'email' => 'cs-bahan@example.test',
             'username' => 'cs-bahan',
+            'cabang_id' => $this->cabangUtama->id
         ]);
 
         $response = $this->actingAs($customerService)
@@ -146,8 +152,8 @@ class BahanBakuControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | STORE
-     |------------------------------------------------------------------ */
+        STORE
+    ------------------------------------------------------------------ */
 
     public function test_store_creates_bahan_baku_with_generated_code_and_initial_stock(): void
     {
@@ -344,8 +350,8 @@ class BahanBakuControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | UPDATE
-     |------------------------------------------------------------------ */
+        UPDATE
+    ------------------------------------------------------------------ */
 
     public function test_update_changes_bahan_baku_data(): void
     {
@@ -521,8 +527,8 @@ class BahanBakuControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | DESTROY
-     |------------------------------------------------------------------ */
+        DESTROY
+    ------------------------------------------------------------------ */
 
     public function test_destroy_deletes_bahan_baku_without_purchase_details(): void
     {
@@ -542,6 +548,7 @@ class BahanBakuControllerTest extends TestCase
         $bahan = $this->buatBahanBaku();
 
         $pembelian = PembelianBahan::create([
+            'cabang_id' => $this->cabangUtama->id,
             'no_pembelian' => 'PB-TEST-001',
             'tanggal_pembelian' => '2026-11-04',
             'nama_pemasok' => 'Pemasok Pengujian',
@@ -574,14 +581,15 @@ class BahanBakuControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | HELPER DATA TEST
-     |------------------------------------------------------------------ */
+        HELPER DATA TEST
+    ------------------------------------------------------------------ */
 
     private function buatBahanBaku(array $attributes = []): BahanBaku
     {
         $this->nomorBahan++;
 
         return BahanBaku::create(array_merge([
+            'cabang_id' => $this->cabangUtama->id,
             'kode_bahan' => 'BB' . str_pad((string) $this->nomorBahan, 3, '0', STR_PAD_LEFT),
             'nama_bahan' => 'Bahan Uji ' . $this->nomorBahan,
             'spesifikasi' => 'Spesifikasi bahan uji',

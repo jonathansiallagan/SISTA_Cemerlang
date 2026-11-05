@@ -10,6 +10,7 @@ use App\Models\Produk;
 use App\Models\Transaksi;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class ProdukControllerTest extends TestCase
@@ -36,12 +37,12 @@ class ProdukControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | AKSES DAN INDEX
-     |------------------------------------------------------------------ */
+        AKSES DAN INDEX
+    ------------------------------------------------------------------ */
 
     public function test_guest_is_redirected_to_login(): void
     {
-        auth()->logout();
+        Auth::logout();
 
         $this->get(route('produk.index'))
             ->assertRedirect(route('login'));
@@ -908,6 +909,7 @@ class ProdukControllerTest extends TestCase
         $nomor = ++$this->nomorBahan;
 
         return BahanBaku::create(array_merge([
+            'cabang_id' => $this->cabangUtama->id,
             'kode_bahan' => 'BB-PRODUK-' . str_pad((string) $nomor, 3, '0', STR_PAD_LEFT),
             'nama_bahan' => 'Bahan Produk Uji ' . $nomor,
             'spesifikasi' => 'Spesifikasi bahan pengujian',

@@ -279,11 +279,14 @@ class BukuBesarController extends Controller
     ) {
         $akunIds = $daftarAkun->pluck('id');
 
+        $waktuMulai = \Carbon\Carbon::parse($start_date)->startOfDay();
+        $waktuSelesai = \Carbon\Carbon::parse($end_date)->endOfDay();
+
         // 1. Saldo sebelum periode laporan.
         $sebelumnya = DetailJurnal::select('detail_jurnals.akun_id')
             ->selectRaw(
                 'SUM(detail_jurnals.debit) as total_debit,
-                 SUM(detail_jurnals.kredit) as total_kredit'
+                SUM(detail_jurnals.kredit) as total_kredit'
             )
             ->join(
                 'jurnals',

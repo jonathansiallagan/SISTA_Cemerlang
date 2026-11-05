@@ -1,0 +1,21 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Cabang;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class CabangFactory extends Factory
+{
+    protected $model = Cabang::class;
+
+    public function definition(): array
+    {
+        return [
+            'nama' => $this->faker->company(),
+            'alamat' => $this->faker->address(),
+            'no_hp' => $this->faker->phoneNumber(),
+            'status' => 'aktif',
+        ];
+    }
+}

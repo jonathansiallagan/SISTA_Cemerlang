@@ -2,13 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\BahanBaku; // Tambahkan namespace model
+use App\Models\BahanBaku;
+use App\Models\Cabang;
 use Illuminate\Database\Seeder;
 
 class BahanBakuSeeder extends Seeder
 {
     public function run(): void
     {
+        $cabangs = Cabang::pluck('id')->toArray();
+
+        if (empty($cabangs)) return;
+
         $bahanBakus = [
             [
                 'kode_bahan' => 'BB001',
@@ -192,12 +197,16 @@ class BahanBakuSeeder extends Seeder
             ],
         ];
 
-        // Murni menggunakan Model Eloquent agar standar dengan seeder lainnya
-        foreach ($bahanBakus as $bahan) {
-            BahanBaku::updateOrCreate(
-                ['kode_bahan' => $bahan['kode_bahan']],
-                $bahan
-            );
+        foreach ($cabangs as $cabangId) {
+            foreach ($bahanBakus as $bahan) {
+                BahanBaku::updateOrCreate(
+                    [
+                        'cabang_id'  => $cabangId,
+                        'kode_bahan' => $bahan['kode_bahan']
+                    ],
+                    array_merge($bahan, ['cabang_id' => $cabangId])
+                );
+            }
         }
     }
 }
