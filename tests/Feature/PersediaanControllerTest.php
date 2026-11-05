@@ -63,7 +63,7 @@ class PersediaanControllerTest extends TestCase
 
     public function test_admin_cabang_can_open_inventory_page(): void
     {
-        $adminCabang = $this->buatUser('Admin Cabang');
+        $adminCabang = $this->buatUser('Admin Cabang', $this->cabangUtama);
 
         $response = $this->actingAs($adminCabang)
             ->get(route('persediaan.index'));
@@ -293,7 +293,7 @@ class PersediaanControllerTest extends TestCase
 
     public function test_admin_cabang_can_store_inventory_purchase(): void
     {
-        $adminCabang = $this->buatUser('Admin Cabang');
+        $adminCabang = $this->buatUser('Admin Cabang', $this->cabangUtama);
 
         $bahan = $this->buatBahanBaku([
             'stok' => 10,
