@@ -1,8 +1,27 @@
-
 .git
 .github
 .env
 .env.*
 !.env.example
-vendor
-node_modules
+
+# Abaikan dependensi lokal (karena akan di-install di stage masing-masing)
+/vendor/
+/node_modules/
+
+# Abaikan hasil build lokal (kita build ulang di stage Node.js)
+/public/build/
+/public/hot
+
+# Keamanan & Cache Laravel (Abaikan isi, tapi pertahankan struktur foldernya)
+/storage/*.key
+/storage/logs/*
+!/storage/logs/.gitignore
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+
+# Mencegah kebocoran cache Laravel lokal ke dalam Production Image
+/bootstrap/cache/*.php
