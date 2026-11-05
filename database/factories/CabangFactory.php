@@ -14,7 +14,7 @@ class CabangFactory extends Factory
         return [
             'nama' => $this->faker->company(),
             'alamat' => $this->faker->address(),
-            'telepon' => $this->faker->phoneNumber(),
+            'no_hp' => $this->faker->phoneNumber(),
             'status' => 'aktif',
         ];
     }
