@@ -41,10 +41,6 @@ class PersediaanController extends Controller
 
         $totalJenisBahan = $bahanBakus->count();
 
-        $totalJenisAktif = $bahanBakus
-            ->where('status', 'aktif')
-            ->count();
-
         $totalStok = $bahanBakus->sum('stok');
 
         $totalNilaiPersediaan = $bahanBakus->sum(
@@ -55,7 +51,6 @@ class PersediaanController extends Controller
         return view('admin.persediaan.index', compact(
             'bahanBakus',
             'totalJenisBahan',
-            'totalJenisAktif',
             'totalStok',
             'totalNilaiPersediaan'
         ));
@@ -174,10 +169,10 @@ class PersediaanController extends Controller
                     ->lockForUpdate()
                     ->first();
 
-                if (!$bahan || $bahan->status !== 'aktif') {
+                if (!$bahan) {
                     throw ValidationException::withMessages([
                         'items' =>
-                        'Bahan baku tidak ditemukan atau sudah nonaktif.',
+                        'Bahan baku tidak ditemukan.',
                     ]);
                 }
 

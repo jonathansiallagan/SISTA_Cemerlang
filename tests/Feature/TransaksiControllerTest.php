@@ -877,24 +877,6 @@ class TransaksiControllerTest extends TestCase
         $this->assertEquals(1, (float) $this->bahanLembar->fresh()->stok);
     }
 
-    public function test_store_rolls_back_when_material_is_inactive(): void
-    {
-        $this->bahanLembar->update([
-            'status' => 'nonaktif',
-        ]);
-
-        $response = $this->from(route('transaksi.create'))
-            ->actingAs($this->customerService)
-            ->post(route('transaksi.store'), $this->dataTransaksiValid());
-
-        $response->assertRedirect(route('transaksi.create'));
-        $response->assertSessionHas('error');
-
-        $this->assertSame(0, Transaksi::query()->count());
-        $this->assertSame(0, Jurnal::query()->count());
-        $this->assertEquals(100, (float) $this->bahanLembar->fresh()->stok);
-    }
-
     public function test_store_rolls_back_when_product_has_no_material_composition(): void
     {
         $produkTanpaKomposisi = $this->buatProduk([
@@ -1013,7 +995,6 @@ class TransaksiControllerTest extends TestCase
             'nama' => $nama ?? 'Cabang Transaksi Uji ' . $nomor,
             'alamat' => 'Alamat Cabang Transaksi Uji ' . $nomor,
             'no_hp' => '08123456' . str_pad((string) $nomor, 4, '0', STR_PAD_LEFT),
-            'status' => 'aktif',
         ]);
     }
 
@@ -1044,7 +1025,6 @@ class TransaksiControllerTest extends TestCase
             'tipe_akun' => $tipe,
             'kelompok_akun' => $kelompok,
             'saldo_normal' => $saldoNormal,
-            'status' => 'aktif',
         ]);
     }
 
@@ -1060,7 +1040,6 @@ class TransaksiControllerTest extends TestCase
             'satuan' => 'lembar',
             'stok' => 100,
             'harga_rata_rata' => 2000,
-            'status' => 'aktif',
         ], $attributes));
     }
 
@@ -1074,7 +1053,6 @@ class TransaksiControllerTest extends TestCase
             'nama_produk' => 'Produk Transaksi Uji ' . $nomor,
             'satuan' => 'lembar',
             'upah_operator' => 500,
-            'status' => 'aktif',
         ], $attributes));
     }
 

@@ -62,7 +62,6 @@
                 <th class="h-[45px] w-[25%] bg-[#fdfdff] px-[15px] text-left">Nama Bahan</th>
                 <th class="h-[45px] w-[20%] bg-[#fdfdff] px-[15px] text-left">Spesifikasi</th>
                 <th class="h-[45px] w-[10%] bg-[#fdfdff] px-[15px] text-left">Satuan</th>
-                <th class="h-[45px] w-[12%] bg-[#fdfdff] px-[15px] text-center">Status</th>
                 <th class="h-[45px] w-[13%] bg-[#fdfdff] px-[15px] text-center">Aksi</th>
             </x-slot:head>
 
@@ -91,26 +90,12 @@
                         {{ $bahan->satuan }}
                     </td>
 
-                    <td class="px-[15px] py-3 text-center align-middle">
-                        @if (strtolower($bahan->status) === 'aktif')
-                            <span
-                                class="rounded-full bg-[#54ca68] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                Aktif
-                            </span>
-                        @else
-                            <span
-                                class="rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                Nonaktif
-                            </span>
-                        @endif
-                    </td>
-
                     <td class="whitespace-nowrap px-[15px] py-3 text-center align-middle">
                         <button type="button" title="Edit Bahan Baku"
                             class="btn-edit-bahan inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#394eea]"
                             data-id="{{ $bahan->id }}" data-kode="{{ $bahan->kode_bahan }}"
                             data-nama="{{ $bahan->nama_bahan }}" data-spesifikasi="{{ $bahan->spesifikasi }}"
-                            data-satuan="{{ $bahan->satuan }}" data-status="{{ $bahan->status }}"
+                            data-satuan="{{ $bahan->satuan }}"
                             data-url="{{ route('bahan-baku.update', $bahan->id) }}">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -247,29 +232,6 @@
                         <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
                     @enderror
                 </div>
-
-                {{-- STATUS --}}
-                <div>
-                    <label for="statusBahan" class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Status <span class="text-[#fc544b]">*</span>
-                    </label>
-
-                    <select name="status" id="statusBahan" required
-                        class="h-[42px] w-full rounded-[3px] border bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:outline-none @error('status') border-[#fc544b] @else border-[#e4e6fc] focus:border-[#95a0f4] @enderror">
-                        <option value="aktif" {{ old('status', 'aktif') === 'aktif' ? 'selected' : '' }}>
-                            Aktif
-                        </option>
-
-                        <option value="nonaktif" {{ old('status') === 'nonaktif' ? 'selected' : '' }}>
-                            Nonaktif
-                        </option>
-                    </select>
-
-                    @error('status')
-                        <div class="mt-1 text-xs text-[#fc544b]">{{ $message }}</div>
-                    @enderror
-                </div>
-
             </div>
 
             {{-- FOOTER MODAL --}}
@@ -370,21 +332,6 @@
                         @endforeach
                     </select>
                 </div>
-
-                {{-- STATUS --}}
-                <div>
-                    <label for="editStatusBahan"
-                        class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Status <span class="text-[#fc544b]">*</span>
-                    </label>
-
-                    <select name="status" id="editStatusBahan" required
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                        <option value="aktif">Aktif</option>
-                        <option value="nonaktif">Nonaktif</option>
-                    </select>
-                </div>
-
             </div>
 
             {{-- FOOTER MODAL EDIT --}}
@@ -469,7 +416,6 @@
                 const namaInput = document.getElementById('editNamaBahan');
                 const spesifikasiInput = document.getElementById('editSpesifikasiBahan');
                 const satuanInput = document.getElementById('editSatuanBahan');
-                const statusInput = document.getElementById('editStatusBahan');
 
                 document.querySelectorAll('.btn-edit-bahan').forEach(function(tombol) {
                     tombol.addEventListener('click', function() {
@@ -478,7 +424,6 @@
                         namaInput.value = this.dataset.nama || '';
                         spesifikasiInput.value = this.dataset.spesifikasi || '';
                         satuanInput.value = this.dataset.satuan || '';
-                        statusInput.value = this.dataset.status || 'aktif';
 
                         form.action = this.dataset.url || '';
 
@@ -507,7 +452,6 @@
                         namaInput.value = @json(old('nama_bahan', ''));
                         spesifikasiInput.value = @json(old('spesifikasi', ''));
                         satuanInput.value = @json(old('satuan', ''));
-                        statusInput.value = @json(old('status', 'aktif'));
                         form.action = tombolLama.dataset.url || '';
 
                         // Membuka modal menggunakan native API dialog
@@ -517,5 +461,4 @@
             });
         </script>
     @endpush
-
 </x-admin-layout-stisla>

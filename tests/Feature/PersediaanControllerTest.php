@@ -55,7 +55,6 @@ class PersediaanControllerTest extends TestCase
         $response->assertViewHasAll([
             'bahanBakus',
             'totalJenisBahan',
-            'totalJenisAktif',
             'totalStok',
             'totalNilaiPersediaan',
         ]);
@@ -117,42 +116,17 @@ class PersediaanControllerTest extends TestCase
     {
         $this->buatBahanBaku([
             'nama_bahan' => 'Kertas A4',
-            'status' => 'aktif',
         ]);
         $this->buatBahanBaku([
             'nama_bahan' => 'Tinta Printer',
-            'status' => 'aktif',
         ]);
         $this->buatBahanBaku([
             'nama_bahan' => 'Flexi Banner',
-            'status' => 'nonaktif',
         ]);
 
         $response = $this->get(route('persediaan.index'));
-
         $response->assertOk();
         $response->assertViewHas('totalJenisBahan', 3);
-    }
-
-    public function test_index_calculates_active_material_types_correctly(): void
-    {
-        $this->buatBahanBaku([
-            'nama_bahan' => 'Kertas A4',
-            'status' => 'aktif',
-        ]);
-        $this->buatBahanBaku([
-            'nama_bahan' => 'Tinta Printer',
-            'status' => 'aktif',
-        ]);
-        $this->buatBahanBaku([
-            'nama_bahan' => 'Flexi Banner',
-            'status' => 'nonaktif',
-        ]);
-
-        $response = $this->get(route('persediaan.index'));
-
-        $response->assertOk();
-        $response->assertViewHas('totalJenisAktif', 2);
     }
 
     public function test_index_calculates_total_stock_correctly(): void
@@ -214,7 +188,6 @@ class PersediaanControllerTest extends TestCase
             fn($items) => $items->isEmpty()
         );
         $response->assertViewHas('totalJenisBahan', 0);
-        $response->assertViewHas('totalJenisAktif', 0);
         $response->assertViewHas('totalStok', 0);
         $response->assertViewHas('totalNilaiPersediaan', 0);
     }
@@ -842,92 +815,6 @@ class PersediaanControllerTest extends TestCase
         PENANGANAN BAHAN BAKU NONAKTIF DAN ROLLBACK
     ------------------------------------------------------------------ */
 
-    public function test_store_rejects_inactive_material(): void
-    {
-        $bahan = $this->buatBahanBaku([
-            'status' => 'nonaktif',
-            'stok' => 10,
-            'harga_rata_rata' => 5000,
-        ]);
-
-        $response = $this->from(route('persediaan.index'))
-            ->post(route('persediaan.store'), [
-                'tanggal_pembelian' => '2026-11-04',
-                'items' => [
-                    [
-                        'bahan_baku_id' => $bahan->id,
-                        'jumlah' => 5,
-                        'harga_satuan' => 10000,
-                    ],
-                ],
-            ]);
-
-        $response->assertRedirect(route('persediaan.index'));
-        $response->assertSessionHasErrors('items');
-
-        $this->assertSame(0, PembelianBahan::query()->count());
-        $this->assertSame(0, DetailPembelianBahan::query()->count());
-
-        $bahan->refresh();
-
-        $this->assertEquals(10, (float) $bahan->stok);
-        $this->assertEquals(5000, (float) $bahan->harga_rata_rata);
-    }
-
-    public function test_store_rolls_back_entire_purchase_when_one_material_is_inactive(): void
-    {
-        $bahanAktif = $this->buatBahanBaku([
-            'nama_bahan' => 'Kertas Aktif',
-            'stok' => 10,
-            'harga_rata_rata' => 5000,
-            'status' => 'aktif',
-        ]);
-
-        $bahanNonaktif = $this->buatBahanBaku([
-            'nama_bahan' => 'Tinta Nonaktif',
-            'stok' => 20,
-            'harga_rata_rata' => 10000,
-            'status' => 'nonaktif',
-        ]);
-
-        $response = $this->from(route('persediaan.index'))
-            ->post(route('persediaan.store'), [
-                'tanggal_pembelian' => '2026-11-04',
-                'nama_pemasok' => 'PT Pemasok',
-                'items' => [
-                    [
-                        'bahan_baku_id' => $bahanAktif->id,
-                        'jumlah' => 5,
-                        'harga_satuan' => 7000,
-                    ],
-                    [
-                        'bahan_baku_id' => $bahanNonaktif->id,
-                        'jumlah' => 3,
-                        'harga_satuan' => 12000,
-                    ],
-                ],
-            ]);
-
-        $response->assertRedirect(route('persediaan.index'));
-        $response->assertSessionHasErrors('items');
-
-        // Pembelian dan seluruh detail harus dibatalkan.
-
-        $this->assertSame(0, PembelianBahan::query()->count());
-        $this->assertSame(0, DetailPembelianBahan::query()->count());
-
-        // Perubahan stok bahan pertama juga harus di-rollback.
-
-        $bahanAktif->refresh();
-
-        $bahanNonaktif->refresh();
-
-        $this->assertEquals(10, (float) $bahanAktif->stok);
-        $this->assertEquals(5000, (float) $bahanAktif->harga_rata_rata);
-        $this->assertEquals(20, (float) $bahanNonaktif->stok);
-        $this->assertEquals(10000, (float) $bahanNonaktif->harga_rata_rata);
-    }
-
     public function test_customer_service_cannot_store_inventory_purchase(): void
     {
         $customerService = $this->buatUser('Customer Service');
@@ -977,7 +864,6 @@ class PersediaanControllerTest extends TestCase
             'satuan' => 'pcs',
             'stok' => 12.500,
             'harga_rata_rata' => 2500,
-            'status' => 'aktif',
         ], $attributes));
     }
 
