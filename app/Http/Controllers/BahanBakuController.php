@@ -126,11 +126,6 @@ class BahanBakuController extends Controller
                     'pak',
                 ]),
             ],
-
-            'status' => [
-                'required',
-                Rule::in(['aktif', 'nonaktif']),
-            ],
         ], [
             'nama_bahan.required' => 'Nama bahan wajib diisi.',
             'nama_bahan.max' => 'Nama bahan maksimal 150 karakter.',
@@ -138,8 +133,6 @@ class BahanBakuController extends Controller
             'spesifikasi.max' => 'Spesifikasi maksimal 150 karakter.',
             'satuan.required' => 'Satuan wajib dipilih.',
             'satuan.in' => 'Satuan yang dipilih tidak valid.',
-            'status.required' => 'Status wajib dipilih.',
-            'status.in' => 'Status yang dipilih tidak valid.',
         ]);
 
         try {
@@ -235,11 +228,6 @@ class BahanBakuController extends Controller
                     'botol',
                     'pak',
                 ]),
-            ],
-
-            'status' => [
-                'required',
-                Rule::in(['aktif', 'nonaktif']),
             ],
         ], [
             // ... (Pesan validasi sama seperti sebelumnya) ...

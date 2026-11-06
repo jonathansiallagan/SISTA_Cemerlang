@@ -22,7 +22,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'rim',
                 'stok' => 100,
                 'harga_rata_rata' => 40000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB002',
@@ -31,7 +30,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'm2',
                 'stok' => 88,
                 'harga_rata_rata' => 10000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB003',
@@ -40,7 +38,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'liter',
                 'stok' => 4.640,
                 'harga_rata_rata' => 150000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB004',
@@ -49,7 +46,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'lembar',
                 'stok' => 1000,
                 'harga_rata_rata' => 500,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB005',
@@ -58,7 +54,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'liter',
                 'stok' => 2,
                 'harga_rata_rata' => 120000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB006',
@@ -67,7 +62,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'lembar',
                 'stok' => 2000,
                 'harga_rata_rata' => 800,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB007',
@@ -76,7 +70,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'm2',
                 'stok' => 50,
                 'harga_rata_rata' => 15000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB008',
@@ -85,7 +78,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'm2',
                 'stok' => 30,
                 'harga_rata_rata' => 20000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB009',
@@ -94,7 +86,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'rim',
                 'stok' => 80,
                 'harga_rata_rata' => 45000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB010',
@@ -103,7 +94,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'gram',
                 'stok' => 5000,
                 'harga_rata_rata' => 200,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB011',
@@ -112,7 +102,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'pcs',
                 'stok' => 100,
                 'harga_rata_rata' => 5000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB012',
@@ -121,7 +110,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'pcs',
                 'stok' => 100,
                 'harga_rata_rata' => 7000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB013',
@@ -130,7 +118,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'm2',
                 'stok' => 20,
                 'harga_rata_rata' => 150000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB014',
@@ -139,7 +126,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'pcs',
                 'stok' => 100,
                 'harga_rata_rata' => 10000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB015',
@@ -148,7 +134,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'meter',
                 'stok' => 100,
                 'harga_rata_rata' => 25000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB016',
@@ -157,7 +142,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'liter',
                 'stok' => 10,
                 'harga_rata_rata' => 80000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB017',
@@ -166,7 +150,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'lembar',
                 'stok' => 3000,
                 'harga_rata_rata' => 1000,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB018',
@@ -175,7 +158,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'lembar',
                 'stok' => 5000,
                 'harga_rata_rata' => 300,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB019',
@@ -184,7 +166,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'pcs',
                 'stok' => 500,
                 'harga_rata_rata' => 2500,
-                'status' => 'aktif',
             ],
             [
                 'kode_bahan' => 'BB020',
@@ -193,7 +174,6 @@ class BahanBakuSeeder extends Seeder
                 'satuan' => 'meter',
                 'stok' => 100,
                 'harga_rata_rata' => 30000,
-                'status' => 'aktif',
             ],
         ];
 

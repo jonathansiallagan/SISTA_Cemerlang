@@ -282,10 +282,9 @@ class TransaksiController extends Controller
                             ->lockForUpdate()
                             ->first();
 
-                        if (!$bahan || $bahan->status !== 'aktif') {
+                        if (!$bahan) {
                             throw new \RuntimeException(
-                                "Bahan baku untuk {$produk->nama_produk} "
-                                    . 'tidak ditemukan atau tidak aktif.'
+                                "Bahan baku untuk {$produk->nama_produk} tidak ditemukan."
                             );
                         }
 

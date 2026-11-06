@@ -161,7 +161,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas A4',
             'spesifikasi' => '  80 gsm, 500 lembar  ',
             'satuan' => 'rim',
-            'status' => 'aktif',
             // Field ini sengaja dikirim untuk memastikan kode tetap dibuat server.
             'kode_bahan' => 'KODE-MANUAL',
             'stok' => 999,
@@ -176,7 +175,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas A4',
             'spesifikasi' => '80 gsm, 500 lembar',
             'satuan' => 'rim',
-            'status' => 'aktif',
         ]);
 
         $bahan = BahanBaku::where('kode_bahan', 'BB001')->firstOrFail();
@@ -196,7 +194,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Tinta Printer',
             'spesifikasi' => 'Tinta CMYK',
             'satuan' => 'liter',
-            'status' => 'aktif',
         ]);
 
         $response->assertRedirect(route('bahan-baku.index'));
@@ -212,7 +209,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => '  Karton  ',
             'spesifikasi' => '   ',
             'satuan' => 'lembar',
-            'status' => 'nonaktif',
         ]);
 
         $response->assertRedirect(route('bahan-baku.index'));
@@ -220,7 +216,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Karton',
             'spesifikasi' => null,
             'satuan' => 'lembar',
-            'status' => 'nonaktif',
         ]);
     }
 
@@ -230,7 +225,7 @@ class BahanBakuControllerTest extends TestCase
             ->post(route('bahan-baku.store'), []);
 
         $response->assertRedirect(route('bahan-baku.index'));
-        $response->assertSessionHasErrors(['nama_bahan', 'satuan', 'status']);
+        $response->assertSessionHasErrors(['nama_bahan', 'satuan']);
         $this->assertDatabaseCount('bahan_baku', 0);
     }
 
@@ -240,7 +235,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => str_repeat('A', 151),
             'spesifikasi' => null,
             'satuan' => 'pcs',
-            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors('nama_bahan');
@@ -253,7 +247,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas A4',
             'spesifikasi' => str_repeat('A', 151),
             'satuan' => 'rim',
-            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors('spesifikasi');
@@ -268,7 +261,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas A4',
             'spesifikasi' => 'Spesifikasi baru',
             'satuan' => 'rim',
-            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors('nama_bahan');
@@ -283,7 +275,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => '  Kertas A4  ',
             'spesifikasi' => null,
             'satuan' => 'rim',
-            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors('nama_bahan');
@@ -296,23 +287,9 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas A4',
             'spesifikasi' => null,
             'satuan' => 'dus',
-            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors('satuan');
-        $this->assertDatabaseCount('bahan_baku', 0);
-    }
-
-    public function test_store_rejects_invalid_status(): void
-    {
-        $response = $this->post(route('bahan-baku.store'), [
-            'nama_bahan' => 'Kertas A4',
-            'spesifikasi' => null,
-            'satuan' => 'rim',
-            'status' => 'tersedia',
-        ]);
-
-        $response->assertSessionHasErrors('status');
         $this->assertDatabaseCount('bahan_baku', 0);
     }
 
@@ -339,7 +316,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Bahan ' . $satuan,
             'spesifikasi' => null,
             'satuan' => $satuan,
-            'status' => 'aktif',
         ]);
 
         $response->assertRedirect(route('bahan-baku.index'));
@@ -360,7 +336,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas Lama',
             'spesifikasi' => 'Spesifikasi lama',
             'satuan' => 'rim',
-            'status' => 'aktif',
         ]);
 
         $response = $this->put(route('bahan-baku.update', $bahan->id), [
@@ -368,7 +343,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas Baru',
             'spesifikasi' => '  100 gsm  ',
             'satuan' => 'lembar',
-            'status' => 'nonaktif',
         ]);
 
         $response->assertRedirect(route('bahan-baku.index'));
@@ -380,7 +354,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas Baru',
             'spesifikasi' => '100 gsm',
             'satuan' => 'lembar',
-            'status' => 'nonaktif',
         ]);
     }
 
@@ -396,7 +369,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas A4',
             'spesifikasi' => 'Spesifikasi diperbarui',
             'satuan' => 'rim',
-            'status' => 'aktif',
         ]);
 
         $response->assertRedirect(route('bahan-baku.index'));
@@ -420,7 +392,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Nama Bahan Diperbarui',
             'spesifikasi' => 'Spesifikasi baru',
             'satuan' => 'pcs',
-            'status' => 'aktif',
             // Field berikut tidak boleh diubah melalui form master bahan baku.
             'stok' => 999,
             'harga_rata_rata' => 1,
@@ -443,7 +414,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Bahan Dua',
             'spesifikasi' => null,
             'satuan' => 'pcs',
-            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors('kode_bahan');
@@ -463,7 +433,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Kertas A4',
             'spesifikasi' => null,
             'satuan' => 'rim',
-            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors('nama_bahan');
@@ -479,7 +448,6 @@ class BahanBakuControllerTest extends TestCase
             'kode_bahan',
             'nama_bahan',
             'satuan',
-            'status',
         ]);
     }
 
@@ -492,10 +460,9 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Nama Baru',
             'spesifikasi' => null,
             'satuan' => 'dus',
-            'status' => 'rusak',
         ]);
 
-        $response->assertSessionHasErrors(['satuan', 'status']);
+        $response->assertSessionHasErrors(['satuan',]);
     }
 
     public function test_update_rejects_name_and_specification_longer_than_150_characters(): void
@@ -507,7 +474,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => str_repeat('N', 151),
             'spesifikasi' => str_repeat('S', 151),
             'satuan' => 'pcs',
-            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors(['nama_bahan', 'spesifikasi']);
@@ -520,7 +486,6 @@ class BahanBakuControllerTest extends TestCase
             'nama_bahan' => 'Bahan Tidak Ada',
             'spesifikasi' => null,
             'satuan' => 'pcs',
-            'status' => 'aktif',
         ]);
 
         $response->assertNotFound();
@@ -596,7 +561,6 @@ class BahanBakuControllerTest extends TestCase
             'satuan' => 'pcs',
             'stok' => 12.500,
             'harga_rata_rata' => 2500,
-            'status' => 'aktif',
         ], $attributes));
     }
 }

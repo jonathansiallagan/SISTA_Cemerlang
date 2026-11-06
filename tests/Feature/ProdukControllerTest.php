@@ -159,24 +159,21 @@ class ProdukControllerTest extends TestCase
 
     public function test_index_displays_only_active_materials_sorted_by_name(): void
     {
-        $aktifZ = $this->buatBahanBaku([
+        $bahanZ = $this->buatBahanBaku([
             'nama_bahan' => 'Tinta Z',
-            'status' => 'aktif',
         ]);
-        $aktifA = $this->buatBahanBaku([
+        $bahanA = $this->buatBahanBaku([
             'nama_bahan' => 'Kertas A4',
-            'status' => 'aktif',
         ]);
-        $this->buatBahanBaku([
-            'nama_bahan' => 'Kertas Nonaktif',
-            'status' => 'nonaktif',
+        $bahanB = $this->buatBahanBaku([
+            'nama_bahan' => 'Kertas Follio',
         ]);
 
         $response = $this->get(route('produk.index'));
 
         $response->assertOk();
-        $response->assertViewHas('bahanBakus', function ($bahanBakus) use ($aktifA, $aktifZ): bool {
-            return $bahanBakus->pluck('id')->all() === [$aktifA->id, $aktifZ->id];
+        $response->assertViewHas('bahanBakus', function ($bahanBakus) use ($bahanA, $bahanB, $bahanZ): bool {
+            return $bahanBakus->pluck('id')->all() === [$bahanA->id, $bahanB->id, $bahanZ->id];
         });
     }
 
@@ -589,8 +586,8 @@ class ProdukControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | UPDATE: UBAH PRODUK DAN KOMPOSISI
-     |------------------------------------------------------------------ */
+        UPDATE: UBAH PRODUK DAN KOMPOSISI
+    ------------------------------------------------------------------ */
 
     public function test_update_changes_product_and_replaces_old_composition(): void
     {
@@ -734,8 +731,8 @@ class ProdukControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | DESTROY: HAPUS PRODUK
-     |------------------------------------------------------------------ */
+        DESTROY: HAPUS PRODUK
+    ------------------------------------------------------------------ */
 
     public function test_destroy_deletes_product_without_transaction_details(): void
     {
@@ -806,8 +803,8 @@ class ProdukControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | TOGGLE STATUS
-     |------------------------------------------------------------------ */
+        TOGGLE STATUS
+    ------------------------------------------------------------------ */
 
     public function test_toggle_status_changes_active_product_to_nonactive(): void
     {
@@ -875,8 +872,8 @@ class ProdukControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | HELPER DATA TEST
-     |------------------------------------------------------------------ */
+        HELPER DATA TEST
+    ------------------------------------------------------------------ */
 
     private function buatCabang(array $attributes = []): Cabang
     {
@@ -886,7 +883,6 @@ class ProdukControllerTest extends TestCase
             'nama' => 'Cabang Produk Uji ' . $nomor,
             'alamat' => 'Alamat Cabang Produk Uji ' . $nomor,
             'no_hp' => '08123456' . str_pad((string) $nomor, 4, '0', STR_PAD_LEFT),
-            'status' => 'aktif',
         ], $attributes));
     }
 
@@ -916,7 +912,6 @@ class ProdukControllerTest extends TestCase
             'satuan' => 'pcs',
             'stok' => 100,
             'harga_rata_rata' => 2500,
-            'status' => 'aktif',
         ], $attributes));
     }
 
@@ -930,7 +925,6 @@ class ProdukControllerTest extends TestCase
             'nama_produk' => 'Produk Uji ' . $nomor,
             'satuan' => 'lembar',
             'upah_operator' => 1500,
-            'status' => 'aktif',
         ], $attributes));
     }
 

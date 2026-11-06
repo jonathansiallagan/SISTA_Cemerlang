@@ -76,7 +76,7 @@
                 <div class="min-w-0 flex-1 py-2.5 pr-5">
                     <h4 class="text-[13px] font-semibold uppercase tracking-[0.5px] text-[#98a6ad]">Bahan Aktif</h4>
                     <div class="text-xl font-bold text-[#34395e]">
-                        {{ number_format($totalJenisAktif, 0, ',', '.') }}
+                        {{ number_format($totalJenisBahan, 0, ',', '.') }}
                     </div>
                 </div>
             </div>

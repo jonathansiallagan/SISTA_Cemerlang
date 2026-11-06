@@ -86,7 +86,6 @@ class ProdukController extends Controller
             ->get();
 
         $bahanBakus = BahanBaku::where('cabang_id', $this->cabangId())
-            ->where('status', 'aktif')
             ->orderBy('nama_bahan')
             ->get();
 

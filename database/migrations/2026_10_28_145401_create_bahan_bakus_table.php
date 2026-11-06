@@ -23,8 +23,6 @@ return new class extends Migration
             $table->decimal('stok', 15, 3)->default(0);
             $table->decimal('harga_rata_rata', 15, 2)->default(0);
 
-            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-
             $table->timestamps();
 
             // Unik per cabang: Tidak boleh ada kode atau nama yang sama di dalam satu cabang yang sama

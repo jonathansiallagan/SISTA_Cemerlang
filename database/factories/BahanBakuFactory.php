@@ -27,7 +27,6 @@ class BahanBakuFactory extends Factory
 
             'stok' => $this->faker->randomFloat(3, 10, 1000),
             'harga_rata_rata' => $this->faker->randomFloat(2, 1000, 50000),
-            'status' => 'aktif',
         ];
     }
 }

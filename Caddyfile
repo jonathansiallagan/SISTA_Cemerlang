@@ -7,5 +7,3 @@
     encode zstd gzip
     php_server
 }
-
-# paksa update
