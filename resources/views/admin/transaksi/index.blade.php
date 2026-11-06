@@ -56,61 +56,8 @@
         @endif
 
         {{-- FILTER TRANSAKSI: RINGKAS --}}
-        <div class="mb-2 rounded-[3px] bg-white px-6 py-4 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <form action="{{ route('transaksi.index') }}" method="GET"
-                class="grid grid-cols-1 items-end gap-x-2.5 gap-y-2 md:grid-cols-2 lg:grid-cols-4">
-
-                {{-- TANGGAL MULAI --}}
-                <div>
-                    <label for="start_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Tanggal Mulai
-                    </label>
-                    <input type="date" id="start_date" name="start_date" value="{{ $startDate }}"
-                        class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                </div>
-
-                {{-- TANGGAL AKHIR --}}
-                <div>
-                    <label for="end_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Tanggal Akhir
-                    </label>
-                    <input type="date" id="end_date" name="end_date" value="{{ $endDate }}"
-                        class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                </div>
-
-                {{-- CABANG --}}
-                @if (auth()->user()->role === 'Admin Pusat')
-                    <div>
-                        <label for="cabang_id" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                            Cabang
-                        </label>
-                        <select id="cabang_id" name="cabang_id"
-                            class="h-[31px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-2 text-[13px] text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                            <option value="">Semua Cabang</option>
-
-                            @foreach ($cabangs as $cabang)
-                                <option value="{{ $cabang->id }}" @selected((string) request('cabang_id') === (string) $cabang->id)>
-                                    {{ $cabang->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                @endif
-
-                {{-- TOMBOL --}}
-                <div class="flex items-center gap-2">
-                    <button type="submit"
-                        class="inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
-                        <i class="fas fa-filter mr-1"></i> Filter
-                    </button>
-
-                    <a href="{{ route('transaksi.index') }}"
-                        class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
-                        <i class="fas fa-redo mr-1"></i> Reset
-                    </a>
-                </div>
-            </form>
-        </div>
+        <x-filter-date-range :action="route('transaksi.index')" :startDate="$startDate" :endDate="$endDate" :cabangs="$cabangs ?? null"
+            :showCabang="true" />
 
         {{-- TABEL RIWAYAT TRANSAKSI --}}
         <x-card-table title="Data Riwayat Transaksi">

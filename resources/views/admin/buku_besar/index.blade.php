@@ -43,89 +43,27 @@
         </div>
 
         {{-- FORM FILTER --}}
-        <div class="mb-4 rounded-[3px] bg-white p-4 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <form action="{{ route('buku_besar.index') }}" method="GET"
-                class="grid grid-cols-1 items-end gap-x-2.5 gap-y-2 md:grid-cols-2 lg:grid-cols-12">
+        <x-filter-date-range :action="route('buku_besar.index')" :startDate="$start_date" :endDate="$end_date" :cabangs="$cabangs ?? null" :showCabang="true">
 
-                {{-- PILIH AKUN --}}
-                <div class="lg:col-span-3">
+            {{-- INPUT KHUSUS: PILIH AKUN --}}
+            <x-slot:extraInputs>
+                <div class="w-full">
                     <label for="akun_id" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
                         Pilih Akun
                     </label>
-                    <select name="akun_id" id="akun_id"
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                        <option value="semua" {{ ($akun_id ?? 'semua') === 'semua' ? 'selected' : '' }}>
-                            Semua Akun
-                        </option>
-
+                    <select id="akun_id" name="akun_id"
+                        class="h-[42px] w-full max-w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
+                        <option value="">Semua Akun</option>
                         @foreach ($akuns as $akun)
-                            <option value="{{ $akun->id }}"
-                                {{ (string) ($akun_id ?? 'semua') === (string) $akun->id ? 'selected' : '' }}>
-                                {{ $akun->kode_akun }} - {{ $akun->nama_akun }}
+                            <option value="{{ $akun->id }}" @selected((string) request('akun_id') === (string) $akun->id)>
+                                {{ $akun->kode_akun }} — {{ $akun->nama_akun }}
                             </option>
                         @endforeach
                     </select>
                 </div>
+            </x-slot:extraInputs>
 
-                {{-- TANGGAL MULAI --}}
-                <div class="lg:col-span-2">
-                    <label for="start_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Tanggal Mulai
-                    </label>
-                    <input type="date" id="start_date" name="start_date" value="{{ $start_date }}" required
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                </div>
-
-                {{-- TANGGAL AKHIR --}}
-                <div class="lg:col-span-2">
-                    <label for="end_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Tanggal Akhir
-                    </label>
-                    <input type="date" id="end_date" name="end_date" value="{{ $end_date }}"
-                        min="{{ $start_date }}" required
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                </div>
-
-                {{-- CABANG --}}
-                @if (Auth::user()->role === 'Admin Pusat')
-                    <div class="lg:col-span-2">
-                        <label for="cabang_id"
-                            class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                            Pilih Cabang
-                        </label>
-                        <select name="cabang_id" id="cabang_id"
-                            class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                            <option value="">Semua Cabang</option>
-
-                            @foreach ($cabangs as $cabang)
-                                <option value="{{ $cabang->id }}"
-                                    {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
-                                    {{ $cabang->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                @endif
-
-                {{-- TOMBOL --}}
-                <div class="md:col-span-2 lg:col-span-3">
-                    <div class="flex flex-wrap items-center">
-                        <button type="submit"
-                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
-                            <i class="fas fa-filter mr-1"></i>
-                            Tampilkan
-                        </button>
-
-                        <a href="{{ route('buku_besar.index') }}"
-                            class="mb-1 inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
-                            <i class="fas fa-redo mr-1"></i>
-                            Reset
-                        </a>
-                    </div>
-                </div>
-
-            </form>
-        </div>
+        </x-filter-date-range>
 
         {{-- HASIL LAPORAN --}}
         @if ($laporan->isNotEmpty())
@@ -206,8 +144,7 @@
                     </div>
 
                     {{-- STATUS KESEIMBANGAN JURNAL --}}
-                    <div
-                        class="flex flex-wrap items-center justify-between rounded border border-[#dee2e6] p-4">
+                    <div class="flex flex-wrap items-center justify-between rounded border border-[#dee2e6] p-4">
                         <div class="mb-2 md:mb-0">
                             <div class="font-bold text-[#191d21]">
                                 Status Keseimbangan Jurnal

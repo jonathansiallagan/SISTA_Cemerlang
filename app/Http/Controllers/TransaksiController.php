@@ -25,15 +25,27 @@ class TransaksiController extends Controller
     {
         $user = $this->user();
 
+        // Harmonisasikan nama parameter request (dukung start_date/end_date & tanggal_mulai/tanggal_akhir)
+        $startDateInput = $request->input('start_date', $request->input('tanggal_mulai'));
+        $endDateInput   = $request->input('end_date', $request->input('tanggal_akhir'));
+
+        // Simpan kembali ke request agar aturan validasi after_or_equal bekerja sempurna
+        if ($startDateInput !== null || $endDateInput !== null) {
+            $request->merge([
+                'start_date' => $startDateInput,
+                'end_date'   => $endDateInput,
+            ]);
+        }
+
         // Validasi input tanggal
         $request->validate([
             'start_date' => ['nullable', 'date'],
             'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
         ]);
 
-        // Default menampilkan transaksi HARI INI
-        $startDate = $request->input('start_date', now()->toDateString());
-        $endDate   = $request->input('end_date', now()->toDateString());
+        // Default menampilkan transaksi HARI INI jika tanggal tidak dikirimkan di request
+        $startDate = $startDateInput ?: now()->toDateString();
+        $endDate   = $endDateInput ?: now()->toDateString();
 
         $query = Transaksi::with([
             'user',
@@ -55,23 +67,22 @@ class TransaksiController extends Controller
             });
         }
 
-        // Terapkan filter tanggal menggunakan standar batas waktu (00:00:00 - 23:59:59)
-        // Filter tanggal mulai jika diisi
-        if ($request->filled('tanggal_mulai')) {
-            $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
-        }
-
-        // Filter tanggal akhir jika diisi
-        if ($request->filled('tanggal_akhir')) {
-            $query->whereDate('tanggal', '<=', $request->tanggal_akhir);
+        // Terapkan filter rentang tanggal (inklusif 00:00:00 - 23:59:59) jika filter diisi
+        if ($startDateInput && $endDateInput) {
+            $query->whereBetween('tanggal', [
+                \Carbon\Carbon::parse($startDateInput)->startOfDay(),
+                \Carbon\Carbon::parse($endDateInput)->endOfDay()
+            ]);
+        } elseif ($startDateInput) {
+            $query->whereDate('tanggal', '>=', $startDateInput);
+        } elseif ($endDateInput) {
+            $query->whereDate('tanggal', '<=', $endDateInput);
         }
 
         $transaksis = $query
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
             ->get();
-
-
 
         $cabangs = $user->isCustomerService()
             ? Cabang::where('id', $user->cabang_id)->get()

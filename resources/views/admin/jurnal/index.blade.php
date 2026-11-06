@@ -18,73 +18,9 @@
     </div>
 
     <div>
-
         {{-- FILTER PERIODE DAN CABANG --}}
-        <div class="mb-2 rounded-[3px] bg-white p-4 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <form action="{{ route('jurnal.index') }}" method="GET"
-                class="grid grid-cols-1 items-end gap-x-2.5 gap-y-2 md:grid-cols-2 lg:grid-cols-12">
-
-                {{-- TANGGAL MULAI --}}
-                <div class="{{ $kolom }}">
-                    <label for="start_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Dari Tanggal
-                    </label>
-
-                    <input type="date" id="start_date" name="start_date" value="{{ $startDate }}" required
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                </div>
-
-                {{-- TANGGAL AKHIR --}}
-                <div class="{{ $kolom }}">
-                    <label for="end_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Sampai Tanggal
-                    </label>
-
-                    <input type="date" id="end_date" name="end_date" value="{{ $endDate }}"
-                        min="{{ $startDate }}" required
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                </div>
-
-                {{-- CABANG ADMIN PUSAT --}}
-                @if ($adalahPusat)
-                    <div class="lg:col-span-3">
-                        <label for="cabang_id" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                            Cabang
-                        </label>
-
-                        <select id="cabang_id" name="cabang_id"
-                            class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                            <option value="">Semua Cabang</option>
-
-                            @foreach ($cabangs as $cabang)
-                                <option value="{{ $cabang->id }}"
-                                    {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
-                                    {{ $cabang->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                @endif
-
-                {{-- TOMBOL FILTER DAN RESET --}}
-                <div class="{{ $kolom }}">
-                    <div class="flex flex-wrap items-center">
-                        <button type="submit"
-                            class="mb-1 mr-2 inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
-                            <i class="fas fa-filter mr-1"></i>
-                            Filter
-                        </button>
-
-                        <a href="{{ route('jurnal.index') }}"
-                            class="mb-1 inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
-                            <i class="fas fa-redo mr-1"></i>
-                            Reset
-                        </a>
-                    </div>
-                </div>
-
-            </form>
-        </div>
+        <x-filter-date-range :action="route('jurnal.index')" :startDate="$startDate" :endDate="$endDate" :cabangs="$cabangs ?? null"
+            :showCabang="true" />
 
         {{-- NOTIFIKASI SUKSES --}}
         @if (session('success'))
@@ -155,9 +91,8 @@
                                     class="px-[15px] py-3 text-center align-middle text-[#6c757d]">
                                     {{ $nomorJurnal }}
                                 </td>
-                                
-                                <td rowspan="{{ $jumlahBaris }}"
-                                    class="whitespace-nowrap px-[15px] py-3 align-middle">
+
+                                <td rowspan="{{ $jumlahBaris }}" class="whitespace-nowrap px-[15px] py-3 align-middle">
                                     {{ \Carbon\Carbon::parse($jurnal->tanggal)->translatedFormat('d F Y') }}
                                 </td>
 

@@ -132,13 +132,6 @@
 
                     <td class="px-[15px] py-3 align-middle font-bold">
                         {{ $bahan->nama_bahan }}
-
-                        @if (strtolower($bahan->status) !== 'aktif')
-                            <span
-                                class="ml-1 rounded-full bg-[#cdd3d8] px-2.5 py-[3px] text-xs font-semibold tracking-[0.3px] text-white">
-                                Nonaktif
-                            </span>
-                        @endif
                     </td>
 
                     <td class="px-[15px] py-3 align-middle">
@@ -226,7 +219,7 @@
                     @endif
 
                     {{-- PERINGATAN JIKA BAHAN KOSONG --}}
-                    @if ($bahanBakus->where('status', 'aktif')->isEmpty())
+                    @if ($bahanBakus->isEmpty())
                         <div
                             class="mb-4 rounded-[3px] border-l-[3px] border-black/20 bg-[#ffa426] px-5 py-2.5 text-white">
                             <i class="fas fa-exclamation-triangle mr-1"></i>
@@ -305,8 +298,7 @@
                                 Detail Bahan yang Dibeli
                             </h6>
 
-                            <button type="button" id="btnTambahBaris"
-                                {{ $bahanBakus->where('status', 'aktif')->isEmpty() ? 'disabled' : '' }}
+                            <button type="button" id="btnTambahBaris" {{ $bahanBakus->isEmpty() ? 'disabled' : '' }}
                                 class="inline-flex items-center rounded-[3px] bg-[#041C88] px-2.5 py-1.5 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea] disabled:cursor-not-allowed disabled:opacity-65">
                                 <i class="fas fa-plus mr-1"></i>
                                 Tambah Baris
@@ -350,7 +342,7 @@
                                             ],
                                         ]);
 
-                                        $bahanAktif = $bahanBakus->where('status', 'aktif')->values();
+                                        $bahanAktif = $bahanBakus;
                                     @endphp
 
                                     @foreach ($oldItems as $i => $oldItem)
@@ -448,8 +440,7 @@
                         Batal
                     </button>
 
-                    <button type="button" id="btnSimpanPembelian"
-                        {{ $bahanBakus->where('status', 'aktif')->isEmpty() ? 'disabled' : '' }}
+                    <button type="button" id="btnSimpanPembelian" {{ $bahanBakus->isEmpty() ? 'disabled' : '' }}
                         class="inline-flex items-center rounded-[3px] border border-[#47c363] bg-[#47c363] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:border-green-600 hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
                         data-confirm-form="formPembelian" data-confirm-theme="success"
                         data-confirm-title="Simpan Pembelian"
@@ -509,7 +500,6 @@
                 // Data bahan aktif dari Laravel.
                 @php
                     $dataBahanOptions = $bahanBakus
-                        ->where('status', 'aktif')
                         ->values()
                         ->map(function ($bahan) {
                             return [

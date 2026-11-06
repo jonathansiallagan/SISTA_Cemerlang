@@ -11,6 +11,8 @@ services:
       - DB_HOST=db
       - APP_ENV=production
       - APP_DEBUG=false
+    volumes:
+      - .:/app
     depends_on:
       - db
 

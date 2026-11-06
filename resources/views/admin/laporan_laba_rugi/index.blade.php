@@ -34,69 +34,8 @@
         </div>
 
         {{-- FILTER TANGGAL DAN CABANG --}}
-        <div class="mb-4 rounded-[3px] bg-white p-4 shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
-            <form action="{{ route('laporan_laba_rugi.index') }}" method="GET"
-                class="grid grid-cols-1 items-end gap-x-2.5 gap-y-2 md:grid-cols-2 {{ Auth::user()->role === 'Admin Pusat' ? 'lg:grid-cols-4' : 'lg:grid-cols-3' }}">
-
-                {{-- CABANG ADMIN PUSAT --}}
-                @if (Auth::user()->role === 'Admin Pusat')
-                    <div>
-                        <label for="cabang_id" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                            Cabang
-                        </label>
-
-                        <select name="cabang_id" id="cabang_id"
-                            class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                            <option value="">Semua Cabang</option>
-
-                            @foreach ($cabangs as $cabang)
-                                <option value="{{ $cabang->id }}"
-                                    {{ (string) request('cabang_id') === (string) $cabang->id ? 'selected' : '' }}>
-                                    {{ $cabang->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                @endif
-
-                {{-- TANGGAL MULAI --}}
-                <div>
-                    <label for="start_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Tanggal Mulai
-                    </label>
-
-                    <input type="date" id="start_date" name="start_date" value="{{ $start_date }}" required
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                </div>
-
-                {{-- TANGGAL AKHIR --}}
-                <div>
-                    <label for="end_date" class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">
-                        Tanggal Akhir
-                    </label>
-
-                    <input type="date" id="end_date" name="end_date" value="{{ $end_date }}"
-                        min="{{ $start_date }}" required
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                </div>
-
-                {{-- TOMBOL FILTER DAN RESET --}}
-                <div class="flex flex-wrap items-center gap-2">
-                    <button type="submit"
-                        class="inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
-                        <i class="fas fa-filter mr-1"></i>
-                        Tampilkan
-                    </button>
-
-                    <a href="{{ route('laporan_laba_rugi.index') }}" title="Reset filter"
-                        class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
-                        <i class="fas fa-redo mr-1"></i>
-                        Reset
-                    </a>
-                </div>
-
-            </form>
-        </div>
+        <x-filter-date-range :action="route('laporan_laba_rugi.index')" :startDate="$start_date" :endDate="$end_date" :cabangs="$cabangs ?? null"
+            :showCabang="true" />
 
         {{-- TABEL LAPORAN --}}
         <div id="laporan-laba-rugi"
