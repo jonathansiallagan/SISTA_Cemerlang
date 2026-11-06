@@ -14,13 +14,10 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (Auth::check() && in_array(Auth::user()->role, $roles, true)) {
-            return $next($request);
-        }
+        $user = Auth::user();
 
-        // User sudah login tapi salah halaman -> arahkan ke dashboard miliknya sendiri
-        if (Auth::check() && $request->routeIs('admin', 'cs')) {
-            return redirect()->route(Auth::user()->homeRoute());
+        if ($user && in_array($user->role, $roles, true)) {
+            return $next($request);
         }
 
         abort(403, 'AKSES DITOLAK: Halaman ini hanya untuk ' . implode(' / ', $roles) . '.');

@@ -1,10 +1,11 @@
 {
     frankenphp
-    auto_https off
 }
 
 :80 {
-    root * /var/www/html/public
+    root * /app/public
     encode zstd gzip
     php_server
 }
+
+# paksa update
