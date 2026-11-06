@@ -20,12 +20,18 @@ use App\Http\Controllers\PersediaanController;
 
 // Halaman awal: arahkan sesuai status login & role
 Route::get('/', function () {
-    if (Auth::user()->role === 'Customer Service') {
-        return redirect()->route('cs.dashboard');
+    if (Auth::check()) {
+        $user = Auth::user();
+
+        if ($user->role === 'Customer Service') {
+            return redirect()->route('cs.dashboard');
+        }
+
+        return redirect()->route('admin.dashboard');
     }
-    
-    return redirect()->route('admin.dashboard');
-})->middleware('auth');
+
+    return redirect()->route('login');
+});
 
 // AREA PUBLIK //
 Route::middleware(['guest'])->group(function () {
@@ -39,13 +45,13 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
     // Rute Dashboard Admin (Untuk Pusat & Cabang)
     Route::get('/admin', [AdminDashboardController::class, 'index'])
-    ->middleware('role:Admin Pusat,Admin Cabang')
-    ->name('admin.dashboard');
-    
+        ->middleware('role:Admin Pusat,Admin Cabang')
+        ->name('admin.dashboard');
+
     // Rute Dashboard CS
     Route::get('/cs', [CsDashboardController::class, 'index'])
-    ->middleware('role:Customer Service')
-    ->name('cs.dashboard');
+        ->middleware('role:Customer Service')
+        ->name('cs.dashboard');
 
     // Halaman Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -55,27 +61,27 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::put('/profil/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::put('/profil/preferensi', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
-    
+
     // Route khusus untuk upload avatar via AJAX
     Route::post('/profil/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
 
-//====================================================================================================//
+    //====================================================================================================//
 
     // === ROUTE TRANSAKSI (Admin Pusat, Admin Cabang, Customer Service) ===
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::get('/transaksi/tambah', [TransaksiController::class, 'create'])->name('transaksi.create');
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
     Route::get('/transaksi/export/pdf', [TransaksiController::class, 'exportPdf',])->name('transaksi.export.pdf');
-    Route::get('/transaksi/export/excel', [TransaksiController::class,'exportExcel',])->name('transaksi.export.excel');
+    Route::get('/transaksi/export/excel', [TransaksiController::class, 'exportExcel',])->name('transaksi.export.excel');
 
-//====================================================================================================//
+    //====================================================================================================//
     // === ROUTE yang bisa diakses ADMIN PUSAT & ADMIN CABANG ===
     Route::middleware(['role:Admin Pusat,Admin Cabang'])->group(function () {
 
         // === ROUTE PENGELUARAN ===
         Route::get('/pengeluaran', [PengeluaranController::class, 'index'])->name('pengeluaran.index');
         Route::post('/pengeluaran', [PengeluaranController::class, 'store'])->name('pengeluaran.store');
-    
+
         // === ROUTE MASTER DATA PRODUK ===
         Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
         Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
@@ -88,11 +94,11 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
         // === ROUTE BUKU BESAR ===
         Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku_besar.index');
-        Route::get('/buku-besar/export/pdf', [BukuBesarController::class,'cetakPdf',])->name('buku_besar.pdf');
-        Route::get('/buku-besar/export/excel', [BukuBesarController::class,'cetakExcel',])->name('buku_besar.excel');
+        Route::get('/buku-besar/export/pdf', [BukuBesarController::class, 'cetakPdf',])->name('buku_besar.pdf');
+        Route::get('/buku-besar/export/excel', [BukuBesarController::class, 'cetakExcel',])->name('buku_besar.excel');
 
         // === ROUTE LAPORAN LABA RUGI ===
-        Route::get('/laporan-laba-rugi', [LaporanLabaRugiController::class,'index'])->name('laporan_laba_rugi.index');
+        Route::get('/laporan-laba-rugi', [LaporanLabaRugiController::class, 'index'])->name('laporan_laba_rugi.index');
 
         // === ROUTE BAHAN BAKU ===
         Route::resource('bahan-baku', BahanBakuController::class)->names('bahan-baku')->except(['show', 'create', 'edit']);
@@ -101,10 +107,10 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
         Route::get('/persediaan', [PersediaanController::class, 'index'])->name('persediaan.index');
         Route::post('/persediaan', [PersediaanController::class, 'store'])->name('persediaan.store');
     });
-//====================================================================================================//
+    //====================================================================================================//
     // === ROUTE yang hanya bisa diakses ADMIN PUSAT ===
     Route::middleware(['role:Admin Pusat'])->group(function () {
-        
+
         // === ROUTE MASTER DATA CABANG ===
         Route::get('/cabang', [CabangController::class, 'index'])->name('cabang.index');
         Route::post('/cabang', [CabangController::class, 'store'])->name('cabang.store');
