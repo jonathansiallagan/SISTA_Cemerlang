@@ -40,18 +40,39 @@ class AdminLayoutStisla extends Component
                         'icon' => 'fa-receipt',
                         'visible' => true,
                     ],
-                ]
-            ],
-            [
-                'title' => 'Master Data',
-                'visible' => in_array($this->user->role, ['Admin Pusat', 'Admin Cabang']),
-                'items' => [
                     [
+                        'label' => 'Pengeluaran',
+                        'route' => 'pengeluaran.index',
+                        'icon' => 'fa-money-bill-wave',
+                        'visible' => true,
+                    ],[
                         'label' => 'Produk',
                         'route' => 'produk.index',
                         'icon' => 'fa-box-open',
                         'visible' => true,
+                    ],[
+                        'label' => 'Jurnal Umum',
+                        'route' => 'jurnal.index',
+                        'icon' => 'fa-book-open',
+                        'visible' => true,
+                    ],[
+                        'label' => 'Buku Besar',
+                        'route' => 'buku_besar.index',
+                        'icon' => 'fa-book',
+                        'visible' => true,
+                    ],[
+                        'label' => 'Laba Rugi',
+                        'route' => 'laporan_laba_rugi.index',
+                        'icon' => 'fa-chart-pie',
+                        'visible' => true,
                     ],
+                ]
+            ],
+            [
+                'title' => 'Persediaan',
+                'visible' => in_array($this->user->role, ['Admin Pusat', 'Admin Cabang']),
+                'items' => [
+                    
                     [
                         'label' => 'Bahan Baku',
                         'route' => 'bahan-baku.index',
@@ -67,37 +88,7 @@ class AdminLayoutStisla extends Component
                 ]
             ],
             [
-                'title' => 'Keuangan',
-                'visible' => in_array($this->user->role, ['Admin Pusat', 'Admin Cabang']),
-                'items' => [
-                    [
-                        'label' => 'Pengeluaran',
-                        'route' => 'pengeluaran.index',
-                        'icon' => 'fa-money-bill-wave',
-                        'visible' => true,
-                    ],
-                    [
-                        'label' => 'Jurnal Umum',
-                        'route' => 'jurnal.index',
-                        'icon' => 'fa-book-open',
-                        'visible' => true,
-                    ],
-                    [
-                        'label' => 'Buku Besar',
-                        'route' => 'buku_besar.index',
-                        'icon' => 'fa-book',
-                        'visible' => true,
-                    ],
-                    [
-                        'label' => 'Laba Rugi',
-                        'route' => 'laporan_laba_rugi.index',
-                        'icon' => 'fa-chart-pie',
-                        'visible' => true,
-                    ],
-                ]
-            ],
-            [
-                'title' => 'Manajemen Pusat',
+                'title' => 'Master Data',
                 'visible' => $this->user->role === 'Admin Pusat',
                 'items' => [
                     [
@@ -107,13 +98,13 @@ class AdminLayoutStisla extends Component
                         'visible' => true,
                     ],
                     [
-                        'label' => 'Manajemen User',
+                        'label' => 'User',
                         'route' => 'user.index',
                         'icon' => 'fa-users',
                         'visible' => true,
                     ],
                     [
-                        'label' => 'Akun Perkiraan',
+                        'label' => 'Akun',
                         'route' => 'akun.index',
                         'icon' => 'fa-list-ol',
                         'visible' => true,
