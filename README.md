@@ -116,30 +116,9 @@ SISTA menggunakan arsitektur aplikasi berbasis web yang menghubungkan pengguna, 
 
 ### Architecture Diagram
 
-```mermaid
-flowchart TB
-    U["Pengguna<br/>Admin Pusat | Admin Cabang | CS"]
-    D["Domain"]
-    N["NGINX<br/>Web Server"]
-    L["Laravel Application<br/>PHP 8.3"]
-    F["Frontend<br/>HTML | CSS | JavaScript | Tailwind"]
-    DB[("MySQL Database")]
-    
-    U --> D
-    D --> N
-    N --> L
-    L --> F
-    F --> U
-    L <--> DB
-
-    G["GitHub Repository"]
-    CI["CI/CD Pipeline"]
-    VPS["VPS + Docker"]
-
-    G --> CI
-    CI --> VPS
-    VPS --> N
-```
+<p align="center">
+  <img src="public/images/arsitektur_sistem.png" width="900" alt="SISTA Architecture">
+</p>
 
 ### Architecture Components
 
