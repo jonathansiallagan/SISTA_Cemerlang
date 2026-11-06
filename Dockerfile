@@ -67,14 +67,13 @@ WORKDIR /app
 COPY . .
 COPY --from=vendor /app/vendor/ ./vendor/
 COPY --from=frontend /app/public/build/ ./public/build/
-COPY Caddyfile /etc/caddy/Caddyfile
+COPY Caddyfile /etc/frankenphp/Caddyfile
 
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 # [BEST PRACTICE]: Karena kita membungkam skrip Composer di Stage 2,
 # kita WAJIB menjalankan package:discover di sini sebelum melakukan cache.
 RUN php artisan package:discover --ansi && \
-    php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
 
