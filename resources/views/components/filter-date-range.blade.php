@@ -69,20 +69,19 @@
             </div>
         @endif
 
-        {{-- SLOT INPUT TAMBAHAN (SEPERTI DROPDOWN AKUN BUKU BESAR) --}}
         @if ($hasExtra)
             {{ $extraInputs }}
         @endif
 
         {{-- TOMBOL AKSI --}}
-        <div class="flex flex-wrap items-center gap-2 sm:col-span-2 lg:col-span-1">
+        <div class="flex h-[42px] w-full items-center gap-2 sm:col-span-2 lg:col-span-1">
             <button type="submit"
-                class="inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                class="inline-flex h-[42px] w-full items-center justify-center rounded-[3px] bg-[#041C88] px-3 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
                 <i class="fas fa-filter mr-1"></i> Filter
             </button>
 
             <a href="{{ $action }}"
-                class="inline-flex items-center rounded-[3px] bg-[#e3eaef] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                class="inline-flex h-[42px] w-full items-center justify-center rounded-[3px] bg-[#e3eaef] px-3 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
                 <i class="fas fa-redo mr-1"></i> Reset
             </a>
         </div>

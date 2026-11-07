@@ -13,38 +13,48 @@
     <div>
         {{-- FILTER --}}
         <div class="mb-[30px] rounded-[3px] bg-white p-[25px] shadow-[0_4px_8px_rgba(0,0,0,0.03)]">
+            @php
+                $gridCols = $isAdminPusat ? 'lg:grid-cols-3' : 'lg:grid-cols-2';
+            @endphp
             <form method="GET" action="{{ url()->current() }}"
-                class="grid grid-cols-1 items-end gap-x-[30px] gap-y-4 md:grid-cols-12">
+                class="grid grid-cols-1 items-end gap-x-2.5 gap-y-3 sm:grid-cols-2 {{ $gridCols }}">
 
-                <div class="md:col-span-5">
-                    <label class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">Cabang</label>
-                    <select name="cabang_id" onchange="this.form.submit()"
-                        class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                        @if ($isAdminPusat)
+                {{-- FILTER CABANG (KHUSUS ADMIN PUSAT) --}}
+                @if ($isAdminPusat)
+                    <div class="w-full">
+                        <label class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">Cabang</label>
+                        <select name="cabang_id"
+                            class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
                             <option value="semua" {{ $cabangId === null ? 'selected' : '' }}>
                                 Semua Cabang
                             </option>
-                        @endif
+                            @foreach ($daftarCabang as $cabang)
+                                <option value="{{ $cabang->id }}"
+                                    {{ (string) $cabangId === (string) $cabang->id ? 'selected' : '' }}>
+                                    {{ $cabang->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
 
-                        @foreach ($daftarCabang as $cabang)
-                            <option value="{{ $cabang->id }}"
-                                {{ (string) $cabangId === (string) $cabang->id ? 'selected' : '' }}>
-                                {{ $cabang->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="md:col-span-4">
-                    <label class="mb-2 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">Tanggal</label>
-                    <input type="date" name="tanggal" value="{{ $tanggal }}" onchange="this.form.submit()"
+                {{-- FILTER TANGGAL --}}
+                <div class="w-full">
+                    <label class="mb-1 block text-xs font-semibold tracking-[0.5px] text-[#34395e]">Tanggal</label>
+                    <input type="date" name="tanggal" value="{{ $tanggal }}"
                         class="h-[42px] w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
                 </div>
 
-                <div class="md:col-span-3">
+                {{-- TOMBOL FILTER & RESET --}}
+                <div class="flex h-[42px] w-full items-center gap-2">
+                    <button type="submit"
+                        class="inline-flex h-[42px] w-full items-center justify-center rounded-[3px] bg-[#041C88] px-3 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                        <i class="fas fa-filter mr-1"></i> Filter
+                    </button>
+
                     <a href="{{ url()->current() }}"
-                        class="flex h-[42px] w-full items-center justify-center gap-1.5 rounded-[3px] bg-[#e3eaef] text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
-                        <i class="fas fa-sync-alt"></i> Reset Filter
+                        class="inline-flex h-[42px] w-full items-center justify-center rounded-[3px] bg-[#e3eaef] px-3 text-xs font-semibold tracking-[0.5px] text-[#191d21] transition-colors hover:bg-[#d3dde4]">
+                        <i class="fas fa-redo mr-1"></i> Reset
                     </a>
                 </div>
             </form>
@@ -225,9 +235,9 @@
                 <h4 class="pr-2.5 text-base font-semibold leading-7 text-[#041C88]">Transaksi Terbaru</h4>
                 <div class="ml-auto">
                     <a href="{{ route('transaksi.index') }}"
-                            class="inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
-                            <i class="fas fa-receipt mr-2"></i>
-                            {{ number_format($jumlahTransaksi) }} Transaksi
+                        class="inline-flex items-center rounded-[3px] bg-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-white transition-colors hover:bg-[#394eea]">
+                        <i class="fas fa-receipt mr-2"></i>
+                        {{ number_format($jumlahTransaksi) }} Transaksi
                     </a>
                 </div>
             </div>
@@ -340,8 +350,8 @@
                 <div class="border-t border-black/5 px-[25px] py-4 text-right">
                     <a href="{{ route('jurnal.index') }}"
                         class="inline-flex items-center rounded-[3px] border border-[#041C88] px-3 py-2 text-xs font-semibold tracking-[0.5px] text-[#041C88] transition-colors hover:bg-[#041C88] hover:text-white">
-                            <i class="fas fa-book-open mr-2"></i>
-                            Lihat Jurnal Umum
+                        <i class="fas fa-book-open mr-2"></i>
+                        Lihat Jurnal Umum
                     </a>
                 </div>
             </div>
