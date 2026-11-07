@@ -112,12 +112,11 @@ class BukuBesarController extends Controller
             ->orderBy('nama')
             ->get();
 
-        // MENGGUNAKAN CARBON UNTUK KONSISTENSI (Best Practice #2 & #4)
-        $akun_id = $request->input('akun_id', 'semua');
+        $akun_id = $request->input('akun_id');
         $start_date = $request->input('start_date', now()->startOfMonth()->toDateString());
         $end_date = $request->input('end_date', now()->endOfMonth()->toDateString());
 
-        $semuaAkun = $akun_id === 'semua';
+        $semuaAkun = empty($akun_id) || $akun_id === 'semua';
 
         if ($semuaAkun) {
             $daftarAkun = $akuns;

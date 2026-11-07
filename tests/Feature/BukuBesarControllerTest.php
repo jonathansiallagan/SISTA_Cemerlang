@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
 use Mockery;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Auth;
 
 class BukuBesarControllerTest extends TestCase
 {
@@ -39,12 +40,12 @@ class BukuBesarControllerTest extends TestCase
     }
 
     /* -----------------------------------------------------------------
-     | AKSES DAN HALAMAN INDEX
-     |------------------------------------------------------------------ */
+        AKSES DAN HALAMAN INDEX
+    ------------------------------------------------------------------ */
 
     public function test_guest_is_redirected_to_login(): void
     {
-        auth()->logout();
+        Auth::logout();
 
         $response = $this->get(route('buku_besar.index'));
 
@@ -129,7 +130,7 @@ class BukuBesarControllerTest extends TestCase
         $response->assertOk();
         $response->assertViewHas('start_date', date('Y-m-01'));
         $response->assertViewHas('end_date', date('Y-m-t'));
-        $response->assertViewHas('akun_id', 'semua');
+        $response->assertViewHas('akun_id', null);
     }
 
     public function test_index_only_provides_active_branches_for_filter(): void
@@ -213,7 +214,7 @@ class BukuBesarControllerTest extends TestCase
 
         $response->assertOk();
         $laporan = $response->viewData('laporan');
-        $ids = $laporan->map(fn ($item) => $item['akun']->id)->all();
+        $ids = $laporan->map(fn($item) => $item['akun']->id)->all();
 
         $this->assertContains($kas->id, $ids);
         $this->assertContains($pendapatan->id, $ids);
@@ -652,7 +653,7 @@ class BukuBesarControllerTest extends TestCase
                     return $data['start_date'] === '2026-11-01'
                         && $data['end_date'] === '2026-11-30'
                         && $data['laporan']->contains(
-                            fn ($item) => $item['akun']->id === $kas->id
+                            fn($item) => $item['akun']->id === $kas->id
                         );
                 })
             )
@@ -699,7 +700,7 @@ class BukuBesarControllerTest extends TestCase
                 }
 
                 return $export->collection()->contains(
-                    fn ($row) => ($row[0] ?? null) === $kas->kode_akun
+                    fn($row) => ($row[0] ?? null) === $kas->kode_akun
                 );
             }
         );
@@ -781,7 +782,7 @@ class BukuBesarControllerTest extends TestCase
     private function ambilItemLaporan($laporan, Akun $akun): array
     {
         $item = $laporan->first(
-            fn ($row) => $row['akun']->id === $akun->id
+            fn($row) => $row['akun']->id === $akun->id
         );
 
         $this->assertNotNull($item, 'Akun tidak ditemukan pada laporan Buku Besar.');
