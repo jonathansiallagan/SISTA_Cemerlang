@@ -53,7 +53,7 @@
                     </label>
                     <select id="akun_id" name="akun_id"
                         class="h-[42px] w-full max-w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                        <option value="">Semua Akun</option>
+                        <option value="semua">Semua Akun</option>
                         @foreach ($akuns as $akun)
                             <option value="{{ $akun->id }}" @selected((string) request('akun_id') === (string) $akun->id)>
                                 {{ $akun->kode_akun }} — {{ $akun->nama_akun }}

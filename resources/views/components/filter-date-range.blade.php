@@ -57,7 +57,7 @@
                 </label>
                 <select id="cabang_id" name="cabang_id"
                     class="h-[42px] w-full max-w-full rounded-[3px] border border-[#e4e6fc] bg-[#fdfdff] px-[15px] text-sm text-[#495057] focus:border-[#95a0f4] focus:outline-none">
-                    <option value="">Semua Cabang</option>
+                    <option value="semua">Semua Cabang</option>
                     @if ($cabangs)
                         @foreach ($cabangs as $cabang)
                             <option value="{{ $cabang->id }}" @selected((string) request('cabang_id') === (string) $cabang->id)>
